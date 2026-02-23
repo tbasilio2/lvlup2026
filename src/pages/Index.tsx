@@ -7,6 +7,7 @@ import ProgressRing from "@/components/ProgressRing";
 import HabitItem from "@/components/HabitItem";
 import Heatmap from "@/components/Heatmap";
 import AddHabitDialog from "@/components/AddHabitDialog";
+import StatsCharts from "@/components/StatsCharts";
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>(getHabits);
@@ -124,6 +125,14 @@ const Index = () => {
             </AnimatePresence>
             <AddHabitDialog onAdd={addHabit} />
           </div>
+        </section>
+
+        {/* Stats */}
+        <section className="mb-8">
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Your Progress
+          </h2>
+          <StatsCharts log={log} habits={habits} />
         </section>
 
         {/* Heatmap */}

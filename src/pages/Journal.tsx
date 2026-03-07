@@ -257,6 +257,9 @@ const Journal = () => {
         >
           <MoodTimeline entries={entries} />
         </motion.section>
+
+        {/* Weekly AI Reflection */}
+        <WeeklyReflection entries={entries} />
       </div>
     </div>
   );

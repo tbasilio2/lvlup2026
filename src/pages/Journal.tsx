@@ -1,0 +1,264 @@
+import { useState, useCallback, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, PenLine } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import JournalEntryForm from "@/components/JournalEntry";
+import MoodTimeline from "@/components/MoodTimeline";
+import {
+  getEntries,
+  saveEntries,
+  formatDate,
+  MOODS,
+  getMoodTailwind,
+  type JournalEntry,
+  type Mood,
+} from "@/lib/journal";
+
+const Journal = () => {
+  const [entries, setEntries] = useState<JournalEntry[]>(getEntries);
+  const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
+  const [isWriting, setIsWriting] = useState(false);
+
+  const todayEntry = useMemo(
+    () => entries.find((e) => e.date === selectedDate),
+    [entries, selectedDate]
+  );
+
+  const handleSave = useCallback(
+    (data: Omit<JournalEntry, "id" | "createdAt">) => {
+      setEntries((prev) => {
+        const existing = prev.findIndex((e) => e.date === data.date);
+        let next: JournalEntry[];
+        if (existing >= 0) {
+          next = [...prev];
+          next[existing] = { ...next[existing], ...data };
+        } else {
+          next = [
+            ...prev,
+            { ...data, id: crypto.randomUUID(), createdAt: Date.now() },
+          ];
+        }
+        saveEntries(next);
+        return next;
+      });
+      setIsWriting(false);
+    },
+    []
+  );
+
+  const navigateDate = (dir: -1 | 1) => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() + dir);
+    if (d <= new Date()) setSelectedDate(formatDate(d));
+  };
+
+  const isToday = selectedDate === formatDate(new Date());
+  const displayDate = new Date(selectedDate + "T12:00:00").toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+
+  // Stats
+  const streak = useMemo(() => {
+    let count = 0;
+    const d = new Date();
+    while (true) {
+      const key = formatDate(d);
+      if (entries.some((e) => e.date === key)) {
+        count++;
+        d.setDate(d.getDate() - 1);
+      } else break;
+    }
+    return count;
+  }, [entries]);
+
+  const moodDistribution = useMemo(() => {
+    const counts: Record<Mood, number> = { amazing: 0, good: 0, okay: 0, low: 0, rough: 0 };
+    entries.forEach((e) => counts[e.mood]++);
+    return counts;
+  }, [entries]);
+
+  const topMood = useMemo(() => {
+    const sorted = Object.entries(moodDistribution).sort((a, b) => b[1] - a[1]);
+    return sorted[0]?.[1] > 0 ? (sorted[0][0] as Mood) : null;
+  }, [moodDistribution]);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-lg px-5 py-8 pb-24">
+        {/* Header */}
+        <motion.header
+          className="mb-8"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl text-foreground flex items-center gap-2">
+                <BookOpen className="h-7 w-7 text-primary" /> Journal
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Intentional reflection & mood tracking
+              </p>
+            </div>
+            {streak > 0 && (
+              <motion.div
+                className="flex flex-col items-center rounded-2xl bg-primary/10 border border-primary/20 px-4 py-2"
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+              >
+                <span className="text-2xl font-serif text-primary">{streak}</span>
+                <span className="text-[10px] font-medium text-primary/70">day streak</span>
+              </motion.div>
+            )}
+          </div>
+        </motion.header>
+
+        {/* Date nav */}
+        <div className="flex items-center justify-between mb-6">
+          <Button variant="ghost" size="icon" onClick={() => navigateDate(-1)}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <div className="text-center">
+            <p className="text-sm font-medium text-foreground">{displayDate}</p>
+            {isToday && (
+              <span className="text-[10px] text-primary font-medium">Today</span>
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigateDate(1)}
+            disabled={isToday}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Entry or form */}
+        <AnimatePresence mode="wait">
+          {isWriting ? (
+            <motion.section
+              key="form"
+              className="rounded-2xl border border-border bg-card p-5 mb-8"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <JournalEntryForm
+                existingEntry={todayEntry}
+                onSave={handleSave}
+                date={selectedDate}
+              />
+            </motion.section>
+          ) : todayEntry ? (
+            <motion.section
+              key="view"
+              className="rounded-2xl border border-border bg-card p-5 mb-8 space-y-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              {/* Mood */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">
+                    {MOODS.find((m) => m.value === todayEntry.mood)?.emoji}
+                  </span>
+                  <span className={`text-sm font-medium ${getMoodTailwind(todayEntry.mood)}`}>
+                    Feeling {todayEntry.mood}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsWriting(true)}
+                  className="gap-1 text-muted-foreground"
+                >
+                  <PenLine className="h-3.5 w-3.5" /> Edit
+                </Button>
+              </div>
+
+              {[
+                { label: "Gratitude", value: todayEntry.gratitude },
+                { label: "Intention", value: todayEntry.intention },
+                { label: "Reflection", value: todayEntry.reflection },
+                { label: "Wins", value: todayEntry.wins },
+              ]
+                .filter((s) => s.value)
+                .map((s) => (
+                  <div key={s.label}>
+                    <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                      {s.label}
+                    </h4>
+                    <p className="text-sm text-foreground leading-relaxed">{s.value}</p>
+                  </div>
+                ))}
+            </motion.section>
+          ) : (
+            <motion.section
+              key="empty"
+              className="rounded-2xl border border-dashed border-border bg-card/50 p-8 mb-8 text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <PenLine className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground mb-4">
+                {isToday ? "Take a moment to reflect on your day" : "No entry for this day"}
+              </p>
+              <Button
+                onClick={() => setIsWriting(true)}
+                className="rounded-full gap-2"
+              >
+                <PenLine className="h-4 w-4" />
+                {isToday ? "Write Today's Entry" : "Add Entry"}
+              </Button>
+            </motion.section>
+          )}
+        </AnimatePresence>
+
+        {/* Mood Stats */}
+        {entries.length > 0 && (
+          <motion.section
+            className="mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              Mood Insights
+            </h2>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                <p className="text-2xl font-serif text-foreground">{entries.length}</p>
+                <p className="text-[10px] text-muted-foreground font-medium">Entries</p>
+              </div>
+              <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                <p className="text-2xl font-serif text-foreground">{streak}</p>
+                <p className="text-[10px] text-muted-foreground font-medium">Streak</p>
+              </div>
+              <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                <p className="text-2xl">
+                  {topMood ? MOODS.find((m) => m.value === topMood)?.emoji : "—"}
+                </p>
+                <p className="text-[10px] text-muted-foreground font-medium">Top Mood</p>
+              </div>
+            </div>
+          </motion.section>
+        )}
+
+        {/* Mood Timeline */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <MoodTimeline entries={entries} />
+        </motion.section>
+      </div>
+    </div>
+  );
+};
+
+export default Journal;

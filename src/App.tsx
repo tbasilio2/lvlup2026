@@ -3,9 +3,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { CheckSquare, Target } from "lucide-react";
+import { CheckSquare, Target, BookOpen } from "lucide-react";
 import Index from "./pages/Index";
 import Goals from "./pages/Goals";
+import Journal from "./pages/Journal";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 
@@ -14,6 +15,7 @@ const queryClient = new QueryClient();
 const navItems = [
   { to: "/", icon: <CheckSquare className="h-5 w-5" />, label: "Habits" },
   { to: "/goals", icon: <Target className="h-5 w-5" />, label: "Goals" },
+  { to: "/journal", icon: <BookOpen className="h-5 w-5" />, label: "Journal" },
 ];
 
 const App = () => (

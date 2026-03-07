@@ -1,0 +1,4 @@
+project_id = "xphvkwxxnqdptgatroww"
+
+[functions.weekly-reflection]
+verify_jwt = false

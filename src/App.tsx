@@ -21,6 +21,7 @@ const navItems = [
   { to: "/", icon: <CheckSquare className="h-5 w-5" />, label: "Habits" },
   { to: "/goals", icon: <Target className="h-5 w-5" />, label: "Goals" },
   { to: "/journal", icon: <BookOpen className="h-5 w-5" />, label: "Journal" },
+  { to: "/trading", icon: <TrendingUp className="h-5 w-5" />, label: "Trades" },
   { to: "/profile", icon: <UserCircle className="h-5 w-5" />, label: "Profile" },
 ];
 

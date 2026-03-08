@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Trash2, ArrowUpRight, ArrowDownRight, Image as ImageIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import ChartAnalysis from "./ChartAnalysis";
 import type { Trade } from "@/hooks/useTrades";
 
 interface Props {

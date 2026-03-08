@@ -21,20 +21,22 @@ const TradeStats = ({ trades }: Props) => {
   }, [trades]);
 
   const items = [
-    { label: "Total P&L", value: `${stats.totalPnl >= 0 ? "+" : ""}${stats.totalPnl.toFixed(2)}`, color: stats.totalPnl >= 0 ? "text-emerald-600" : "text-red-500" },
-    { label: "Win Rate", value: `${stats.winRate.toFixed(1)}%`, color: stats.winRate >= 50 ? "text-emerald-600" : "text-red-500" },
-    { label: "Avg Win", value: `+${stats.avgWin.toFixed(2)}`, color: "text-emerald-600" },
-    { label: "Avg Loss", value: `-${stats.avgLoss.toFixed(2)}`, color: "text-red-500" },
-    { label: "Risk:Reward", value: `1:${stats.rr.toFixed(2)}`, color: "text-foreground" },
-    { label: "Trades", value: `${stats.total} closed · ${stats.openCount} open`, color: "text-foreground" },
+    { label: "Total P&L", value: `${stats.totalPnl >= 0 ? "+" : ""}${stats.totalPnl.toFixed(2)}`, positive: stats.totalPnl >= 0 },
+    { label: "Win Rate", value: `${stats.winRate.toFixed(1)}%`, positive: stats.winRate >= 50 },
+    { label: "Avg Win", value: `+${stats.avgWin.toFixed(2)}`, positive: true },
+    { label: "Avg Loss", value: `-${stats.avgLoss.toFixed(2)}`, positive: false },
+    { label: "Risk:Reward", value: `1:${stats.rr.toFixed(2)}`, positive: null },
+    { label: "Trades", value: `${stats.total} closed · ${stats.openCount} open`, positive: null },
   ];
 
   return (
     <div className="grid grid-cols-3 gap-2">
       {items.map((item) => (
         <div key={item.label} className="rounded-xl border border-border bg-card p-3 text-center">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{item.label}</p>
-          <p className={`text-sm font-bold mt-0.5 ${item.color}`}>{item.value}</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono">{item.label}</p>
+          <p className={`text-sm font-bold font-mono mt-0.5 ${
+            item.positive === null ? "text-foreground" : item.positive ? "text-profit" : "text-loss"
+          }`}>{item.value}</p>
         </div>
       ))}
     </div>

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 interface ProgressRingProps {
-  progress: number; // 0 to 1
+  progress: number;
   size?: number;
   strokeWidth?: number;
 }
@@ -19,7 +19,7 @@ const ProgressRing = ({ progress, size = 120, strokeWidth = 8 }: ProgressRingPro
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="hsl(var(--habit-incomplete))"
+          stroke="hsl(var(--secondary))"
           strokeWidth={strokeWidth}
         />
         <motion.circle
@@ -38,7 +38,7 @@ const ProgressRing = ({ progress, size = 120, strokeWidth = 8 }: ProgressRingPro
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.span
-          className="text-2xl font-bold text-foreground"
+          className="text-2xl font-bold text-foreground font-mono"
           key={Math.round(progress * 100)}
           initial={{ scale: 1.3, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -46,7 +46,7 @@ const ProgressRing = ({ progress, size = 120, strokeWidth = 8 }: ProgressRingPro
         >
           {Math.round(progress * 100)}%
         </motion.span>
-        <span className="text-xs text-muted-foreground font-medium">complete</span>
+        <span className="text-[10px] text-muted-foreground font-medium">complete</span>
       </div>
     </div>
   );

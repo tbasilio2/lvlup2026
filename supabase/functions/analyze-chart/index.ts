@@ -46,11 +46,25 @@ Structure your response EXACTLY as JSON with these fields:
 
 Be specific about what you see. Reference visible patterns, candle formations, and levels.`;
 
-    const userContent: any[] = [
-      { type: "image_url", image_url: { url: screenshot_url } },
-    ];
+    const userContent: any[] = [];
 
-    if (trade_context) {
+    if (screenshot_url && screenshot_url !== "none") {
+      userContent.push({ type: "image_url", image_url: { url: screenshot_url } });
+    }
+
+    if (is_setup_advice && setup_details) {
+      const parts = [
+        `FUTURE TRADE SETUP ADVICE REQUEST`,
+        setup_details.symbol ? `Symbol: ${setup_details.symbol}` : null,
+        setup_details.direction ? `Planned direction: ${setup_details.direction}` : null,
+        setup_details.entry_price ? `Planned entry: ${setup_details.entry_price}` : null,
+        setup_details.stop_loss ? `Stop loss: ${setup_details.stop_loss}` : null,
+        setup_details.take_profit ? `Take profit: ${setup_details.take_profit}` : null,
+        setup_details.strategy ? `Strategy: ${setup_details.strategy}` : null,
+        setup_details.notes ? `Reasoning: ${setup_details.notes}` : null,
+      ].filter(Boolean).join(" | ");
+      userContent.push({ type: "text", text: parts });
+    } else if (trade_context) {
       userContent.push({
         type: "text",
         text: `Trade context: ${trade_context.symbol} ${trade_context.direction} | Entry: ${trade_context.entry_price} | Exit: ${trade_context.exit_price ?? "still open"} | P&L: ${trade_context.pnl ?? "n/a"} | Strategy: ${trade_context.strategy ?? "not specified"} | Notes: ${trade_context.notes ?? "none"}`,

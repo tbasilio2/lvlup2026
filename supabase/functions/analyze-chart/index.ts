@@ -23,11 +23,6 @@ serve(async (req) => {
         );
       }
     }
-      return new Response(
-        JSON.stringify({ error: "No screenshot URL provided" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
 
     const systemPrompt = `You are an expert technical analyst and trading coach. You are reviewing a chart screenshot from a trader. Analyze the chart and provide structured feedback. Consider:
 - Price action patterns (support/resistance, trend lines, chart patterns)

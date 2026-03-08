@@ -12,6 +12,7 @@ import EquityCurve from "@/components/trading/EquityCurve";
 import TradingViewWidget from "@/components/trading/TradingViewWidget";
 import TradeAIAnalysis from "@/components/trading/TradeAIAnalysis";
 import SetupAdvisor from "@/components/trading/SetupAdvisor";
+import AITradePlanner from "@/components/trading/AITradePlanner";
 import { TrendingUp } from "lucide-react";
 
 const Trading = () => {
@@ -54,9 +55,10 @@ const Trading = () => {
         </motion.div>
 
         <Tabs defaultValue="journal" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4 rounded-xl bg-secondary">
+          <TabsList className="grid w-full grid-cols-5 rounded-xl bg-secondary">
             <TabsTrigger value="journal" className="rounded-lg text-xs font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Journal</TabsTrigger>
             <TabsTrigger value="analytics" className="rounded-lg text-xs font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Analytics</TabsTrigger>
+            <TabsTrigger value="ai-trade" className="rounded-lg text-xs font-mono data-[state=active]:bg-card data-[state=active]:text-primary">AI Trade</TabsTrigger>
             <TabsTrigger value="advisor" className="rounded-lg text-xs font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Advisor</TabsTrigger>
             <TabsTrigger value="chart" className="rounded-lg text-xs font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Chart</TabsTrigger>
           </TabsList>
@@ -86,6 +88,10 @@ const Trading = () => {
             <TradeAIAnalysis trades={trades} />
             <PnLCalendar trades={trades} />
             <EquityCurve trades={trades} />
+          </TabsContent>
+
+          <TabsContent value="ai-trade" className="space-y-4">
+            <AITradePlanner />
           </TabsContent>
 
           <TabsContent value="advisor" className="space-y-4">

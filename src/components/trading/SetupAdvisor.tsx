@@ -199,6 +199,19 @@ const SetupAdvisor = () => {
           </button>
         )}
 
+        {/* Extracting indicator */}
+        {extracting && (
+          <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+            <span className="text-xs text-muted-foreground">Reading price levels from chart…</span>
+          </div>
+        )}
+        {extractNote && !extracting && (
+          <div className="flex items-center gap-2 rounded-lg border border-profit/20 bg-profit/5 px-3 py-2">
+            <Eye className="h-3.5 w-3.5 text-profit" />
+            <span className="text-xs text-muted-foreground">{extractNote}</span>
+          </div>
+        )}
         {/* Setup Details */}
         <div className="grid grid-cols-2 gap-2">
           <div>

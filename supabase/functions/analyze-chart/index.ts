@@ -10,11 +10,19 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { screenshot_url, trade_context } = await req.json();
+    const { screenshot_url, trade_context, is_setup_advice, setup_details } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    if (!screenshot_url) {
+    if (!screenshot_url || screenshot_url === "none") {
+      // Allow text-only setup advice
+      if (!is_setup_advice || !setup_details?.symbol) {
+        return new Response(
+          JSON.stringify({ error: "No screenshot URL or setup details provided" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
       return new Response(
         JSON.stringify({ error: "No screenshot URL provided" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }

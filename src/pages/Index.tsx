@@ -12,7 +12,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
   const { habits, log, loading, addHabit, deleteHabit, toggleHabit } = useHabits();
-  const { signOut } = useAuth();
 
   const today = useMemo(() => formatDate(new Date()), []);
   const todayCompleted = log[today] || [];

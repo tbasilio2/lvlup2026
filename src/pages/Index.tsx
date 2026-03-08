@@ -69,11 +69,6 @@ const Index = () => {
             </motion.div>
           )}
 
-          <div className="mt-4 flex justify-end">
-            <Button variant="ghost" size="sm" onClick={signOut} className="gap-1 text-muted-foreground text-xs">
-              <LogOut className="h-3.5 w-3.5" /> Sign out
-            </Button>
-          </div>
         </motion.header>
 
         <section className="mb-8">

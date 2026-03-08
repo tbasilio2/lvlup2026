@@ -20,40 +20,40 @@ const TradeRow = ({ trade, onDelete }: Props) => {
       layout
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card overflow-hidden"
+      className="rounded-xl border border-border bg-card overflow-hidden"
     >
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-3 px-4 py-3 text-left"
+        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-secondary/50 transition-colors"
       >
-        <div className={`p-1.5 rounded-lg ${trade.direction === "long" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
+        <div className={`p-1.5 rounded-lg ${trade.direction === "long" ? "bg-profit/10" : "bg-loss/10"}`}>
           {trade.direction === "long" ? (
-            <ArrowUpRight className="h-4 w-4 text-emerald-600" />
+            <ArrowUpRight className="h-4 w-4 text-profit" />
           ) : (
-            <ArrowDownRight className="h-4 w-4 text-red-500" />
+            <ArrowDownRight className="h-4 w-4 text-loss" />
           )}
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-sm text-foreground">{trade.symbol}</span>
-            <Badge variant={trade.status === "open" ? "secondary" : "outline"} className="text-[10px] px-1.5 py-0">
+            <span className="font-semibold text-sm text-foreground font-mono">{trade.symbol}</span>
+            <Badge variant={trade.status === "open" ? "secondary" : "outline"} className="text-[10px] px-1.5 py-0 font-mono">
               {trade.status}
             </Badge>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             {format(new Date(trade.entry_date), "MMM d, yyyy HH:mm")}
-            {trade.strategy && <span className="ml-2">· {trade.strategy}</span>}
+            {trade.strategy && <span className="ml-2 text-primary/70">· {trade.strategy}</span>}
           </p>
         </div>
 
         <div className="text-right">
           {trade.pnl != null ? (
-            <span className={`text-sm font-semibold ${isWin ? "text-emerald-600" : isLoss ? "text-red-500" : "text-muted-foreground"}`}>
+            <span className={`text-sm font-bold font-mono ${isWin ? "text-profit" : isLoss ? "text-loss" : "text-muted-foreground"}`}>
               {trade.pnl >= 0 ? "+" : ""}{trade.pnl.toFixed(2)}
             </span>
           ) : (
-            <span className="text-xs text-muted-foreground">Open</span>
+            <span className="text-xs text-muted-foreground font-mono">Open</span>
           )}
         </div>
 
@@ -64,24 +64,24 @@ const TradeRow = ({ trade, onDelete }: Props) => {
         <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
-          className="border-t border-border px-4 py-3 space-y-3"
+          className="border-t border-border px-4 py-3 space-y-3 bg-secondary/20"
         >
           <div className="grid grid-cols-3 gap-3 text-xs">
             <div>
               <span className="text-muted-foreground">Entry</span>
-              <p className="font-medium text-foreground">{trade.entry_price}</p>
+              <p className="font-medium text-foreground font-mono">{trade.entry_price}</p>
             </div>
             <div>
               <span className="text-muted-foreground">Exit</span>
-              <p className="font-medium text-foreground">{trade.exit_price ?? "—"}</p>
+              <p className="font-medium text-foreground font-mono">{trade.exit_price ?? "—"}</p>
             </div>
             <div>
               <span className="text-muted-foreground">Qty</span>
-              <p className="font-medium text-foreground">{trade.quantity}</p>
+              <p className="font-medium text-foreground font-mono">{trade.quantity}</p>
             </div>
             <div>
               <span className="text-muted-foreground">Fees</span>
-              <p className="font-medium text-foreground">{trade.fees ?? 0}</p>
+              <p className="font-medium text-foreground font-mono">{trade.fees ?? 0}</p>
             </div>
             {trade.exit_date && (
               <div className="col-span-2">

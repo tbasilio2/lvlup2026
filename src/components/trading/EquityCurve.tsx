@@ -26,7 +26,7 @@ const EquityCurve = ({ trades }: Props) => {
 
   if (data.length < 2) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-6 text-center">
+      <div className="rounded-xl border border-border bg-card p-6 text-center">
         <p className="text-sm text-muted-foreground">Need at least 2 closed trades to show equity curve</p>
       </div>
     );
@@ -35,32 +35,33 @@ const EquityCurve = ({ trades }: Props) => {
   const isPositive = data[data.length - 1]?.pnl >= 0;
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-4">
-      <h3 className="text-sm font-semibold text-foreground mb-3">Equity Curve</h3>
+    <div className="rounded-xl border border-border bg-card p-4">
+      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono mb-3">Equity Curve</h3>
       <ResponsiveContainer width="100%" height={200}>
         <AreaChart data={data}>
           <defs>
             <linearGradient id="equityGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={isPositive ? "#10b981" : "#ef4444"} stopOpacity={0.3} />
-              <stop offset="100%" stopColor={isPositive ? "#10b981" : "#ef4444"} stopOpacity={0} />
+              <stop offset="0%" stopColor={isPositive ? "hsl(160, 84%, 39%)" : "hsl(0, 72%, 51%)"} stopOpacity={0.3} />
+              <stop offset="100%" stopColor={isPositive ? "hsl(160, 84%, 39%)" : "hsl(0, 72%, 51%)"} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
-          <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 15%, 15%)" />
+          <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(215, 15%, 50%)", fontFamily: "JetBrains Mono" }} />
+          <YAxis tick={{ fontSize: 10, fill: "hsl(215, 15%, 50%)", fontFamily: "JetBrains Mono" }} />
           <Tooltip
             contentStyle={{
-              background: "hsl(var(--card))",
-              border: "1px solid hsl(var(--border))",
-              borderRadius: 12,
+              background: "hsl(220, 18%, 12%)",
+              border: "1px solid hsl(220, 15%, 15%)",
+              borderRadius: 8,
               fontSize: 12,
+              fontFamily: "JetBrains Mono",
             }}
-            labelStyle={{ color: "hsl(var(--foreground))" }}
+            labelStyle={{ color: "hsl(210, 20%, 93%)" }}
           />
           <Area
             type="monotone"
             dataKey="pnl"
-            stroke={isPositive ? "#10b981" : "#ef4444"}
+            stroke={isPositive ? "hsl(160, 84%, 39%)" : "hsl(0, 72%, 51%)"}
             fill="url(#equityGrad)"
             strokeWidth={2}
             name="Cumulative P&L"

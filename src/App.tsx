@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { CheckSquare, Target, BookOpen, UserCircle } from "lucide-react";
+import { CheckSquare, Target, BookOpen, UserCircle, TrendingUp } from "lucide-react";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Goals from "./pages/Goals";

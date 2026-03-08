@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Goals from "./pages/Goals";
 import Journal from "./pages/Journal";
 import Profile from "./pages/Profile";
+import Trading from "./pages/Trading";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";

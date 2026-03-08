@@ -24,7 +24,7 @@ serve(async (req) => {
     const tradeSummary = trades
       .map(
         (t: any) =>
-          `${t.entry_date} | ${t.symbol} ${t.direction} | Entry: ${t.entry_price} Exit: ${t.exit_price ?? "open"} | Qty: ${t.quantity} | P&L: ${t.pnl ?? "n/a"} | Strategy: ${t.strategy ?? "none"} | Notes: ${t.notes ?? ""}`
+          `${t.entry_date} | ${t.symbol} ${t.direction} | Entry: ${t.entry_price} Exit: ${t.exit_price ?? "open"} | Qty: ${t.quantity} | P&L: ${t.pnl ?? "n/a"} | Strategy: ${t.strategy ?? "none"} | Notes: ${t.notes ?? ""} | Has chart: ${t.screenshot_url ? "yes" : "no"}`
       )
       .join("\n");
 

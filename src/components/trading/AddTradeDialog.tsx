@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, ImagePlus, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import type { TradeInsert } from "@/hooks/useTrades";
 
 interface Props {
@@ -10,8 +13,12 @@ interface Props {
 }
 
 const AddTradeDialog = ({ onAdd }: Props) => {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     symbol: "",
     direction: "long" as "long" | "short",
@@ -27,9 +34,42 @@ const AddTradeDialog = ({ onAdd }: Props) => {
 
   const update = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Screenshot must be under 5MB");
+      return;
+    }
+    setScreenshotFile(file);
+    setScreenshotPreview(URL.createObjectURL(file));
+  };
+
+  const clearScreenshot = () => {
+    setScreenshotFile(null);
+    setScreenshotPreview(null);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const uploadScreenshot = async (): Promise<string | undefined> => {
+    if (!screenshotFile || !user) return undefined;
+    const ext = screenshotFile.name.split(".").pop() || "png";
+    const path = `${user.id}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage
+      .from("trade-screenshots")
+      .upload(path, screenshotFile, { contentType: screenshotFile.type });
+    if (error) {
+      toast.error("Failed to upload screenshot");
+      return undefined;
+    }
+    const { data } = supabase.storage.from("trade-screenshots").getPublicUrl(path);
+    return data.publicUrl;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const screenshotUrl = await uploadScreenshot();
     await onAdd({
       symbol: form.symbol.toUpperCase(),
       direction: form.direction,
@@ -41,9 +81,11 @@ const AddTradeDialog = ({ onAdd }: Props) => {
       fees: parseFloat(form.fees || "0"),
       strategy: form.strategy || undefined,
       notes: form.notes || undefined,
+      screenshot_url: screenshotUrl,
     });
     setLoading(false);
     setOpen(false);
+    clearScreenshot();
     setForm({
       symbol: "", direction: "long", entry_price: "", exit_price: "",
       quantity: "1", entry_date: new Date().toISOString().slice(0, 16),
@@ -123,6 +165,39 @@ const AddTradeDialog = ({ onAdd }: Props) => {
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1 block">Notes</label>
             <textarea value={form.notes} onChange={(e) => update("notes", e.target.value)} placeholder="Trade notes..." rows={2} className={inputCls + " resize-none"} />
+          </div>
+
+          {/* Screenshot Upload */}
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">Chart Screenshot</label>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            {screenshotPreview ? (
+              <div className="relative rounded-xl border border-border overflow-hidden">
+                <img src={screenshotPreview} alt="Preview" className="w-full max-h-40 object-contain bg-secondary/30" />
+                <button
+                  type="button"
+                  onClick={clearScreenshot}
+                  className="absolute top-2 right-2 p-1 rounded-lg bg-background/80 backdrop-blur-sm border border-border hover:bg-destructive/20 transition-colors"
+                >
+                  <X className="h-3.5 w-3.5 text-foreground" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="w-full rounded-xl border border-dashed border-border bg-secondary/20 hover:bg-secondary/40 transition-colors py-6 flex flex-col items-center gap-1.5"
+              >
+                <ImagePlus className="h-5 w-5 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Upload chart screenshot</span>
+              </button>
+            )}
           </div>
 
           <Button type="submit" disabled={loading} className="w-full rounded-xl gap-2">

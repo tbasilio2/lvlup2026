@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Trash2, ArrowUpRight, ArrowDownRight, Image as ImageIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import ChartAnalysis from "./ChartAnalysis";
 import type { Trade } from "@/hooks/useTrades";
 
 interface Props {
@@ -99,9 +100,10 @@ const TradeRow = ({ trade, onDelete }: Props) => {
           )}
 
           {trade.screenshot_url && (
-            <div>
-              <span className="text-xs text-muted-foreground flex items-center gap-1 mb-1"><ImageIcon className="h-3 w-3" /> Screenshot</span>
+            <div className="space-y-2">
+              <span className="text-xs text-muted-foreground flex items-center gap-1"><ImageIcon className="h-3 w-3" /> Screenshot</span>
               <img src={trade.screenshot_url} alt="Trade chart" className="rounded-lg border border-border max-h-48 object-contain" />
+              <ChartAnalysis trade={trade} />
             </div>
           )}
 

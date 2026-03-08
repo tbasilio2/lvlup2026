@@ -1,8 +1,7 @@
 import { useState, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, CalendarDays, LogOut } from "lucide-react";
+import { Sparkles, CalendarDays } from "lucide-react";
 import { useHabits, formatDate, getStreak } from "@/hooks/useHabits";
-import { useAuth } from "@/contexts/AuthContext";
 import ProgressRing from "@/components/ProgressRing";
 import HabitItem from "@/components/HabitItem";
 import Heatmap from "@/components/Heatmap";
@@ -13,7 +12,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
   const { habits, log, loading, addHabit, deleteHabit, toggleHabit } = useHabits();
-  const { signOut } = useAuth();
 
   const today = useMemo(() => formatDate(new Date()), []);
   const todayCompleted = log[today] || [];
@@ -71,11 +69,6 @@ const Index = () => {
             </motion.div>
           )}
 
-          <div className="mt-4 flex justify-end">
-            <Button variant="ghost" size="sm" onClick={signOut} className="gap-1 text-muted-foreground text-xs">
-              <LogOut className="h-3.5 w-3.5" /> Sign out
-            </Button>
-          </div>
         </motion.header>
 
         <section className="mb-8">

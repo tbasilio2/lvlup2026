@@ -3,11 +3,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { CheckSquare, Target, BookOpen } from "lucide-react";
+import { CheckSquare, Target, BookOpen, UserCircle } from "lucide-react";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Goals from "./pages/Goals";
 import Journal from "./pages/Journal";
+import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -19,6 +20,7 @@ const navItems = [
   { to: "/", icon: <CheckSquare className="h-5 w-5" />, label: "Habits" },
   { to: "/goals", icon: <Target className="h-5 w-5" />, label: "Goals" },
   { to: "/journal", icon: <BookOpen className="h-5 w-5" />, label: "Journal" },
+  { to: "/profile", icon: <UserCircle className="h-5 w-5" />, label: "Profile" },
 ];
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -39,6 +41,7 @@ const AppRoutes = () => {
         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
         <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
         <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {user && <BottomNav items={navItems} />}

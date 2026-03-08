@@ -10,6 +10,7 @@ import TradeStats from "@/components/trading/TradeStats";
 import PnLCalendar from "@/components/trading/PnLCalendar";
 import EquityCurve from "@/components/trading/EquityCurve";
 import TradingViewWidget from "@/components/trading/TradingViewWidget";
+import TradeAIAnalysis from "@/components/trading/TradeAIAnalysis";
 import { TrendingUp } from "lucide-react";
 
 const Trading = () => {
@@ -80,6 +81,7 @@ const Trading = () => {
 
           <TabsContent value="analytics" className="space-y-4">
             <TradeStats trades={trades} />
+            <TradeAIAnalysis trades={trades} />
             <PnLCalendar trades={trades} />
             <EquityCurve trades={trades} />
           </TabsContent>

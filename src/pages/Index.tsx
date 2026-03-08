@@ -1,8 +1,7 @@
 import { useState, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, CalendarDays, LogOut } from "lucide-react";
+import { Sparkles, CalendarDays } from "lucide-react";
 import { useHabits, formatDate, getStreak } from "@/hooks/useHabits";
-import { useAuth } from "@/contexts/AuthContext";
 import ProgressRing from "@/components/ProgressRing";
 import HabitItem from "@/components/HabitItem";
 import Heatmap from "@/components/Heatmap";

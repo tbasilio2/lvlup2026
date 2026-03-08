@@ -25,7 +25,9 @@ const SetupAdvisor = () => {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [extracting, setExtracting] = useState(false);
   const [advice, setAdvice] = useState<ChartAdvice | null>(null);
+  const [extractNote, setExtractNote] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     symbol: "",
@@ -39,6 +41,41 @@ const SetupAdvisor = () => {
 
   const update = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
 
+  const extractLevelsFromScreenshot = async (f: File) => {
+    if (!user) return;
+    setExtracting(true);
+    setExtractNote(null);
+    try {
+      const ext = f.name.split(".").pop() || "png";
+      const path = `${user.id}/extract-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("trade-screenshots")
+        .upload(path, f, { contentType: f.type });
+      if (upErr) { setExtracting(false); return; }
+      const { data: urlData } = supabase.storage.from("trade-screenshots").getPublicUrl(path);
+
+      const { data, error } = await supabase.functions.invoke("extract-chart-levels", {
+        body: { screenshot_url: urlData.publicUrl },
+      });
+      if (error || data?.error) { setExtracting(false); return; }
+
+      setForm((p) => ({
+        ...p,
+        symbol: data.symbol || p.symbol,
+        direction: (data.direction === "long" || data.direction === "short") ? data.direction : p.direction,
+        entry_price: data.entry_price || p.entry_price,
+        stop_loss: data.stop_loss || p.stop_loss,
+        take_profit: data.take_profit || p.take_profit,
+      }));
+      setExtractNote(`AI read levels (${data.confidence} confidence): ${data.notes}`);
+      toast.success("Price levels extracted from chart");
+    } catch {
+      // silently fail extraction – user can still fill manually
+    } finally {
+      setExtracting(false);
+    }
+  };
+
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -46,6 +83,7 @@ const SetupAdvisor = () => {
     setFile(f);
     setPreview(URL.createObjectURL(f));
     setAdvice(null);
+    extractLevelsFromScreenshot(f);
   };
 
   const clearFile = () => {
@@ -53,6 +91,7 @@ const SetupAdvisor = () => {
     setPreview(null);
     if (fileRef.current) fileRef.current.value = "";
     setAdvice(null);
+    setExtractNote(null);
   };
 
   const getAdvice = async () => {
@@ -160,6 +199,19 @@ const SetupAdvisor = () => {
           </button>
         )}
 
+        {/* Extracting indicator */}
+        {extracting && (
+          <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+            <span className="text-xs text-muted-foreground">Reading price levels from chart…</span>
+          </div>
+        )}
+        {extractNote && !extracting && (
+          <div className="flex items-center gap-2 rounded-lg border border-profit/20 bg-profit/5 px-3 py-2">
+            <Eye className="h-3.5 w-3.5 text-profit" />
+            <span className="text-xs text-muted-foreground">{extractNote}</span>
+          </div>
+        )}
         {/* Setup Details */}
         <div className="grid grid-cols-2 gap-2">
           <div>

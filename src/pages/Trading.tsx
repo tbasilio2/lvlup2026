@@ -90,6 +90,10 @@ const Trading = () => {
             <EquityCurve trades={trades} />
           </TabsContent>
 
+          <TabsContent value="ai-trade" className="space-y-4">
+            <AITradePlanner />
+          </TabsContent>
+
           <TabsContent value="advisor" className="space-y-4">
             <SetupAdvisor />
           </TabsContent>

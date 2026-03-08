@@ -168,6 +168,66 @@ export type Database = {
         }
         Relationships: []
       }
+      trades: {
+        Row: {
+          created_at: string
+          direction: string
+          entry_date: string
+          entry_price: number
+          exit_date: string | null
+          exit_price: number | null
+          fees: number | null
+          id: string
+          notes: string | null
+          pnl: number | null
+          quantity: number
+          screenshot_url: string | null
+          status: string
+          strategy: string | null
+          symbol: string
+          tags: string[] | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          entry_date: string
+          entry_price: number
+          exit_date?: string | null
+          exit_price?: number | null
+          fees?: number | null
+          id?: string
+          notes?: string | null
+          pnl?: number | null
+          quantity?: number
+          screenshot_url?: string | null
+          status?: string
+          strategy?: string | null
+          symbol: string
+          tags?: string[] | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          entry_date?: string
+          entry_price?: number
+          exit_date?: string | null
+          exit_price?: number | null
+          fees?: number | null
+          id?: string
+          notes?: string | null
+          pnl?: number | null
+          quantity?: number
+          screenshot_url?: string | null
+          status?: string
+          strategy?: string | null
+          symbol?: string
+          tags?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

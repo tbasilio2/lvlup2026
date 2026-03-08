@@ -88,6 +88,10 @@ const Trading = () => {
             <EquityCurve trades={trades} />
           </TabsContent>
 
+          <TabsContent value="advisor" className="space-y-4">
+            <SetupAdvisor />
+          </TabsContent>
+
           <TabsContent value="chart" className="space-y-3">
             <div className="flex gap-2">
               <input

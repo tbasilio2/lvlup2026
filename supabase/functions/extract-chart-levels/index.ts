@@ -32,10 +32,14 @@ serve(async (req) => {
             role: "system",
             content: `You are an expert at reading trading chart screenshots. Extract any visible price levels from the chart. Look for:
 - Entry price: marked lines, arrows, or labels indicating entry
-- Stop loss (SL): red lines, labels, or markers below/above entry
-- Take profit (TP): green lines, labels, or markers at target levels
+- Stop loss (SL): typically marked with red lines, red zones, or labels below/above entry
+- Take profit (TP): typically marked with green lines, green zones, or labels at target levels
 - Symbol/pair name visible on the chart
-- Trade direction (long/short) based on entry vs SL/TP placement
+- Trade direction: determine long or short based on:
+  - Color coding: green/blue zones above entry = long (TP above), red zones below = long (SL below). Reverse for short.
+  - If TP is above entry and SL is below entry → long
+  - If TP is below entry and SL is above entry → short
+  - Red area = loss zone (SL side), Green area = profit zone (TP side)
 
 Also try to identify the symbol from the chart title, watermark, or labels.
 If a value is not visible or unclear, return null for that field. Only return values you can clearly read from the chart.`,

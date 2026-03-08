@@ -12,6 +12,7 @@ import EquityCurve from "@/components/trading/EquityCurve";
 import TradingViewWidget from "@/components/trading/TradingViewWidget";
 import TradeAIAnalysis from "@/components/trading/TradeAIAnalysis";
 import SetupAdvisor from "@/components/trading/SetupAdvisor";
+import AITradePlanner from "@/components/trading/AITradePlanner";
 import { TrendingUp } from "lucide-react";
 
 const Trading = () => {

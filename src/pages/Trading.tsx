@@ -81,6 +81,7 @@ const Trading = () => {
 
           <TabsContent value="analytics" className="space-y-4">
             <TradeStats trades={trades} />
+            <TradeAIAnalysis trades={trades} />
             <PnLCalendar trades={trades} />
             <EquityCurve trades={trades} />
           </TabsContent>

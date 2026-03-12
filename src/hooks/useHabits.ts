@@ -3,6 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
+const DEFAULT_HABITS = [
+  { name: "Meditate", emoji: "🧘" },
+  { name: "Exercise", emoji: "💪" },
+  { name: "Read", emoji: "📖" },
+  { name: "Hydrate", emoji: "💧" },
+  { name: "Journal", emoji: "✍️" },
+];
+
 export interface Habit {
   id: string;
   name: string;
@@ -52,7 +60,18 @@ export function useHabits() {
       if (habitsRes.error) throw habitsRes.error;
       if (logsRes.error) throw logsRes.error;
 
-      setHabits(habitsRes.data.map((h: any) => ({ id: h.id, name: h.name, emoji: h.emoji, created_at: h.created_at })));
+      let habitsData = habitsRes.data;
+
+      // Seed default habits for new users
+      if (habitsData.length === 0) {
+        const { data: seeded, error: seedErr } = await supabase
+          .from("habits")
+          .insert(DEFAULT_HABITS.map((h) => ({ user_id: user.id, name: h.name, emoji: h.emoji })))
+          .select();
+        if (!seedErr && seeded) habitsData = seeded;
+      }
+
+      setHabits(habitsData.map((h: any) => ({ id: h.id, name: h.name, emoji: h.emoji, created_at: h.created_at })));
 
       const logMap: HabitLog = {};
       logsRes.data.forEach((l: any) => {

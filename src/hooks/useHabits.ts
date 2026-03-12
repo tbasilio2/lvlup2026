@@ -3,14 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-const DEFAULT_HABITS = [
-  { name: "Meditate", emoji: "🧘" },
-  { name: "Exercise", emoji: "💪" },
-  { name: "Read", emoji: "📖" },
-  { name: "Hydrate", emoji: "💧" },
-  { name: "Journal", emoji: "✍️" },
-];
-
 export interface Habit {
   id: string;
   name: string;

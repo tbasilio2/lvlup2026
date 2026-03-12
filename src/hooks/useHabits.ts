@@ -52,18 +52,7 @@ export function useHabits() {
       if (habitsRes.error) throw habitsRes.error;
       if (logsRes.error) throw logsRes.error;
 
-      let habitsData = habitsRes.data;
-
-      // Seed default habits for new users
-      if (habitsData.length === 0) {
-        const { data: seeded, error: seedErr } = await supabase
-          .from("habits")
-          .insert(DEFAULT_HABITS.map((h) => ({ user_id: user.id, name: h.name, emoji: h.emoji })))
-          .select();
-        if (!seedErr && seeded) habitsData = seeded;
-      }
-
-      setHabits(habitsData.map((h: any) => ({ id: h.id, name: h.name, emoji: h.emoji, created_at: h.created_at })));
+      setHabits(habitsRes.data.map((h: any) => ({ id: h.id, name: h.name, emoji: h.emoji, created_at: h.created_at })));
 
       const logMap: HabitLog = {};
       logsRes.data.forEach((l: any) => {

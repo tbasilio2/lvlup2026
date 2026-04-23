@@ -174,7 +174,7 @@ const SetupAdvisor = () => {
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">Setup Advisor</h3>
-            <p className="text-[10px] text-muted-foreground font-mono">Upload a chart &amp; describe your plan for AI feedback</p>
+            <p className="text-[10px] text-muted-foreground font-mono">Upload a chart → AI auto-extracts levels &amp; advises</p>
           </div>
         </div>
 

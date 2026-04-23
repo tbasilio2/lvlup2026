@@ -20,7 +20,11 @@ serve(async (req) => {
       });
     }
 
-    const dirLabel = direction === "long" ? "LONG (BUY)" : "SHORT (SELL)";
+    const dirLabel = direction === "long"
+      ? "LONG (BUY)"
+      : direction === "short"
+        ? "SHORT (SELL)"
+        : "the BEST direction (you decide LONG or SHORT based on price action, structure, momentum, and any visible bias such as red/green markers, arrows, or zones)";
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -36,20 +40,21 @@ serve(async (req) => {
             content: `You are an elite technical analyst and trade planner. The trader wants to go ${dirLabel} on this chart. Your job is to:
 
 1. Analyze the chart thoroughly (price action, structure, key levels, patterns, indicators visible)
-2. Determine the BEST entry price for a ${dirLabel} position based on current structure
+2. ${direction ? `Determine the BEST entry price for a ${dirLabel} position based on current structure` : "Pick the optimal direction (long or short) based on the chart, then determine the BEST entry price"}
 3. Set an optimal stop loss based on structure (below/above key support/resistance, recent swing)
 4. Set a realistic take profit target based on the next key level, measured move, or structure target
 5. Calculate the risk:reward ratio
-6. Rate the trade quality and explain whether this is a good ${dirLabel} setup or not
+6. Rate the trade quality and explain whether this is a good setup or not
 
 Be specific with exact price numbers you can read from the chart. Reference visible levels, candles, and patterns.
-If the symbol is not provided, try to read it from the chart.`,
+If the symbol is not provided, try to read it from the chart.
+Always return a definitive direction ("long" or "short") in your output.`,
           },
           {
             role: "user",
             content: [
               { type: "image_url", image_url: { url: screenshot_url } },
-              { type: "text", text: `I want to go ${dirLabel}${symbol ? ` on ${symbol}` : ""}. Analyze this chart and give me the optimal entry, stop loss, and take profit levels.` },
+              { type: "text", text: `Analyze this chart${symbol ? ` for ${symbol}` : ""} and give me ${direction ? `the optimal entry, stop loss, and take profit levels for a ${dirLabel} trade` : "the best trade plan: pick the optimal direction (long or short), then provide entry, stop loss, and take profit levels"}.` },
             ],
           },
         ],

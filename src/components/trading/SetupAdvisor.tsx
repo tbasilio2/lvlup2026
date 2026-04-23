@@ -41,8 +41,8 @@ const SetupAdvisor = () => {
 
   const update = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
 
-  const extractLevelsFromScreenshot = async (f: File) => {
-    if (!user) return;
+  const extractLevelsFromScreenshot = async (f: File): Promise<{ url?: string; extracted?: any }> => {
+    if (!user) return {};
     setExtracting(true);
     setExtractNote(null);
     try {
@@ -51,39 +51,82 @@ const SetupAdvisor = () => {
       const { error: upErr } = await supabase.storage
         .from("trade-screenshots")
         .upload(path, f, { contentType: f.type });
-      if (upErr) { setExtracting(false); return; }
+      if (upErr) { setExtracting(false); return {}; }
       const { data: urlData } = supabase.storage.from("trade-screenshots").getPublicUrl(path);
 
       const { data, error } = await supabase.functions.invoke("extract-chart-levels", {
         body: { screenshot_url: urlData.publicUrl },
       });
-      if (error || data?.error) { setExtracting(false); return; }
+      if (error || data?.error) { setExtracting(false); return { url: urlData.publicUrl }; }
+
+      const next = {
+        symbol: data.symbol || "",
+        direction: (data.direction === "long" || data.direction === "short" ? data.direction : "") as "" | "long" | "short",
+        entry_price: data.entry_price || "",
+        stop_loss: data.stop_loss || "",
+        take_profit: data.take_profit || "",
+      };
 
       setForm((p) => ({
         ...p,
-        symbol: data.symbol || p.symbol,
-        direction: (data.direction === "long" || data.direction === "short") ? data.direction : p.direction,
-        entry_price: data.entry_price || p.entry_price,
-        stop_loss: data.stop_loss || p.stop_loss,
-        take_profit: data.take_profit || p.take_profit,
+        symbol: next.symbol || p.symbol,
+        direction: next.direction || p.direction,
+        entry_price: next.entry_price || p.entry_price,
+        stop_loss: next.stop_loss || p.stop_loss,
+        take_profit: next.take_profit || p.take_profit,
       }));
       setExtractNote(`AI read levels (${data.confidence} confidence): ${data.notes}`);
-      toast.success("Price levels extracted from chart");
+      return { url: urlData.publicUrl, extracted: next };
     } catch {
-      // silently fail extraction – user can still fill manually
+      return {};
     } finally {
       setExtracting(false);
     }
   };
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const runAdvice = async (screenshotUrl: string | undefined, extracted?: any) => {
+    setLoading(true);
+    setAdvice(null);
+    try {
+      const merged = {
+        symbol: extracted?.symbol || form.symbol,
+        direction: extracted?.direction || form.direction,
+        entry_price: extracted?.entry_price || form.entry_price,
+        stop_loss: extracted?.stop_loss || form.stop_loss,
+        take_profit: extracted?.take_profit || form.take_profit,
+        strategy: form.strategy,
+        notes: form.notes,
+      };
+      const context: Record<string, string> = {};
+      Object.entries(merged).forEach(([k, v]) => { if (v) context[k] = String(v); });
+
+      const { data, error } = await supabase.functions.invoke("analyze-chart", {
+        body: {
+          screenshot_url: screenshotUrl || "none",
+          trade_context: Object.keys(context).length ? { ...context, exit_price: null, pnl: null } : undefined,
+          is_setup_advice: true,
+          setup_details: context,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) { toast.error(data.error); return; }
+      setAdvice(data);
+    } catch {
+      toast.error("Failed to get advice");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
     if (f.size > 5 * 1024 * 1024) { toast.error("Max 5MB"); return; }
     setFile(f);
     setPreview(URL.createObjectURL(f));
     setAdvice(null);
-    extractLevelsFromScreenshot(f);
+    const { url, extracted } = await extractLevelsFromScreenshot(f);
+    await runAdvice(url, extracted);
   };
 
   const clearFile = () => {

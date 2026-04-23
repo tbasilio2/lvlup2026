@@ -262,9 +262,12 @@ const SetupAdvisor = () => {
           {loading ? (
             <><Loader2 className="h-4 w-4 animate-spin" /> Analyzing…</>
           ) : (
-            <><Send className="h-4 w-4" /> Get Trade Advice</>
+            <><Send className="h-4 w-4" /> Re-run Advice</>
           )}
         </button>
+        <p className="text-[10px] text-muted-foreground/70 font-mono text-center -mt-1">
+          Tip: edit any field above and re-run for refined feedback
+        </p>
       </motion.div>
 
       {/* AI Advice Results */}

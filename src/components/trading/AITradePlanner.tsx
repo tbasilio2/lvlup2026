@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import {
   Brain, Loader2, ImagePlus, X, Star, Eye, Target, Shield,
-  ArrowUpRight, ArrowDownRight, AlertTriangle, Crosshair, Zap
+  ArrowUpRight, ArrowDownRight, AlertTriangle, Crosshair, Zap, RefreshCw
 } from "lucide-react";
 
 interface TradePlan {
@@ -28,53 +28,28 @@ interface TradePlan {
 const AITradePlanner = () => {
   const { user } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<TradePlan | null>(null);
-  const [direction, setDirection] = useState<"long" | "short" | "">("");
-  const [symbol, setSymbol] = useState("");
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    if (f.size > 5 * 1024 * 1024) { toast.error("Max 5MB"); return; }
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
-    setPlan(null);
-  };
-
-  const clearFile = () => {
-    setFile(null);
-    setPreview(null);
-    if (fileRef.current) fileRef.current.value = "";
-    setPlan(null);
-  };
-
-  const getPlan = async () => {
-    if (!file) { toast.error("Upload a chart screenshot"); return; }
-    if (!direction) { toast.error("Select a direction first"); return; }
+  const runPlan = async (file: File, dirOverride?: "long" | "short") => {
+    if (!user) { toast.error("Sign in required"); return; }
     setLoading(true);
     setPlan(null);
 
     try {
-      let screenshotUrl: string | undefined;
-      if (user) {
-        const ext = file.name.split(".").pop() || "png";
-        const path = `${user.id}/ai-trade-${Date.now()}.${ext}`;
-        const { error } = await supabase.storage
-          .from("trade-screenshots")
-          .upload(path, file, { contentType: file.type });
-        if (error) { toast.error("Upload failed"); setLoading(false); return; }
-        const { data } = supabase.storage.from("trade-screenshots").getPublicUrl(path);
-        screenshotUrl = data.publicUrl;
-      }
+      const ext = file.name.split(".").pop() || "png";
+      const path = `${user.id}/ai-trade-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("trade-screenshots")
+        .upload(path, file, { contentType: file.type });
+      if (upErr) { toast.error("Upload failed"); setLoading(false); return; }
+      const { data: urlData } = supabase.storage.from("trade-screenshots").getPublicUrl(path);
 
       const { data, error } = await supabase.functions.invoke("ai-trade-plan", {
         body: {
-          screenshot_url: screenshotUrl,
-          direction,
-          symbol: symbol || undefined,
+          screenshot_url: urlData.publicUrl,
+          direction: dirOverride,
         },
       });
 
@@ -88,10 +63,31 @@ const AITradePlanner = () => {
     }
   };
 
+  const lastFileRef = useRef<File | null>(null);
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 5 * 1024 * 1024) { toast.error("Max 5MB"); return; }
+    lastFileRef.current = f;
+    setPreview(URL.createObjectURL(f));
+    runPlan(f);
+  };
+
+  const clearFile = () => {
+    lastFileRef.current = null;
+    setPreview(null);
+    if (fileRef.current) fileRef.current.value = "";
+    setPlan(null);
+  };
+
+  const flipDirection = (dir: "long" | "short") => {
+    if (!lastFileRef.current) return;
+    runPlan(lastFileRef.current, dir);
+  };
+
   const qualityColor = (q: number) =>
     q >= 8 ? "text-profit" : q >= 5 ? "text-streak-glow" : "text-loss";
-
-  const inputCls = "w-full rounded-xl border border-input bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground/60";
 
   return (
     <div className="space-y-4">
@@ -106,7 +102,7 @@ const AITradePlanner = () => {
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">AI Trade Planner</h3>
-            <p className="text-[10px] text-muted-foreground font-mono">Upload chart → Pick direction → Get entry, SL &amp; TP</p>
+            <p className="text-[10px] text-muted-foreground font-mono">Upload a chart → AI picks direction, entry, SL &amp; TP automatically</p>
           </div>
         </div>
 
@@ -118,64 +114,57 @@ const AITradePlanner = () => {
             <button type="button" onClick={clearFile} className="absolute top-2 right-2 p-1 rounded-lg bg-background/80 backdrop-blur-sm border border-border hover:bg-destructive/20 transition-colors">
               <X className="h-3.5 w-3.5 text-foreground" />
             </button>
+            {loading && (
+              <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                <span className="text-xs font-mono text-foreground">Analyzing chart…</span>
+              </div>
+            )}
           </div>
         ) : (
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="w-full rounded-xl border border-dashed border-border bg-secondary/20 hover:bg-secondary/40 transition-colors py-5 flex flex-col items-center gap-1.5"
+            className="w-full rounded-xl border border-dashed border-border bg-secondary/20 hover:bg-secondary/40 transition-colors py-8 flex flex-col items-center gap-1.5"
           >
-            <ImagePlus className="h-5 w-5 text-muted-foreground" />
+            <ImagePlus className="h-6 w-6 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">Upload chart screenshot</span>
+            <span className="text-[10px] text-muted-foreground/70 font-mono">AI will auto-analyze instantly</span>
           </button>
         )}
 
-        {/* Symbol (optional) */}
-        <div>
-          <label className="text-[10px] font-mono text-muted-foreground mb-0.5 block">Symbol (optional)</label>
-          <input value={symbol} onChange={(e) => setSymbol(e.target.value)} placeholder="e.g. EURUSD" className={inputCls} />
-        </div>
-
-        {/* Direction Picker */}
-        <div>
-          <label className="text-[10px] font-mono text-muted-foreground mb-1 block">Direction</label>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setDirection("long")}
-              className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold transition-all ${
-                direction === "long"
-                  ? "border-profit bg-profit/10 text-profit"
-                  : "border-border bg-card text-muted-foreground hover:bg-secondary/40"
-              }`}
-            >
-              <ArrowUpRight className="h-4 w-4" /> Long
-            </button>
-            <button
-              type="button"
-              onClick={() => setDirection("short")}
-              className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold transition-all ${
-                direction === "short"
-                  ? "border-loss bg-loss/10 text-loss"
-                  : "border-border bg-card text-muted-foreground hover:bg-secondary/40"
-              }`}
-            >
-              <ArrowDownRight className="h-4 w-4" /> Short
-            </button>
+        {/* Direction override – only after a plan exists */}
+        {plan && !loading && (
+          <div>
+            <label className="text-[10px] font-mono text-muted-foreground mb-1 block flex items-center gap-1">
+              <RefreshCw className="h-3 w-3" /> Re-analyze as
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => flipDirection("long")}
+                className={`flex items-center justify-center gap-2 rounded-xl border py-2 text-xs font-semibold transition-all ${
+                  plan.direction === "long"
+                    ? "border-profit bg-profit/10 text-profit"
+                    : "border-border bg-card text-muted-foreground hover:bg-secondary/40"
+                }`}
+              >
+                <ArrowUpRight className="h-3.5 w-3.5" /> Long
+              </button>
+              <button
+                type="button"
+                onClick={() => flipDirection("short")}
+                className={`flex items-center justify-center gap-2 rounded-xl border py-2 text-xs font-semibold transition-all ${
+                  plan.direction === "short"
+                    ? "border-loss bg-loss/10 text-loss"
+                    : "border-border bg-card text-muted-foreground hover:bg-secondary/40"
+                }`}
+              >
+                <ArrowDownRight className="h-3.5 w-3.5" /> Short
+              </button>
+            </div>
           </div>
-        </div>
-
-        <button
-          onClick={getPlan}
-          disabled={loading || !file || !direction}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:brightness-110 disabled:opacity-50"
-        >
-          {loading ? (
-            <><Loader2 className="h-4 w-4 animate-spin" /> Analyzing chart…</>
-          ) : (
-            <><Brain className="h-4 w-4" /> Generate Trade Plan</>
-          )}
-        </button>
+        )}
       </motion.div>
 
       {/* Results */}

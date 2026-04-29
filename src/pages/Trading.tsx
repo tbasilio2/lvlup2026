@@ -78,7 +78,7 @@ const Trading = () => {
               <div className="space-y-2">
                 <AnimatePresence>
                   {trades.map((trade) => (
-                    <TradeRow key={trade.id} trade={trade} onDelete={deleteTrade} />
+                    <TradeRow key={trade.id} trade={trade} onDelete={deleteTrade} onUpdate={updateTrade} />
                   ))}
                 </AnimatePresence>
               </div>

@@ -17,7 +17,7 @@ import AnalysesHistory from "@/components/trading/AnalysesHistory";
 import { TrendingUp } from "lucide-react";
 
 const Trading = () => {
-  const { trades, loading, addTrade, addTradesBatch, deleteTrade } = useTrades();
+  const { trades, loading, addTrade, addTradesBatch, deleteTrade, updateTrade } = useTrades();
   const [chartSymbol, setChartSymbol] = useState("OANDA:EURUSD");
 
   if (loading) {

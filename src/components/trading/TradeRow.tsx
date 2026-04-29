@@ -110,7 +110,15 @@ const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
             </div>
           )}
 
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-3">
+            {onUpdate && (
+              <button
+                onClick={() => setEditOpen(true)}
+                className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+              >
+                <Pencil className="h-3 w-3" /> Edit
+              </button>
+            )}
             <button
               onClick={() => onDelete(trade.id)}
               className="text-xs text-destructive hover:text-destructive/80 flex items-center gap-1 transition-colors"
@@ -119,6 +127,9 @@ const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
             </button>
           </div>
         </motion.div>
+      )}
+      {onUpdate && (
+        <EditTradeDialog trade={trade} open={editOpen} onOpenChange={setEditOpen} onSave={onUpdate} />
       )}
     </motion.div>
   );

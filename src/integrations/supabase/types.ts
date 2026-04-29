@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      chart_analyses: {
+        Row: {
+          created_at: string
+          direction: string | null
+          entry_price: string | null
+          id: string
+          kind: string
+          payload: Json
+          quality: number | null
+          risk_reward: string | null
+          screenshot_url: string | null
+          stop_loss: string | null
+          symbol: string | null
+          take_profit: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          direction?: string | null
+          entry_price?: string | null
+          id?: string
+          kind: string
+          payload?: Json
+          quality?: number | null
+          risk_reward?: string | null
+          screenshot_url?: string | null
+          stop_loss?: string | null
+          symbol?: string | null
+          take_profit?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string | null
+          entry_price?: string | null
+          id?: string
+          kind?: string
+          payload?: Json
+          quality?: number | null
+          risk_reward?: string | null
+          screenshot_url?: string | null
+          stop_loss?: string | null
+          symbol?: string | null
+          take_profit?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       goals: {
         Row: {
           completed: boolean

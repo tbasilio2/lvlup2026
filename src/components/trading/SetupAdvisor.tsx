@@ -111,6 +111,23 @@ const SetupAdvisor = () => {
       if (error) throw error;
       if (data?.error) { toast.error(data.error); return; }
       setAdvice(data);
+
+      // Save to history
+      if (user) {
+        await supabase.from("chart_analyses" as any).insert({
+          user_id: user.id,
+          kind: "advisor",
+          symbol: merged.symbol || null,
+          direction: merged.direction || null,
+          entry_price: merged.entry_price || null,
+          stop_loss: merged.stop_loss || null,
+          take_profit: merged.take_profit || null,
+          risk_reward: null,
+          quality: typeof data.setup_quality === "number" ? data.setup_quality : null,
+          screenshot_url: screenshotUrl || null,
+          payload: data,
+        });
+      }
     } catch {
       toast.error("Failed to get advice");
     } finally {

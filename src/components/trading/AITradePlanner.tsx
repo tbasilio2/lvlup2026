@@ -56,6 +56,21 @@ const AITradePlanner = () => {
       if (error) throw error;
       if (data?.error) { toast.error(data.error); return; }
       setPlan(data);
+
+      // Save to history
+      await supabase.from("chart_analyses" as any).insert({
+        user_id: user.id,
+        kind: "ai_trade",
+        symbol: data.symbol ?? null,
+        direction: data.direction ?? null,
+        entry_price: data.entry_price ?? null,
+        stop_loss: data.stop_loss ?? null,
+        take_profit: data.take_profit ?? null,
+        risk_reward: data.risk_reward ?? null,
+        quality: typeof data.trade_quality === "number" ? data.trade_quality : null,
+        screenshot_url: urlData.publicUrl,
+        payload: data,
+      });
     } catch {
       toast.error("Failed to generate trade plan");
     } finally {

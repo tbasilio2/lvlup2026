@@ -17,7 +17,7 @@ import AnalysesHistory from "@/components/trading/AnalysesHistory";
 import { TrendingUp } from "lucide-react";
 
 const Trading = () => {
-  const { trades, loading, addTrade, addTradesBatch, deleteTrade } = useTrades();
+  const { trades, loading, addTrade, addTradesBatch, deleteTrade, updateTrade } = useTrades();
   const [chartSymbol, setChartSymbol] = useState("OANDA:EURUSD");
 
   if (loading) {
@@ -78,7 +78,7 @@ const Trading = () => {
               <div className="space-y-2">
                 <AnimatePresence>
                   {trades.map((trade) => (
-                    <TradeRow key={trade.id} trade={trade} onDelete={deleteTrade} />
+                    <TradeRow key={trade.id} trade={trade} onDelete={deleteTrade} onUpdate={updateTrade} />
                   ))}
                 </AnimatePresence>
               </div>

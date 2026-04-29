@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Trash2, ArrowUpRight, ArrowDownRight, Image as ImageIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { Trash2, ArrowUpRight, ArrowDownRight, Image as ImageIcon, ChevronDown, ChevronUp, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import ChartAnalysis from "./ChartAnalysis";
-import type { Trade } from "@/hooks/useTrades";
+import EditTradeDialog from "./EditTradeDialog";
+import type { Trade, TradeInsert } from "@/hooks/useTrades";
 
 interface Props {
   trade: Trade;
   onDelete: (id: string) => void;
+  onUpdate?: (id: string, updates: Partial<TradeInsert>) => Promise<void>;
 }
 
-const TradeRow = ({ trade, onDelete }: Props) => {
+const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
   const [expanded, setExpanded] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const isWin = (trade.pnl ?? 0) > 0;
   const isLoss = (trade.pnl ?? 0) < 0;
 
@@ -107,7 +110,15 @@ const TradeRow = ({ trade, onDelete }: Props) => {
             </div>
           )}
 
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-3">
+            {onUpdate && (
+              <button
+                onClick={() => setEditOpen(true)}
+                className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+              >
+                <Pencil className="h-3 w-3" /> Edit
+              </button>
+            )}
             <button
               onClick={() => onDelete(trade.id)}
               className="text-xs text-destructive hover:text-destructive/80 flex items-center gap-1 transition-colors"
@@ -116,6 +127,9 @@ const TradeRow = ({ trade, onDelete }: Props) => {
             </button>
           </div>
         </motion.div>
+      )}
+      {onUpdate && (
+        <EditTradeDialog trade={trade} open={editOpen} onOpenChange={setEditOpen} onSave={onUpdate} />
       )}
     </motion.div>
   );

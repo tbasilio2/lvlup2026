@@ -14,11 +14,19 @@ import TradeAIAnalysis from "@/components/trading/TradeAIAnalysis";
 import SetupAdvisor from "@/components/trading/SetupAdvisor";
 import AITradePlanner from "@/components/trading/AITradePlanner";
 import AnalysesHistory from "@/components/trading/AnalysesHistory";
+import AdvancedMetrics from "@/components/trading/analytics/AdvancedMetrics";
+import DrawdownChart from "@/components/trading/analytics/DrawdownChart";
+import MonthlyHeatmap from "@/components/trading/analytics/MonthlyHeatmap";
+import BreakdownTable from "@/components/trading/analytics/BreakdownTable";
+import TimeOfDayChart from "@/components/trading/analytics/TimeOfDayChart";
+import LongShortCompare from "@/components/trading/analytics/LongShortCompare";
+import { useTradeAnalytics } from "@/hooks/useTradeAnalytics";
 import { TrendingUp } from "lucide-react";
 
 const Trading = () => {
   const { trades, loading, addTrade, addTradesBatch, deleteTrade, updateTrade } = useTrades();
   const [chartSymbol, setChartSymbol] = useState("OANDA:EURUSD");
+  const analytics = useTradeAnalytics(trades);
 
   if (loading) {
     return (

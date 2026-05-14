@@ -14,11 +14,19 @@ import TradeAIAnalysis from "@/components/trading/TradeAIAnalysis";
 import SetupAdvisor from "@/components/trading/SetupAdvisor";
 import AITradePlanner from "@/components/trading/AITradePlanner";
 import AnalysesHistory from "@/components/trading/AnalysesHistory";
+import AdvancedMetrics from "@/components/trading/analytics/AdvancedMetrics";
+import DrawdownChart from "@/components/trading/analytics/DrawdownChart";
+import MonthlyHeatmap from "@/components/trading/analytics/MonthlyHeatmap";
+import BreakdownTable from "@/components/trading/analytics/BreakdownTable";
+import TimeOfDayChart from "@/components/trading/analytics/TimeOfDayChart";
+import LongShortCompare from "@/components/trading/analytics/LongShortCompare";
+import { useTradeAnalytics } from "@/hooks/useTradeAnalytics";
 import { TrendingUp } from "lucide-react";
 
 const Trading = () => {
   const { trades, loading, addTrade, addTradesBatch, deleteTrade, updateTrade } = useTrades();
   const [chartSymbol, setChartSymbol] = useState("OANDA:EURUSD");
+  const analytics = useTradeAnalytics(trades);
 
   if (loading) {
     return (
@@ -56,10 +64,11 @@ const Trading = () => {
         </motion.div>
 
         <Tabs defaultValue="journal" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6 rounded-xl bg-secondary">
+          <TabsList className="grid w-full grid-cols-7 rounded-xl bg-secondary">
             <TabsTrigger value="journal" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Journal</TabsTrigger>
             <TabsTrigger value="analytics" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Stats</TabsTrigger>
-            <TabsTrigger value="ai-trade" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">AI Trade</TabsTrigger>
+            <TabsTrigger value="advanced" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Pro</TabsTrigger>
+            <TabsTrigger value="ai-trade" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">AI</TabsTrigger>
             <TabsTrigger value="advisor" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Advisor</TabsTrigger>
             <TabsTrigger value="history" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">History</TabsTrigger>
             <TabsTrigger value="chart" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Chart</TabsTrigger>
@@ -90,6 +99,16 @@ const Trading = () => {
             <TradeAIAnalysis trades={trades} />
             <PnLCalendar trades={trades} />
             <EquityCurve trades={trades} />
+          </TabsContent>
+
+          <TabsContent value="advanced" className="space-y-4">
+            <AdvancedMetrics a={analytics} />
+            <DrawdownChart a={analytics} />
+            <MonthlyHeatmap a={analytics} />
+            <LongShortCompare a={analytics} />
+            <BreakdownTable title="By Symbol" rows={analytics.bySymbol} />
+            <BreakdownTable title="By Strategy" rows={analytics.byStrategy} />
+            <TimeOfDayChart a={analytics} />
           </TabsContent>
 
           <TabsContent value="ai-trade" className="space-y-4">

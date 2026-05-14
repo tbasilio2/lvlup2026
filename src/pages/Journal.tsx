@@ -121,6 +121,28 @@ const Journal = () => {
                   <p className="text-sm text-foreground leading-relaxed">{s.value}</p>
                 </div>
               ))}
+              {(todayEntry.profitLoss != null || todayEntry.fees != null) && (
+                <div className="flex items-center gap-4 pt-1">
+                  {todayEntry.profitLoss != null && (
+                    <div className="flex items-center gap-1.5">
+                      {todayEntry.profitLoss >= 0 ? (
+                        <TrendingUp className="h-3.5 w-3.5 text-profit" />
+                      ) : (
+                        <TrendingDown className="h-3.5 w-3.5 text-loss" />
+                      )}
+                      <span className={`text-sm font-bold font-mono ${todayEntry.profitLoss >= 0 ? "text-profit" : "text-loss"}`}>
+                        {todayEntry.profitLoss >= 0 ? "+" : ""}{todayEntry.profitLoss.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                  {todayEntry.fees != null && todayEntry.fees > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <Receipt className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-sm font-mono text-muted-foreground">{todayEntry.fees.toFixed(2)}</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </motion.section>
           ) : (
             <motion.section key="empty" className="rounded-2xl border border-dashed border-border bg-card/50 p-8 mb-8 text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>

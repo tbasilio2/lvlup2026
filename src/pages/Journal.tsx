@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, ChevronLeft, ChevronRight, PenLine } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight, PenLine, TrendingUp, TrendingDown, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import JournalEntryForm from "@/components/JournalEntry";
 import WeeklyReflection from "@/components/WeeklyReflection";

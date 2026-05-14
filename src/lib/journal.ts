@@ -8,6 +8,8 @@ export interface JournalEntry {
   intention: string;
   reflection: string;
   wins: string;
+  profitLoss: number | null;
+  fees: number | null;
   createdAt: number;
 }
 

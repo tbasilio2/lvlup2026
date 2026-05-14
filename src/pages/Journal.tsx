@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, ChevronLeft, ChevronRight, PenLine } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight, PenLine, TrendingUp, TrendingDown, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import JournalEntryForm from "@/components/JournalEntry";
 import WeeklyReflection from "@/components/WeeklyReflection";
@@ -17,7 +17,7 @@ const Journal = () => {
 
   const todayEntry = useMemo(() => entries.find((e) => e.date === selectedDate), [entries, selectedDate]);
 
-  const handleSave = useCallback((data: { date: string; mood: Mood; gratitude: string; intention: string; reflection: string; wins: string }) => {
+  const handleSave = useCallback((data: { date: string; mood: Mood; gratitude: string; intention: string; reflection: string; wins: string; profitLoss: number | null; fees: number | null }) => {
     saveEntry(data);
     setIsWriting(false);
   }, [saveEntry]);
@@ -121,6 +121,28 @@ const Journal = () => {
                   <p className="text-sm text-foreground leading-relaxed">{s.value}</p>
                 </div>
               ))}
+              {(todayEntry.profitLoss != null || todayEntry.fees != null) && (
+                <div className="flex items-center gap-4 pt-1">
+                  {todayEntry.profitLoss != null && (
+                    <div className="flex items-center gap-1.5">
+                      {todayEntry.profitLoss >= 0 ? (
+                        <TrendingUp className="h-3.5 w-3.5 text-profit" />
+                      ) : (
+                        <TrendingDown className="h-3.5 w-3.5 text-loss" />
+                      )}
+                      <span className={`text-sm font-bold font-mono ${todayEntry.profitLoss >= 0 ? "text-profit" : "text-loss"}`}>
+                        {todayEntry.profitLoss >= 0 ? "+" : ""}{todayEntry.profitLoss.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                  {todayEntry.fees != null && todayEntry.fees > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <Receipt className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-sm font-mono text-muted-foreground">{todayEntry.fees.toFixed(2)}</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </motion.section>
           ) : (
             <motion.section key="empty" className="rounded-2xl border border-dashed border-border bg-card/50 p-8 mb-8 text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -135,7 +157,7 @@ const Journal = () => {
 
         {entries.length > 0 && (
           <motion.section className="mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Mood Insights</h2>
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Insights</h2>
             <div className="grid grid-cols-3 gap-2">
               <div className="rounded-2xl border border-border bg-card p-4 text-center">
                 <p className="text-2xl font-serif text-foreground">{entries.length}</p>
@@ -150,6 +172,32 @@ const Journal = () => {
                 <p className="text-[10px] text-muted-foreground font-medium">Top Mood</p>
               </div>
             </div>
+            {(() => {
+              const entriesWithPnl = entries.filter((e) => e.profitLoss != null);
+              if (entriesWithPnl.length === 0) return null;
+              const totalPnl = entriesWithPnl.reduce((sum, e) => sum + (e.profitLoss ?? 0), 0);
+              const totalFees = entriesWithPnl.reduce((sum, e) => sum + (e.fees ?? 0), 0);
+              const net = totalPnl - totalFees;
+              const winDays = entriesWithPnl.filter((e) => (e.profitLoss ?? 0) > 0).length;
+              return (
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                    <p className={`text-2xl font-serif font-mono ${net >= 0 ? "text-profit" : "text-loss"}`}>
+                      {net >= 0 ? "+" : ""}{net.toFixed(0)}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground font-medium">Net P&L</p>
+                  </div>
+                  <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                    <p className="text-2xl font-serif font-mono text-foreground">{winDays}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium">Win Days</p>
+                  </div>
+                  <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                    <p className="text-2xl font-serif font-mono text-muted-foreground">{totalFees.toFixed(0)}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium">Total Fees</p>
+                  </div>
+                </div>
+              );
+            })()}
           </motion.section>
         )}
 

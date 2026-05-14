@@ -160,10 +160,12 @@ export type Database = {
         Row: {
           created_at: string
           date: string
+          fees: number | null
           gratitude: string | null
           id: string
           intention: string | null
           mood: string
+          profit_loss: number | null
           reflection: string | null
           user_id: string
           wins: string | null
@@ -171,10 +173,12 @@ export type Database = {
         Insert: {
           created_at?: string
           date: string
+          fees?: number | null
           gratitude?: string | null
           id?: string
           intention?: string | null
           mood: string
+          profit_loss?: number | null
           reflection?: string | null
           user_id: string
           wins?: string | null
@@ -182,10 +186,12 @@ export type Database = {
         Update: {
           created_at?: string
           date?: string
+          fees?: number | null
           gratitude?: string | null
           id?: string
           intention?: string | null
           mood?: string
+          profit_loss?: number | null
           reflection?: string | null
           user_id?: string
           wins?: string | null

@@ -17,7 +17,7 @@ const Journal = () => {
 
   const todayEntry = useMemo(() => entries.find((e) => e.date === selectedDate), [entries, selectedDate]);
 
-  const handleSave = useCallback((data: { date: string; mood: Mood; gratitude: string; intention: string; reflection: string; wins: string }) => {
+  const handleSave = useCallback((data: { date: string; mood: Mood; gratitude: string; intention: string; reflection: string; wins: string; profitLoss: number | null; fees: number | null }) => {
     saveEntry(data);
     setIsWriting(false);
   }, [saveEntry]);

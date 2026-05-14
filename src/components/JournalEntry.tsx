@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Send, ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Receipt } from "lucide-react";
+import { Sparkles, Send, ChevronLeft, ChevronRight, TrendingUp, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -107,6 +107,41 @@ const JournalEntryForm = ({ existingEntry, onSave, date }: Props) => {
                     <span className="text-[10px] font-medium text-muted-foreground">{m.label}</span>
                   </motion.button>
                 ))}
+              </div>
+            </div>
+          ) : currentStep === "pnl" ? (
+            <div className="space-y-5">
+              <div className="text-center">
+                <h3 className="font-serif text-xl text-foreground">Trading Performance</h3>
+                <p className="text-sm text-muted-foreground mt-1">Log your daily P&L and fees</p>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-1.5">
+                    <TrendingUp className="h-3.5 w-3.5 text-profit" /> Profit / Loss
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={profitLoss}
+                    onChange={(e) => setProfitLoss(e.target.value)}
+                    placeholder="e.g. 125.50 or -45.00"
+                    className="rounded-xl border-border bg-card focus:border-primary font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-1.5">
+                    <Receipt className="h-3.5 w-3.5 text-primary" /> Fees
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={fees}
+                    onChange={(e) => setFees(e.target.value)}
+                    placeholder="e.g. 12.00"
+                    className="rounded-xl border-border bg-card focus:border-primary font-mono"
+                  />
+                </div>
               </div>
             </div>
           ) : (

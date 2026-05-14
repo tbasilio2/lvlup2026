@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Send, ChevronLeft, ChevronRight } from "lucide-react";
+import { Sparkles, Send, ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import {
   MOODS,
   getRandomPrompt,
@@ -16,7 +17,7 @@ interface Props {
   date: string;
 }
 
-const steps = ["mood", "gratitude", "intention", "reflection", "wins"] as const;
+const steps = ["mood", "gratitude", "intention", "reflection", "wins", "pnl"] as const;
 
 const JournalEntryForm = ({ existingEntry, onSave, date }: Props) => {
   const [step, setStep] = useState(0);
@@ -25,6 +26,8 @@ const JournalEntryForm = ({ existingEntry, onSave, date }: Props) => {
   const [intention, setIntention] = useState(existingEntry?.intention || "");
   const [reflection, setReflection] = useState(existingEntry?.reflection || "");
   const [wins, setWins] = useState(existingEntry?.wins || "");
+  const [profitLoss, setProfitLoss] = useState<string>(existingEntry?.profitLoss?.toString() ?? "");
+  const [fees, setFees] = useState<string>(existingEntry?.fees?.toString() ?? "");
 
   const prompts = useMemo(
     () => ({
@@ -41,7 +44,11 @@ const JournalEntryForm = ({ existingEntry, onSave, date }: Props) => {
 
   const handleNext = () => {
     if (isLast) {
-      onSave({ date, mood, gratitude, intention, reflection, wins });
+      onSave({
+        date, mood, gratitude, intention, reflection, wins,
+        profitLoss: profitLoss.trim() ? Number(profitLoss) : null,
+        fees: fees.trim() ? Number(fees) : null,
+      });
     } else {
       setStep((s) => s + 1);
     }

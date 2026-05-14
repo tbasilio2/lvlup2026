@@ -64,10 +64,11 @@ const Trading = () => {
         </motion.div>
 
         <Tabs defaultValue="journal" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6 rounded-xl bg-secondary">
+          <TabsList className="grid w-full grid-cols-7 rounded-xl bg-secondary">
             <TabsTrigger value="journal" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Journal</TabsTrigger>
             <TabsTrigger value="analytics" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Stats</TabsTrigger>
-            <TabsTrigger value="ai-trade" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">AI Trade</TabsTrigger>
+            <TabsTrigger value="advanced" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Pro</TabsTrigger>
+            <TabsTrigger value="ai-trade" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">AI</TabsTrigger>
             <TabsTrigger value="advisor" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Advisor</TabsTrigger>
             <TabsTrigger value="history" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">History</TabsTrigger>
             <TabsTrigger value="chart" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Chart</TabsTrigger>

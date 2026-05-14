@@ -157,7 +157,7 @@ const Journal = () => {
 
         {entries.length > 0 && (
           <motion.section className="mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Mood Insights</h2>
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Insights</h2>
             <div className="grid grid-cols-3 gap-2">
               <div className="rounded-2xl border border-border bg-card p-4 text-center">
                 <p className="text-2xl font-serif text-foreground">{entries.length}</p>
@@ -172,6 +172,32 @@ const Journal = () => {
                 <p className="text-[10px] text-muted-foreground font-medium">Top Mood</p>
               </div>
             </div>
+            {(() => {
+              const entriesWithPnl = entries.filter((e) => e.profitLoss != null);
+              if (entriesWithPnl.length === 0) return null;
+              const totalPnl = entriesWithPnl.reduce((sum, e) => sum + (e.profitLoss ?? 0), 0);
+              const totalFees = entriesWithPnl.reduce((sum, e) => sum + (e.fees ?? 0), 0);
+              const net = totalPnl - totalFees;
+              const winDays = entriesWithPnl.filter((e) => (e.profitLoss ?? 0) > 0).length;
+              return (
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                    <p className={`text-2xl font-serif font-mono ${net >= 0 ? "text-profit" : "text-loss"}`}>
+                      {net >= 0 ? "+" : ""}{net.toFixed(0)}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground font-medium">Net P&L</p>
+                  </div>
+                  <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                    <p className="text-2xl font-serif font-mono text-foreground">{winDays}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium">Win Days</p>
+                  </div>
+                  <div className="rounded-2xl border border-border bg-card p-4 text-center">
+                    <p className="text-2xl font-serif font-mono text-muted-foreground">{totalFees.toFixed(0)}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium">Total Fees</p>
+                  </div>
+                </div>
+              );
+            })()}
           </motion.section>
         )}
 

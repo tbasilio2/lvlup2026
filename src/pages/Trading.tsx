@@ -101,6 +101,16 @@ const Trading = () => {
             <EquityCurve trades={trades} />
           </TabsContent>
 
+          <TabsContent value="advanced" className="space-y-4">
+            <AdvancedMetrics a={analytics} />
+            <DrawdownChart a={analytics} />
+            <MonthlyHeatmap a={analytics} />
+            <LongShortCompare a={analytics} />
+            <BreakdownTable title="By Symbol" rows={analytics.bySymbol} />
+            <BreakdownTable title="By Strategy" rows={analytics.byStrategy} />
+            <TimeOfDayChart a={analytics} />
+          </TabsContent>
+
           <TabsContent value="ai-trade" className="space-y-4">
             <AITradePlanner />
           </TabsContent>

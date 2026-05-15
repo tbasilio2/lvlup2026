@@ -98,8 +98,7 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
       .from("trade-screenshots")
       .upload(path, screenshotFile, { contentType: screenshotFile.type });
     if (error) { toast.error("Upload failed"); return undefined; }
-    const { data } = supabase.storage.from("trade-screenshots").getPublicUrl(path);
-    return data.publicUrl;
+    return path;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

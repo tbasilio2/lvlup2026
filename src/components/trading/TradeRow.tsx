@@ -6,6 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import ChartAnalysis from "./ChartAnalysis";
 import EditTradeDialog from "./EditTradeDialog";
 import type { Trade, TradeInsert } from "@/hooks/useTrades";
+import { useSignedTradeScreenshot } from "@/lib/tradeScreenshot";
+
+const SignedScreenshot = ({ value }: { value: string }) => {
+  const url = useSignedTradeScreenshot(value);
+  if (!url) return null;
+  return <img src={url} alt="Trade chart" className="rounded-lg border border-border max-h-48 object-contain" />;
+};
 
 interface Props {
   trade: Trade;

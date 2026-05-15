@@ -124,8 +124,11 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
       tags: form.tags ? form.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
     };
 
-    // Recompute pnl if exit_price set
-    if (updates.exit_price != null) {
+    const manualPnl = form.pnl.trim() ? parseFloat(form.pnl) : null;
+    if (manualPnl != null) {
+      (updates as any).pnl = manualPnl;
+      (updates as any).status = "closed";
+    } else if (updates.exit_price != null) {
       const pnl =
         updates.direction === "long"
           ? (updates.exit_price - (updates.entry_price as number)) * (updates.quantity as number)

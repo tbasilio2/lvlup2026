@@ -34,10 +34,21 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
     entry_date: toLocal(trade.entry_date),
     exit_date: toLocal(trade.exit_date),
     fees: String(trade.fees ?? 0),
+    pnl: trade.pnl != null ? String(trade.pnl) : "",
     strategy: trade.strategy ?? "",
     notes: trade.notes ?? "",
     tags: (trade.tags ?? []).join(", "),
   });
+
+  const autoPnl = (() => {
+    const ep = parseFloat(form.entry_price);
+    const xp = parseFloat(form.exit_price);
+    const q = parseFloat(form.quantity);
+    const f = parseFloat(form.fees || "0");
+    if (!isFinite(ep) || !isFinite(xp) || !isFinite(q)) return null;
+    const gross = form.direction === "long" ? (xp - ep) * q : (ep - xp) * q;
+    return gross - (isFinite(f) ? f : 0);
+  })();
 
   useEffect(() => {
     if (open) {

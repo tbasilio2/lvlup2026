@@ -73,8 +73,8 @@ const AddTradeDialog = ({ onAdd }: Props) => {
       toast.error("Failed to upload screenshot");
       return undefined;
     }
-    const { data } = supabase.storage.from("trade-screenshots").getPublicUrl(path);
-    return data.publicUrl;
+    // Store the storage path; signed URLs are generated on demand.
+    return path;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

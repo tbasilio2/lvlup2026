@@ -41,7 +41,7 @@ const SetupAdvisor = () => {
 
   const update = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
 
-  const extractLevelsFromScreenshot = async (f: File): Promise<{ url?: string; extracted?: any }> => {
+  const extractLevelsFromScreenshot = async (f: File): Promise<{ url?: string; path?: string; extracted?: any }> => {
     if (!user) return {};
     setExtracting(true);
     setExtractNote(null);
@@ -52,12 +52,16 @@ const SetupAdvisor = () => {
         .from("trade-screenshots")
         .upload(path, f, { contentType: f.type });
       if (upErr) { setExtracting(false); return {}; }
-      const { data: urlData } = supabase.storage.from("trade-screenshots").getPublicUrl(path);
+      const { data: signed } = await supabase.storage
+        .from("trade-screenshots")
+        .createSignedUrl(path, 3600);
+      const signedUrl = signed?.signedUrl;
+      if (!signedUrl) { setExtracting(false); return { path }; }
 
       const { data, error } = await supabase.functions.invoke("extract-chart-levels", {
-        body: { screenshot_url: urlData.publicUrl },
+        body: { screenshot_url: signedUrl },
       });
-      if (error || data?.error) { setExtracting(false); return { url: urlData.publicUrl }; }
+      if (error || data?.error) { setExtracting(false); return { url: signedUrl, path }; }
 
       const next = {
         symbol: data.symbol || "",
@@ -76,7 +80,7 @@ const SetupAdvisor = () => {
         take_profit: next.take_profit || p.take_profit,
       }));
       setExtractNote(`AI read levels (${data.confidence} confidence): ${data.notes}`);
-      return { url: urlData.publicUrl, extracted: next };
+      return { url: signedUrl, path, extracted: next };
     } catch {
       return {};
     } finally {
@@ -84,7 +88,11 @@ const SetupAdvisor = () => {
     }
   };
 
-  const runAdvice = async (screenshotUrl: string | undefined, extracted?: any) => {
+  const runAdvice = async (
+    screenshotUrl: string | undefined,
+    screenshotPath: string | null,
+    extracted?: any
+  ) => {
     setLoading(true);
     setAdvice(null);
     try {
@@ -112,7 +120,7 @@ const SetupAdvisor = () => {
       if (data?.error) { toast.error(data.error); return; }
       setAdvice(data);
 
-      // Save to history
+      // Save to history (store storage path, not signed URL)
       if (user) {
         await supabase.from("chart_analyses" as any).insert({
           user_id: user.id,
@@ -124,7 +132,7 @@ const SetupAdvisor = () => {
           take_profit: merged.take_profit || null,
           risk_reward: null,
           quality: typeof data.setup_quality === "number" ? data.setup_quality : null,
-          screenshot_url: screenshotUrl || null,
+          screenshot_url: screenshotPath,
           payload: data,
         });
       }
@@ -142,8 +150,8 @@ const SetupAdvisor = () => {
     setFile(f);
     setPreview(URL.createObjectURL(f));
     setAdvice(null);
-    const { url, extracted } = await extractLevelsFromScreenshot(f);
-    await runAdvice(url, extracted);
+    const { url, path, extracted } = await extractLevelsFromScreenshot(f);
+    await runAdvice(url, path ?? null, extracted);
   };
 
   const clearFile = () => {
@@ -160,6 +168,7 @@ const SetupAdvisor = () => {
       return;
     }
     let screenshotUrl: string | undefined;
+    let screenshotPath: string | null = null;
     if (file && user) {
       const ext = file.name.split(".").pop() || "png";
       const path = `${user.id}/advisor-${Date.now()}.${ext}`;
@@ -167,10 +176,13 @@ const SetupAdvisor = () => {
         .from("trade-screenshots")
         .upload(path, file, { contentType: file.type });
       if (error) { toast.error("Upload failed"); return; }
-      const { data } = supabase.storage.from("trade-screenshots").getPublicUrl(path);
-      screenshotUrl = data.publicUrl;
+      const { data } = await supabase.storage
+        .from("trade-screenshots")
+        .createSignedUrl(path, 3600);
+      screenshotUrl = data?.signedUrl;
+      screenshotPath = path;
     }
-    await runAdvice(screenshotUrl);
+    await runAdvice(screenshotUrl, screenshotPath);
   };
 
   const qualityColor = (q: number) =>

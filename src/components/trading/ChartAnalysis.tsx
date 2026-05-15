@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Trade } from "@/hooks/useTrades";
 import { toast } from "sonner";
 import { Brain, Loader2, Eye, Target, Shield, Lightbulb, Star, X } from "lucide-react";
+import { getTradeScreenshotSignedUrl } from "@/lib/tradeScreenshot";
 
 interface ChartAnalysisResult {
   chart_analysis: string;
@@ -28,9 +29,10 @@ const ChartAnalysis = ({ trade }: Props) => {
     setLoading(true);
     setShow(true);
     try {
+      const signedUrl = await getTradeScreenshotSignedUrl(trade.screenshot_url);
       const { data, error } = await supabase.functions.invoke("analyze-chart", {
         body: {
-          screenshot_url: trade.screenshot_url,
+          screenshot_url: signedUrl ?? trade.screenshot_url,
           trade_context: {
             symbol: trade.symbol,
             direction: trade.direction,

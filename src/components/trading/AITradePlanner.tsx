@@ -44,11 +44,14 @@ const AITradePlanner = () => {
         .from("trade-screenshots")
         .upload(path, file, { contentType: file.type });
       if (upErr) { toast.error("Upload failed"); setLoading(false); return; }
-      const { data: urlData } = supabase.storage.from("trade-screenshots").getPublicUrl(path);
+      const { data: signed } = await supabase.storage
+        .from("trade-screenshots")
+        .createSignedUrl(path, 3600);
+      if (!signed?.signedUrl) { toast.error("Could not access uploaded chart"); setLoading(false); return; }
 
       const { data, error } = await supabase.functions.invoke("ai-trade-plan", {
         body: {
-          screenshot_url: urlData.publicUrl,
+          screenshot_url: signed.signedUrl,
           direction: dirOverride,
         },
       });
@@ -57,7 +60,7 @@ const AITradePlanner = () => {
       if (data?.error) { toast.error(data.error); return; }
       setPlan(data);
 
-      // Save to history
+      // Save to history (store storage path, not signed URL)
       await supabase.from("chart_analyses" as any).insert({
         user_id: user.id,
         kind: "ai_trade",
@@ -68,7 +71,7 @@ const AITradePlanner = () => {
         take_profit: data.take_profit ?? null,
         risk_reward: data.risk_reward ?? null,
         quality: typeof data.trade_quality === "number" ? data.trade_quality : null,
-        screenshot_url: urlData.publicUrl,
+        screenshot_url: path,
         payload: data,
       });
     } catch {

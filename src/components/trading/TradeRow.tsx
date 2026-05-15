@@ -6,6 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import ChartAnalysis from "./ChartAnalysis";
 import EditTradeDialog from "./EditTradeDialog";
 import type { Trade, TradeInsert } from "@/hooks/useTrades";
+import { useSignedTradeScreenshot } from "@/lib/tradeScreenshot";
+
+const SignedScreenshot = ({ value }: { value: string }) => {
+  const url = useSignedTradeScreenshot(value);
+  if (!url) return null;
+  return <img src={url} alt="Trade chart" className="rounded-lg border border-border max-h-48 object-contain" />;
+};
 
 interface Props {
   trade: Trade;
@@ -105,7 +112,7 @@ const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
           {trade.screenshot_url && (
             <div className="space-y-2">
               <span className="text-xs text-muted-foreground flex items-center gap-1"><ImageIcon className="h-3 w-3" /> Screenshot</span>
-              <img src={trade.screenshot_url} alt="Trade chart" className="rounded-lg border border-border max-h-48 object-contain" />
+              <SignedScreenshot value={trade.screenshot_url} />
               <ChartAnalysis trade={trade} />
             </div>
           )}

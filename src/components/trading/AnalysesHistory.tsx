@@ -4,6 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { History, Trash2, ArrowUpRight, ArrowDownRight, Star, Brain, Zap, ChevronDown, ChevronUp, Image as ImageIcon } from "lucide-react";
+import { useSignedTradeScreenshot } from "@/lib/tradeScreenshot";
+
+const SignedAnalysisImage = ({ value }: { value: string }) => {
+  const url = useSignedTradeScreenshot(value);
+  if (!url) return null;
+  return (
+    <a href={url} target="_blank" rel="noreferrer" className="block rounded-lg overflow-hidden border border-border">
+      <img src={url} alt="Chart" className="w-full max-h-48 object-contain bg-secondary/30" />
+    </a>
+  );
+};
 
 interface Analysis {
   id: string;
@@ -147,11 +158,7 @@ const AnalysesHistory = () => {
                     className="overflow-hidden border-t border-border"
                   >
                     <div className="p-3 space-y-3">
-                      {it.screenshot_url && (
-                        <a href={it.screenshot_url} target="_blank" rel="noreferrer" className="block rounded-lg overflow-hidden border border-border">
-                          <img src={it.screenshot_url} alt="Chart" className="w-full max-h-48 object-contain bg-secondary/30" />
-                        </a>
-                      )}
+                      {it.screenshot_url && <SignedAnalysisImage value={it.screenshot_url} />}
                       <div className="grid grid-cols-3 gap-2">
                         <div className="rounded-lg bg-secondary/40 p-2 text-center">
                           <div className="text-[9px] font-mono text-muted-foreground uppercase mb-0.5">Entry</div>

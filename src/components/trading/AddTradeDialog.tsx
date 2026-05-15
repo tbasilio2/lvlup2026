@@ -172,6 +172,16 @@ const AddTradeDialog = ({ onAdd }: Props) => {
           </div>
 
           <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">P&L (manual override)</label>
+            <input type="number" step="any" value={form.pnl} onChange={(e) => update("pnl", e.target.value)} placeholder="Leave empty to auto-calculate" className={inputCls + " font-mono"} />
+            {!form.pnl.trim() && autoPnl != null && (
+              <p className={`text-[10px] mt-1 font-mono ${autoPnl >= 0 ? "text-profit" : "text-loss"}`}>
+                Auto: {autoPnl >= 0 ? "+" : ""}{autoPnl.toFixed(2)}
+              </p>
+            )}
+          </div>
+
+          <div>
             <label className="text-xs font-medium text-muted-foreground mb-1 block">Strategy / Setup</label>
             <input value={form.strategy} onChange={(e) => update("strategy", e.target.value)} placeholder="e.g. Break & Retest" className={inputCls} />
           </div>

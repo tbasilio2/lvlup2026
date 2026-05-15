@@ -105,7 +105,7 @@ const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
           {trade.screenshot_url && (
             <div className="space-y-2">
               <span className="text-xs text-muted-foreground flex items-center gap-1"><ImageIcon className="h-3 w-3" /> Screenshot</span>
-              <img src={trade.screenshot_url} alt="Trade chart" className="rounded-lg border border-border max-h-48 object-contain" />
+              <SignedScreenshot value={trade.screenshot_url} />
               <ChartAnalysis trade={trade} />
             </div>
           )}

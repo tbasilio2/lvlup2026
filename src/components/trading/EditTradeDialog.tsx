@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import type { Trade, TradeInsert } from "@/hooks/useTrades";
+import { useSignedTradeScreenshot } from "@/lib/tradeScreenshot";
 
 interface Props {
   trade: Trade;
@@ -234,12 +235,7 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
             <label className="text-xs font-medium text-muted-foreground mb-1 block">Chart Screenshot</label>
             <input ref={fileRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
             {screenshotPreview ? (
-              <div className="relative rounded-xl border border-border overflow-hidden">
-                <img src={screenshotPreview} alt="Preview" className="w-full max-h-40 object-contain bg-secondary/30" />
-                <button type="button" onClick={clearScreenshot} className="absolute top-2 right-2 p-1 rounded-lg bg-background/80 backdrop-blur-sm border border-border hover:bg-destructive/20 transition-colors">
-                  <X className="h-3.5 w-3.5 text-foreground" />
-                </button>
-              </div>
+              <ScreenshotPreview src={screenshotPreview} onClear={clearScreenshot} />
             ) : (
               <button type="button" onClick={() => fileRef.current?.click()} className="w-full rounded-xl border border-dashed border-border bg-secondary/20 hover:bg-secondary/40 transition-colors py-6 flex flex-col items-center gap-1.5">
                 <ImagePlus className="h-5 w-5 text-muted-foreground" />
@@ -254,6 +250,18 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
         </form>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const ScreenshotPreview = ({ src, onClear }: { src: string; onClear: () => void }) => {
+  const signed = useSignedTradeScreenshot(src);
+  return (
+    <div className="relative rounded-xl border border-border overflow-hidden">
+      <img src={signed ?? src} alt="Preview" className="w-full max-h-40 object-contain bg-secondary/30" />
+      <button type="button" onClick={onClear} className="absolute top-2 right-2 p-1 rounded-lg bg-background/80 backdrop-blur-sm border border-border hover:bg-destructive/20 transition-colors">
+        <X className="h-3.5 w-3.5 text-foreground" />
+      </button>
+    </div>
   );
 };
 

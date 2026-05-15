@@ -41,7 +41,7 @@ const SetupAdvisor = () => {
 
   const update = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
 
-  const extractLevelsFromScreenshot = async (f: File): Promise<{ url?: string; extracted?: any }> => {
+  const extractLevelsFromScreenshot = async (f: File): Promise<{ url?: string; path?: string; extracted?: any }> => {
     if (!user) return {};
     setExtracting(true);
     setExtractNote(null);
@@ -52,12 +52,16 @@ const SetupAdvisor = () => {
         .from("trade-screenshots")
         .upload(path, f, { contentType: f.type });
       if (upErr) { setExtracting(false); return {}; }
-      const { data: urlData } = supabase.storage.from("trade-screenshots").getPublicUrl(path);
+      const { data: signed } = await supabase.storage
+        .from("trade-screenshots")
+        .createSignedUrl(path, 3600);
+      const signedUrl = signed?.signedUrl;
+      if (!signedUrl) { setExtracting(false); return { path }; }
 
       const { data, error } = await supabase.functions.invoke("extract-chart-levels", {
-        body: { screenshot_url: urlData.publicUrl },
+        body: { screenshot_url: signedUrl },
       });
-      if (error || data?.error) { setExtracting(false); return { url: urlData.publicUrl }; }
+      if (error || data?.error) { setExtracting(false); return { url: signedUrl, path }; }
 
       const next = {
         symbol: data.symbol || "",
@@ -76,7 +80,7 @@ const SetupAdvisor = () => {
         take_profit: next.take_profit || p.take_profit,
       }));
       setExtractNote(`AI read levels (${data.confidence} confidence): ${data.notes}`);
-      return { url: urlData.publicUrl, extracted: next };
+      return { url: signedUrl, path, extracted: next };
     } catch {
       return {};
     } finally {

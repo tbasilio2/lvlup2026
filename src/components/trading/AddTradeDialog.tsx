@@ -81,6 +81,7 @@ const AddTradeDialog = ({ onAdd }: Props) => {
     e.preventDefault();
     setLoading(true);
     const screenshotUrl = await uploadScreenshot();
+    const manualPnl = form.pnl.trim() ? parseFloat(form.pnl) : null;
     await onAdd({
       symbol: form.symbol.toUpperCase(),
       direction: form.direction,
@@ -90,6 +91,8 @@ const AddTradeDialog = ({ onAdd }: Props) => {
       entry_date: new Date(form.entry_date).toISOString(),
       exit_date: form.exit_date ? new Date(form.exit_date).toISOString() : null,
       fees: parseFloat(form.fees || "0"),
+      pnl: manualPnl,
+      status: manualPnl != null || form.exit_price ? "closed" : "open",
       strategy: form.strategy || undefined,
       notes: form.notes || undefined,
       screenshot_url: screenshotUrl,
@@ -100,7 +103,7 @@ const AddTradeDialog = ({ onAdd }: Props) => {
     setForm({
       symbol: "", direction: "long", entry_price: "", exit_price: "",
       quantity: "1", entry_date: new Date().toISOString().slice(0, 16),
-      exit_date: "", fees: "0", strategy: "", notes: "",
+      exit_date: "", fees: "0", pnl: "", strategy: "", notes: "",
     });
   };
 

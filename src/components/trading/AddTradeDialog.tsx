@@ -28,9 +28,20 @@ const AddTradeDialog = ({ onAdd }: Props) => {
     entry_date: new Date().toISOString().slice(0, 16),
     exit_date: "",
     fees: "0",
+    pnl: "",
     strategy: "",
     notes: "",
   });
+
+  const autoPnl = (() => {
+    const ep = parseFloat(form.entry_price);
+    const xp = parseFloat(form.exit_price);
+    const q = parseFloat(form.quantity);
+    const f = parseFloat(form.fees || "0");
+    if (!isFinite(ep) || !isFinite(xp) || !isFinite(q)) return null;
+    const gross = form.direction === "long" ? (xp - ep) * q : (ep - xp) * q;
+    return gross - (isFinite(f) ? f : 0);
+  })();
 
   const update = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
 

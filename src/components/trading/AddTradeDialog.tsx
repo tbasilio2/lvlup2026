@@ -28,9 +28,20 @@ const AddTradeDialog = ({ onAdd }: Props) => {
     entry_date: new Date().toISOString().slice(0, 16),
     exit_date: "",
     fees: "0",
+    pnl: "",
     strategy: "",
     notes: "",
   });
+
+  const autoPnl = (() => {
+    const ep = parseFloat(form.entry_price);
+    const xp = parseFloat(form.exit_price);
+    const q = parseFloat(form.quantity);
+    const f = parseFloat(form.fees || "0");
+    if (!isFinite(ep) || !isFinite(xp) || !isFinite(q)) return null;
+    const gross = form.direction === "long" ? (xp - ep) * q : (ep - xp) * q;
+    return gross - (isFinite(f) ? f : 0);
+  })();
 
   const update = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
 
@@ -70,6 +81,7 @@ const AddTradeDialog = ({ onAdd }: Props) => {
     e.preventDefault();
     setLoading(true);
     const screenshotUrl = await uploadScreenshot();
+    const manualPnl = form.pnl.trim() ? parseFloat(form.pnl) : null;
     await onAdd({
       symbol: form.symbol.toUpperCase(),
       direction: form.direction,
@@ -79,6 +91,8 @@ const AddTradeDialog = ({ onAdd }: Props) => {
       entry_date: new Date(form.entry_date).toISOString(),
       exit_date: form.exit_date ? new Date(form.exit_date).toISOString() : null,
       fees: parseFloat(form.fees || "0"),
+      pnl: manualPnl,
+      status: manualPnl != null || form.exit_price ? "closed" : "open",
       strategy: form.strategy || undefined,
       notes: form.notes || undefined,
       screenshot_url: screenshotUrl,
@@ -89,7 +103,7 @@ const AddTradeDialog = ({ onAdd }: Props) => {
     setForm({
       symbol: "", direction: "long", entry_price: "", exit_price: "",
       quantity: "1", entry_date: new Date().toISOString().slice(0, 16),
-      exit_date: "", fees: "0", strategy: "", notes: "",
+      exit_date: "", fees: "0", pnl: "", strategy: "", notes: "",
     });
   };
 
@@ -155,6 +169,16 @@ const AddTradeDialog = ({ onAdd }: Props) => {
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Exit Date</label>
               <input type="datetime-local" value={form.exit_date} onChange={(e) => update("exit_date", e.target.value)} className={inputCls} />
             </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">P&L (manual override)</label>
+            <input type="number" step="any" value={form.pnl} onChange={(e) => update("pnl", e.target.value)} placeholder="Leave empty to auto-calculate" className={inputCls + " font-mono"} />
+            {!form.pnl.trim() && autoPnl != null && (
+              <p className={`text-[10px] mt-1 font-mono ${autoPnl >= 0 ? "text-profit" : "text-loss"}`}>
+                Auto: {autoPnl >= 0 ? "+" : ""}{autoPnl.toFixed(2)}
+              </p>
+            )}
           </div>
 
           <div>

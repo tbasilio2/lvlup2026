@@ -61,6 +61,7 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
         entry_date: toLocal(trade.entry_date),
         exit_date: toLocal(trade.exit_date),
         fees: String(trade.fees ?? 0),
+        pnl: trade.pnl != null ? String(trade.pnl) : "",
         strategy: trade.strategy ?? "",
         notes: trade.notes ?? "",
         tags: (trade.tags ?? []).join(", "),

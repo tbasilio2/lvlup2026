@@ -58,6 +58,7 @@ const Trading = () => {
               </div>
             </div>
             <div className="flex gap-2">
+              <MT5ImportWizard onImport={addTradesBatch} />
               <CSVImport onImport={addTradesBatch} />
               <AddTradeDialog onAdd={addTrade} />
             </div>

@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import AddTradeDialog from "@/components/trading/AddTradeDialog";
 import CSVImport from "@/components/trading/CSVImport";
+import MT5ImportWizard from "@/components/trading/MT5ImportWizard";
 import TradeRow from "@/components/trading/TradeRow";
 import TradeStats from "@/components/trading/TradeStats";
 import PnLCalendar from "@/components/trading/PnLCalendar";

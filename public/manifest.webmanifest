@@ -1,0 +1,17 @@
+{
+  "name": "Reflect — Habits, Goals, Journal & Trading",
+  "short_name": "Reflect",
+  "description": "Track habits, set goals, journal your thoughts, and analyze your trades. All in one place.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1318",
+  "theme_color": "#0f1318",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

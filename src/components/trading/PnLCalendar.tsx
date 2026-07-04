@@ -1,11 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   startOfMonth, endOfMonth, eachDayOfInterval, format, isSameMonth,
   startOfWeek, endOfWeek, subMonths, addMonths,
 } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
 import type { Trade } from "@/hooks/useTrades";
+import DayTradesDialog from "./DayTradesDialog";
 
 interface Props {
   trades: Trade[];
@@ -13,6 +13,17 @@ interface Props {
 
 const PnLCalendar = ({ trades }: Props) => {
   const [month, setMonth] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+
+  const tradesByDay = useMemo(() => {
+    const map: Record<string, Trade[]> = {};
+    trades.forEach((t) => {
+      if (!t.exit_date) return;
+      const day = format(new Date(t.exit_date), "yyyy-MM-dd");
+      (map[day] ||= []).push(t);
+    });
+    return map;
+  }, [trades]);
 
   const dailyPnL = useMemo(() => {
     const map: Record<string, number> = {};

@@ -34,7 +34,7 @@ const Trading = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-2xl px-5 py-8 pb-24 space-y-4">
+        <div className="mx-auto max-w-7xl px-5 py-8 pb-24 space-y-4">
           <Skeleton className="h-10 w-48" />
           <div className="grid grid-cols-3 gap-2">
             {[1, 2, 3, 4, 5, 6].map((i) => <Skeleton key={i} className="h-16 rounded-xl" />)}

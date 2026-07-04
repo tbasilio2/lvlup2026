@@ -47,9 +47,9 @@ const Trading = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-2xl px-5 py-8 pb-24">
+      <div className="mx-auto max-w-7xl px-5 py-8 pb-24">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
                 <TrendingUp className="h-5 w-5 text-primary" />
@@ -59,7 +59,7 @@ const Trading = () => {
                 <p className="text-xs text-muted-foreground font-mono">Track · Analyze · Improve</p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <MT5ImportWizard onImport={addTradesBatch} />
               <CSVImport onImport={addTradesBatch} />
               <AddTradeDialog onAdd={addTrade} />
@@ -69,7 +69,7 @@ const Trading = () => {
 
         <Tabs defaultValue="journal" className="space-y-4">
           <TabsList className="grid w-full grid-cols-7 rounded-xl bg-secondary">
-            <TabsTrigger value="journal" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Journal</TabsTrigger>
+            <TabsTrigger value="journal" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Dashboard</TabsTrigger>
             <TabsTrigger value="analytics" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Stats</TabsTrigger>
             <TabsTrigger value="advanced" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Pro</TabsTrigger>
             <TabsTrigger value="ai-trade" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">AI</TabsTrigger>
@@ -78,23 +78,39 @@ const Trading = () => {
             <TabsTrigger value="chart" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Chart</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="journal" className="space-y-3">
-            <TradeStats trades={trades} />
+          <TabsContent value="journal" className="space-y-4">
+            <TradeHeroStats trades={trades} />
 
             {trades.length === 0 ? (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12 rounded-xl border border-dashed border-border bg-card/50">
                 <TrendingUp className="h-8 w-8 text-muted-foreground/30 mx-auto mb-3" />
                 <p className="text-muted-foreground text-sm">No trades yet.</p>
-                <p className="text-muted-foreground/60 text-xs mt-1">Add your first trade or import from CSV.</p>
+                <p className="text-muted-foreground/60 text-xs mt-1">Add your first trade or import from MT5 / CSV.</p>
               </motion.div>
             ) : (
-              <div className="space-y-2">
-                <AnimatePresence>
-                  {trades.map((trade) => (
-                    <TradeRow key={trade.id} trade={trade} onDelete={deleteTrade} onUpdate={updateTrade} />
-                  ))}
-                </AnimatePresence>
-              </div>
+              <>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-2">
+                    <PnLCalendar trades={trades} />
+                  </div>
+                  <div>
+                    <EquityCurve trades={trades} />
+                  </div>
+                </div>
+
+                <RecentTradesTable trades={trades} />
+
+                <div>
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-[0.14em] font-mono mb-2 mt-2">All Trades</h3>
+                  <div className="space-y-2">
+                    <AnimatePresence>
+                      {trades.map((trade) => (
+                        <TradeRow key={trade.id} trade={trade} onDelete={deleteTrade} onUpdate={updateTrade} />
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </>
             )}
           </TabsContent>
 

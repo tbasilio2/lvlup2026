@@ -8,6 +8,8 @@ import CSVImport from "@/components/trading/CSVImport";
 import MT5ImportWizard from "@/components/trading/MT5ImportWizard";
 import TradeRow from "@/components/trading/TradeRow";
 import TradeStats from "@/components/trading/TradeStats";
+import TradeHeroStats from "@/components/trading/TradeHeroStats";
+import RecentTradesTable from "@/components/trading/RecentTradesTable";
 import PnLCalendar from "@/components/trading/PnLCalendar";
 import EquityCurve from "@/components/trading/EquityCurve";
 import TradingViewWidget from "@/components/trading/TradingViewWidget";

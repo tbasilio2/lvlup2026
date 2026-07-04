@@ -27,13 +27,12 @@ const PnLCalendar = ({ trades }: Props) => {
 
   const dailyPnL = useMemo(() => {
     const map: Record<string, number> = {};
-    trades.forEach((t) => {
-      if (t.pnl == null || !t.exit_date) return;
-      const day = format(new Date(t.exit_date), "yyyy-MM-dd");
-      map[day] = (map[day] || 0) + t.pnl;
+    Object.entries(tradesByDay).forEach(([day, ts]) => {
+      const sum = ts.reduce((s, t) => s + (t.pnl ?? 0), 0);
+      if (ts.some((t) => t.pnl != null)) map[day] = sum;
     });
     return map;
-  }, [trades]);
+  }, [tradesByDay]);
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(month), { weekStartsOn: 1 });

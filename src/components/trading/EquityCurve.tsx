@@ -86,11 +86,11 @@ const EquityCurve = ({ trades }: Props) => {
               stroke: "hsl(210, 20%, 93%)",
               strokeWidth: 2,
               style: { cursor: "pointer" },
-              onClick: (_: unknown, payload: { payload?: { id?: string } }) => {
-                const id = payload?.payload?.id;
+              onClick: (props: unknown) => {
+                const id = (props as { payload?: { id?: string } })?.payload?.id;
                 if (id) setSelectedId(id);
               },
-            }}
+            } as never}
           />
         </AreaChart>
       </ResponsiveContainer>

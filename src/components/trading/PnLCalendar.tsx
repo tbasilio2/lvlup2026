@@ -71,16 +71,21 @@ const PnLCalendar = ({ trades }: Props) => {
         {calendarDays.map((day) => {
           const key = format(day, "yyyy-MM-dd");
           const pnl = dailyPnL[key];
+          const dayTrades = tradesByDay[key] ?? [];
           const inMonth = isSameMonth(day, month);
+          const clickable = dayTrades.length > 0;
 
           return (
-            <div
+            <button
               key={key}
-              className={`aspect-square flex flex-col items-center justify-center rounded-lg text-[10px] transition-colors ${
+              type="button"
+              disabled={!clickable}
+              onClick={() => clickable && setSelectedDay(key)}
+              className={`aspect-square flex flex-col items-center justify-center rounded-lg text-[10px] transition-all ${
                 !inMonth ? "opacity-20" : ""
-              }`}
+              } ${clickable ? "hover:ring-2 hover:ring-primary/50 hover:scale-105 cursor-pointer" : "cursor-default"}`}
               style={{ backgroundColor: pnl != null ? getColor(pnl) : undefined }}
-              title={pnl != null ? `${key}: ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}` : key}
+              title={pnl != null ? `${key}: ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} · ${dayTrades.length} trade(s)` : key}
             >
               <span className={`font-mono font-medium ${pnl != null ? "text-foreground" : "text-muted-foreground"}`}>
                 {format(day, "d")}
@@ -90,10 +95,17 @@ const PnLCalendar = ({ trades }: Props) => {
                   {pnl >= 0 ? "+" : ""}{pnl.toFixed(0)}
                 </span>
               )}
-            </div>
+            </button>
           );
         })}
       </div>
+
+      <DayTradesDialog
+        open={selectedDay !== null}
+        onOpenChange={(o) => !o && setSelectedDay(null)}
+        title={selectedDay ? format(new Date(selectedDay), "EEEE, MMM d, yyyy") : ""}
+        trades={selectedDay ? tradesByDay[selectedDay] ?? [] : []}
+      />
     </div>
   );
 };

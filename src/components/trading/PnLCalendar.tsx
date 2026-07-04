@@ -1,11 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   startOfMonth, endOfMonth, eachDayOfInterval, format, isSameMonth,
   startOfWeek, endOfWeek, subMonths, addMonths,
 } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
 import type { Trade } from "@/hooks/useTrades";
+import DayTradesDialog from "./DayTradesDialog";
 
 interface Props {
   trades: Trade[];
@@ -13,16 +13,26 @@ interface Props {
 
 const PnLCalendar = ({ trades }: Props) => {
   const [month, setMonth] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
-  const dailyPnL = useMemo(() => {
-    const map: Record<string, number> = {};
+  const tradesByDay = useMemo(() => {
+    const map: Record<string, Trade[]> = {};
     trades.forEach((t) => {
-      if (t.pnl == null || !t.exit_date) return;
+      if (!t.exit_date) return;
       const day = format(new Date(t.exit_date), "yyyy-MM-dd");
-      map[day] = (map[day] || 0) + t.pnl;
+      (map[day] ||= []).push(t);
     });
     return map;
   }, [trades]);
+
+  const dailyPnL = useMemo(() => {
+    const map: Record<string, number> = {};
+    Object.entries(tradesByDay).forEach(([day, ts]) => {
+      const sum = ts.reduce((s, t) => s + (t.pnl ?? 0), 0);
+      if (ts.some((t) => t.pnl != null)) map[day] = sum;
+    });
+    return map;
+  }, [tradesByDay]);
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(month), { weekStartsOn: 1 });
@@ -61,16 +71,21 @@ const PnLCalendar = ({ trades }: Props) => {
         {calendarDays.map((day) => {
           const key = format(day, "yyyy-MM-dd");
           const pnl = dailyPnL[key];
+          const dayTrades = tradesByDay[key] ?? [];
           const inMonth = isSameMonth(day, month);
+          const clickable = dayTrades.length > 0;
 
           return (
-            <div
+            <button
               key={key}
-              className={`aspect-square flex flex-col items-center justify-center rounded-lg text-[10px] transition-colors ${
+              type="button"
+              disabled={!clickable}
+              onClick={() => clickable && setSelectedDay(key)}
+              className={`aspect-square flex flex-col items-center justify-center rounded-lg text-[10px] transition-all ${
                 !inMonth ? "opacity-20" : ""
-              }`}
+              } ${clickable ? "hover:ring-2 hover:ring-primary/50 hover:scale-105 cursor-pointer" : "cursor-default"}`}
               style={{ backgroundColor: pnl != null ? getColor(pnl) : undefined }}
-              title={pnl != null ? `${key}: ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}` : key}
+              title={pnl != null ? `${key}: ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} · ${dayTrades.length} trade(s)` : key}
             >
               <span className={`font-mono font-medium ${pnl != null ? "text-foreground" : "text-muted-foreground"}`}>
                 {format(day, "d")}
@@ -80,10 +95,17 @@ const PnLCalendar = ({ trades }: Props) => {
                   {pnl >= 0 ? "+" : ""}{pnl.toFixed(0)}
                 </span>
               )}
-            </div>
+            </button>
           );
         })}
       </div>
+
+      <DayTradesDialog
+        open={selectedDay !== null}
+        onOpenChange={(o) => !o && setSelectedDay(null)}
+        title={selectedDay ? format(new Date(selectedDay), "EEEE, MMM d, yyyy") : ""}
+        trades={selectedDay ? tradesByDay[selectedDay] ?? [] : []}
+      />
     </div>
   );
 };

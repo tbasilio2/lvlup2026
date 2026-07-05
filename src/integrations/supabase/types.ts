@@ -198,6 +198,51 @@ export type Database = {
         }
         Relationships: []
       }
+      mt5_accounts: {
+        Row: {
+          broker_server: string
+          created_at: string
+          id: string
+          label: string
+          last_error: string | null
+          last_synced_at: string | null
+          login: string
+          metaapi_account_id: string | null
+          platform: string
+          state: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          broker_server: string
+          created_at?: string
+          id?: string
+          label: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          login: string
+          metaapi_account_id?: string | null
+          platform?: string
+          state?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          broker_server?: string
+          created_at?: string
+          id?: string
+          label?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          login?: string
+          metaapi_account_id?: string | null
+          platform?: string
+          state?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -232,6 +277,8 @@ export type Database = {
           exit_price: number | null
           fees: number | null
           id: string
+          metaapi_deal_id: string | null
+          mt5_account_id: string | null
           notes: string | null
           pnl: number | null
           quantity: number
@@ -251,6 +298,8 @@ export type Database = {
           exit_price?: number | null
           fees?: number | null
           id?: string
+          metaapi_deal_id?: string | null
+          mt5_account_id?: string | null
           notes?: string | null
           pnl?: number | null
           quantity?: number
@@ -270,6 +319,8 @@ export type Database = {
           exit_price?: number | null
           fees?: number | null
           id?: string
+          metaapi_deal_id?: string | null
+          mt5_account_id?: string | null
           notes?: string | null
           pnl?: number | null
           quantity?: number
@@ -280,7 +331,15 @@ export type Database = {
           tags?: string[] | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trades_mt5_account_id_fkey"
+            columns: ["mt5_account_id"]
+            isOneToOne: false
+            referencedRelation: "mt5_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

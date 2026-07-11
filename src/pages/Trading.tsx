@@ -6,6 +6,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AddTradeDialog from "@/components/trading/AddTradeDialog";
 import CSVImport from "@/components/trading/CSVImport";
 import MT5ImportWizard from "@/components/trading/MT5ImportWizard";
+import MT5ConnectDialog from "@/components/trading/MT5ConnectDialog";
+import ConnectedAccountsList from "@/components/trading/ConnectedAccountsList";
 import TradeRow from "@/components/trading/TradeRow";
 import TradeStats from "@/components/trading/TradeStats";
 import TradeHeroStats from "@/components/trading/TradeHeroStats";
@@ -27,8 +29,9 @@ import { useTradeAnalytics } from "@/hooks/useTradeAnalytics";
 import { TrendingUp } from "lucide-react";
 
 const Trading = () => {
-  const { trades, loading, addTrade, addTradesBatch, deleteTrade, updateTrade } = useTrades();
+  const { trades, loading, addTrade, addTradesBatch, deleteTrade, updateTrade, refetch } = useTrades();
   const [chartSymbol, setChartSymbol] = useState("OANDA:EURUSD");
+  const [mt5Refresh, setMt5Refresh] = useState(0);
   const analytics = useTradeAnalytics(trades);
 
   if (loading) {
@@ -60,12 +63,20 @@ const Trading = () => {
               </div>
             </div>
             <div className="flex gap-2 flex-wrap">
+              <MT5ConnectDialog onConnected={() => setMt5Refresh((n) => n + 1)} />
               <MT5ImportWizard onImport={addTradesBatch} />
               <CSVImport onImport={addTradesBatch} />
               <AddTradeDialog onAdd={addTrade} />
             </div>
           </div>
         </motion.div>
+
+        <div className="mb-4">
+          <ConnectedAccountsList
+            refreshKey={mt5Refresh}
+            onSynced={() => { refetch(); setMt5Refresh((n) => n + 1); }}
+          />
+        </div>
 
         <Tabs defaultValue="journal" className="space-y-4">
           <TabsList className="grid w-full grid-cols-7 rounded-xl bg-secondary">

@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS trades_user_metaapi_deal_unique ON public.trades (user_id, metaapi_deal_id) WHERE metaapi_deal_id IS NOT NULL;

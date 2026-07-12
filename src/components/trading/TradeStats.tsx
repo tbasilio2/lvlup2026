@@ -25,7 +25,7 @@ const TradeStats = ({ trades }: Props) => {
     { label: "Total P&L", value: formatMoney(stats.totalPnl, { signed: true }), positive: stats.totalPnl >= 0 },
     { label: "Win Rate", value: `${stats.winRate.toFixed(1)}%`, positive: stats.winRate >= 50 },
     { label: "Avg Win", value: formatMoney(stats.avgWin, { signed: true }), positive: true },
-    { label: "Avg Loss", value: `-${formatMoney(stats.avgLoss).replace(/^R/, "R")}`.replace("--", "-"), positive: false },
+    { label: "Avg Loss", value: formatMoney(-stats.avgLoss), positive: false },
     { label: "Risk:Reward", value: `1:${stats.rr.toFixed(2)}`, positive: null },
     { label: "Trades", value: `${stats.total} closed · ${stats.openCount} open`, positive: null },
   ];

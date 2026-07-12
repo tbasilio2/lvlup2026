@@ -1,54 +1,45 @@
-# MT5 Auto-Sync via MetaApi
+## Goal
+Display all monetary values (P&L, fees, wins, losses, expectancy, drawdown, etc.) in South African Rand (ZAR) with an `R` prefix instead of unlabeled numbers.
 
-Add real-time MT5 account syncing (Trade Art / TradeZella style) on top of the existing manual HTML/CSV wizard. The user connects an MT5 account once (broker server + login + investor read-only password), and trades stream into the journal.
+## Approach
+Numbers today are rendered as bare `toFixed(2)` values with no currency symbol. Add a single formatting helper and use it everywhere money is shown, so we get one source of truth (easy to switch later).
 
-## How it works
+### 1. New helper `src/lib/currency.ts`
+```ts
+export const CURRENCY = "ZAR";
+export const CURRENCY_SYMBOL = "R";
 
-```text
-Browser  ──►  Edge Function  ──►  MetaApi Cloud  ──►  User's MT5 broker
-   ▲              │                     │
-   └── trades ────┴── deals history ◄───┘
+// e.g. formatMoney(1234.5) -> "R 1 234.50"; signed -> "+R 1 234.50" / "-R 1 234.50"
+export function formatMoney(n: number, opts?: { signed?: boolean; digits?: number }): string;
+export function formatMoneyCompact(n: number): string; // "R 1.2k" for calendar cells
 ```
+Uses `Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" })` under the hood, then normalises the symbol to a plain `R ` prefix so it fits the mono/terminal style.
 
-- MetaApi hosts a virtual MT5 terminal per account. We never touch MT5 directly.
-- The **investor password** is read-only — it can view trades but cannot place or modify orders.
-- All MetaApi calls happen in an edge function so the MetaApi token and the user's investor password never touch the browser.
+### 2. Replace bare P&L / fee renderings with `formatMoney`
+Files to update (UI only, no business logic):
+- `src/components/trading/RecentTradesTable.tsx` — P&L cell
+- `src/components/trading/TradeStats.tsx` — Total P&L, Avg Win, Avg Loss
+- `src/components/trading/TradeHeroStats.tsx`
+- `src/components/trading/TradeRow.tsx`
+- `src/components/trading/EquityCurve.tsx` (axis + tooltip)
+- `src/components/trading/PnLCalendar.tsx` (tooltip + cell → compact)
+- `src/components/trading/DayTradesDialog.tsx`
+- `src/components/trading/analytics/AdvancedMetrics.tsx` — Expectancy, Max DD
+- `src/components/trading/analytics/BreakdownTable.tsx` — Net, Expectancy
+- `src/components/trading/analytics/LongShortCompare.tsx` — Net P&L
+- `src/components/trading/analytics/MonthlyHeatmap.tsx`
+- `src/components/trading/CSVImport.tsx` — preview P&L
+- `src/components/trading/MT5ImportWizard.tsx` — preview P&L
+- `src/components/trading/AddTradeDialog.tsx` / `EditTradeDialog.tsx` — field labels ("P&L (R)", "Fees (R)")
+- `src/pages/Journal.tsx` — Net P&L, Total Fees, per-entry P&L
+- `src/components/JournalEntry.tsx` — field labels
 
-## What to build
+Signed helper is used where a `+` prefix is already shown for wins.
 
-### 1. Secret
-- `METAAPI_TOKEN` — token was pasted in chat and will be stored securely via `set_secret` on first build-mode action. Never logged or returned to the client.
+### 3. Out of scope
+- No DB schema changes; amounts stay as plain numbers.
+- No FX conversion — this is a display-only relabel. Existing values are shown as ZAR as-is.
+- Chart symbols (`OANDA:EURUSD` etc.) stay untouched — those are instruments, not currency.
 
-### 2. Database (already migrated)
-- Table `mt5_accounts` (RLS: own rows only).
-- `trades.metaapi_deal_id` + `trades.mt5_account_id` for dedupe on re-sync.
-
-### 3. Edge functions
-- `mt5-connect` — creates a MetaApi provisioning profile + account, deploys it, polls until `DEPLOYED`, stores the row. Investor password is forwarded to MetaApi and never persisted on our side.
-- `mt5-sync` — fetches historical deals via MetaApi REST, groups entry/exit deals by position, upserts into `trades` with `metaapi_deal_id` dedupe, updates `last_synced_at`.
-- `mt5-disconnect` — undeploys + deletes the MetaApi account, removes the DB row.
-
-All three validate the caller's JWT and scope everything to `auth.uid()`.
-
-### 4. UI
-- `MT5ConnectDialog` — form for label, broker server, login, investor password, region dropdown (new-york / london / singapore). Submits to `mt5-connect`, shows provisioning spinner.
-- `ConnectedAccountsList` — one card per linked account with state badge, last sync time, **Sync now**, **Disconnect**.
-- Mount both on the Trading page header, next to existing MT5 Import / CSV Import.
-- Keep `MT5ImportWizard` as-is for users who prefer manual export.
-
-## Technical notes
-
-- MetaApi endpoints: `POST /users/current/provisioning-profiles`, `POST /users/current/accounts`, `GET /users/current/accounts/{id}` (poll state), `GET /users/current/accounts/{id}/history-deals/time/{from}/{to}`.
-- Cost is on the user's MetaApi account.
-- No polling loop server-side — user hits **Sync now**. Scheduled cron can be added later.
-
-## Out of scope
-- Real-time WebSocket streaming
-- MT4/cTrader
-- Auto-scheduled background sync
-
-## Deliverables
-- 3 edge functions (`mt5-connect`, `mt5-sync`, `mt5-disconnect`)
-- `METAAPI_TOKEN` stored via `set_secret`
-- 2 new components (`MT5ConnectDialog`, `ConnectedAccountsList`)
-- Small edit to `src/pages/Trading.tsx`
+## Notes
+If later you want a user-selectable currency, `CURRENCY`/`CURRENCY_SYMBOL` can be moved to a profile setting and read from context — the helper API stays the same.

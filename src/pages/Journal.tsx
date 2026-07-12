@@ -9,6 +9,7 @@ import { useJournal } from "@/hooks/useJournal";
 import { formatDate, MOODS, getMoodTailwind } from "@/lib/journal";
 import type { Mood } from "@/lib/journal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatMoney, formatMoneyCompact } from "@/lib/currency";
 
 const Journal = () => {
   const { entries, loading, saveEntry } = useJournal();
@@ -131,14 +132,14 @@ const Journal = () => {
                         <TrendingDown className="h-3.5 w-3.5 text-loss" />
                       )}
                       <span className={`text-sm font-bold font-mono ${todayEntry.profitLoss >= 0 ? "text-profit" : "text-loss"}`}>
-                        {todayEntry.profitLoss >= 0 ? "+" : ""}{todayEntry.profitLoss.toFixed(2)}
+                        {formatMoney(todayEntry.profitLoss, { signed: true })}
                       </span>
                     </div>
                   )}
                   {todayEntry.fees != null && todayEntry.fees > 0 && (
                     <div className="flex items-center gap-1.5">
                       <Receipt className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-sm font-mono text-muted-foreground">{todayEntry.fees.toFixed(2)}</span>
+                      <span className="text-sm font-mono text-muted-foreground">{formatMoney(todayEntry.fees)}</span>
                     </div>
                   )}
                 </div>
@@ -183,7 +184,7 @@ const Journal = () => {
                 <div className="grid grid-cols-3 gap-2 mt-2">
                   <div className="rounded-2xl border border-border bg-card p-4 text-center">
                     <p className={`text-2xl font-serif font-mono ${net >= 0 ? "text-profit" : "text-loss"}`}>
-                      {net >= 0 ? "+" : ""}{net.toFixed(0)}
+                      {formatMoneyCompact(net, { signed: true })}
                     </p>
                     <p className="text-[10px] text-muted-foreground font-medium">Net P&L</p>
                   </div>
@@ -192,7 +193,7 @@ const Journal = () => {
                     <p className="text-[10px] text-muted-foreground font-medium">Win Days</p>
                   </div>
                   <div className="rounded-2xl border border-border bg-card p-4 text-center">
-                    <p className="text-2xl font-serif font-mono text-muted-foreground">{totalFees.toFixed(0)}</p>
+                    <p className="text-2xl font-serif font-mono text-muted-foreground">{formatMoneyCompact(totalFees)}</p>
                     <p className="text-[10px] text-muted-foreground font-medium">Total Fees</p>
                   </div>
                 </div>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Upload, Loader2, FileText, CheckCircle2, ArrowRight, ArrowLeft } from "lucide-react";
 import type { TradeInsert } from "@/hooks/useTrades";
 import { toast } from "sonner";
+import { formatMoney } from "@/lib/currency";
 
 interface Props {
   onImport: (trades: TradeInsert[]) => Promise<void>;
@@ -250,7 +251,7 @@ const MT5ImportWizard = ({ onImport }: Props) => {
                       <td className="px-2 py-1.5 text-right font-mono">{t.entry_price}</td>
                       <td className="px-2 py-1.5 text-right font-mono">{t.exit_price ?? "—"}</td>
                       <td className={`px-2 py-1.5 text-right font-mono ${(t.pnl ?? 0) >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                        {t.pnl != null ? t.pnl.toFixed(2) : "—"}
+                        {t.pnl != null ? formatMoney(t.pnl) : "—"}
                       </td>
                     </tr>
                   ))}

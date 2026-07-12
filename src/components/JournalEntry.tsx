@@ -118,7 +118,7 @@ const JournalEntryForm = ({ existingEntry, onSave, date }: Props) => {
               <div className="space-y-3">
                 <div>
                   <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-1.5">
-                    <TrendingUp className="h-3.5 w-3.5 text-profit" /> Profit / Loss
+                    <TrendingUp className="h-3.5 w-3.5 text-profit" /> Profit / Loss (R)
                   </label>
                   <Input
                     type="number"
@@ -131,7 +131,7 @@ const JournalEntryForm = ({ existingEntry, onSave, date }: Props) => {
                 </div>
                 <div>
                   <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-1.5">
-                    <Receipt className="h-3.5 w-3.5 text-primary" /> Fees
+                    <Receipt className="h-3.5 w-3.5 text-primary" /> Fees (R)
                   </label>
                   <Input
                     type="number"

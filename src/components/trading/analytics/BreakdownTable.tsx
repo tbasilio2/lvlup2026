@@ -1,4 +1,5 @@
 import type { BreakdownRow } from "@/hooks/useTradeAnalytics";
+import { formatMoney } from "@/lib/currency";
 
 interface Props { title: string; rows: BreakdownRow[] }
 
@@ -25,10 +26,10 @@ const BreakdownTable = ({ title, rows }: Props) => {
                 <td className="py-1.5 px-2 text-right text-muted-foreground">{r.trades}</td>
                 <td className="py-1.5 px-2 text-right text-foreground">{r.winRate.toFixed(0)}%</td>
                 <td className={`py-1.5 px-2 text-right font-bold ${r.netPnl >= 0 ? "text-profit" : "text-loss"}`}>
-                  {r.netPnl >= 0 ? "+" : ""}{r.netPnl.toFixed(2)}
+                  {formatMoney(r.netPnl, { signed: true })}
                 </td>
                 <td className={`py-1.5 px-2 text-right ${r.expectancy >= 0 ? "text-profit" : "text-loss"}`}>
-                  {r.expectancy >= 0 ? "+" : ""}{r.expectancy.toFixed(2)}
+                  {formatMoney(r.expectancy, { signed: true })}
                 </td>
               </tr>
             ))}

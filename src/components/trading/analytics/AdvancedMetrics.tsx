@@ -1,4 +1,5 @@
 import type { TradeAnalytics } from "@/hooks/useTradeAnalytics";
+import { formatMoney } from "@/lib/currency";
 
 interface Props { a: TradeAnalytics }
 
@@ -6,10 +7,10 @@ const fmt = (n: number, d = 2) => (Number.isFinite(n) ? n.toFixed(d) : "∞");
 
 const AdvancedMetrics = ({ a }: Props) => {
   const items = [
-    { label: "Expectancy", value: `${a.expectancy >= 0 ? "+" : ""}${fmt(a.expectancy)}`, positive: a.expectancy >= 0 },
+    { label: "Expectancy", value: formatMoney(a.expectancy, { signed: true }), positive: a.expectancy >= 0 },
     { label: "Profit Factor", value: fmt(a.profitFactor), positive: a.profitFactor >= 1 },
     { label: "Avg R", value: `${a.avgR >= 0 ? "+" : ""}${fmt(a.avgR)}R`, positive: a.avgR >= 0 },
-    { label: "Max DD", value: `${fmt(a.maxDrawdown)} (${fmt(a.maxDrawdownPct, 1)}%)`, positive: false },
+    { label: "Max DD", value: `${formatMoney(a.maxDrawdown)} (${fmt(a.maxDrawdownPct, 1)}%)`, positive: false },
     {
       label: "Current Streak",
       value: a.currentStreak.type === "none" ? "—" : `${a.currentStreak.count} ${a.currentStreak.type === "win" ? "W" : "L"}`,

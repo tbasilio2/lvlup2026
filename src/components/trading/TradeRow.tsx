@@ -7,6 +7,7 @@ import ChartAnalysis from "./ChartAnalysis";
 import EditTradeDialog from "./EditTradeDialog";
 import type { Trade, TradeInsert } from "@/hooks/useTrades";
 import { useSignedTradeScreenshot } from "@/lib/tradeScreenshot";
+import { formatMoney } from "@/lib/currency";
 
 const SignedScreenshot = ({ value }: { value: string }) => {
   const url = useSignedTradeScreenshot(value);
@@ -61,7 +62,7 @@ const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
         <div className="text-right">
           {trade.pnl != null ? (
             <span className={`text-sm font-bold font-mono ${isWin ? "text-profit" : isLoss ? "text-loss" : "text-muted-foreground"}`}>
-              {trade.pnl >= 0 ? "+" : ""}{trade.pnl.toFixed(2)}
+              {formatMoney(trade.pnl, { signed: true })}
             </span>
           ) : (
             <span className="text-xs text-muted-foreground font-mono">Open</span>
@@ -92,7 +93,7 @@ const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
             </div>
             <div>
               <span className="text-muted-foreground">Fees</span>
-              <p className="font-medium text-foreground font-mono">{trade.fees ?? 0}</p>
+              <p className="font-medium text-foreground font-mono">{formatMoney(trade.fees ?? 0)}</p>
             </div>
             {trade.exit_date && (
               <div className="col-span-2">

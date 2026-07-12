@@ -3,6 +3,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianG
 import { format } from "date-fns";
 import type { Trade } from "@/hooks/useTrades";
 import DayTradesDialog from "./DayTradesDialog";
+import { formatMoney, formatMoneyCompact } from "@/lib/currency";
 
 interface Props {
   trades: Trade[];
@@ -60,7 +61,10 @@ const EquityCurve = ({ trades }: Props) => {
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 15%, 15%)" />
           <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(215, 15%, 50%)", fontFamily: "JetBrains Mono" }} />
-          <YAxis tick={{ fontSize: 10, fill: "hsl(215, 15%, 50%)", fontFamily: "JetBrains Mono" }} />
+          <YAxis
+            tick={{ fontSize: 10, fill: "hsl(215, 15%, 50%)", fontFamily: "JetBrains Mono" }}
+            tickFormatter={(v: number) => formatMoneyCompact(v)}
+          />
           <Tooltip
             contentStyle={{
               background: "hsl(220, 18%, 12%)",
@@ -70,7 +74,7 @@ const EquityCurve = ({ trades }: Props) => {
               fontFamily: "JetBrains Mono",
             }}
             labelStyle={{ color: "hsl(210, 20%, 93%)" }}
-            formatter={(v: number) => [v.toFixed(2), "Cumulative P&L"]}
+            formatter={(v: number) => [formatMoney(v), "Cumulative P&L"]}
           />
           <Area
             type="monotone"

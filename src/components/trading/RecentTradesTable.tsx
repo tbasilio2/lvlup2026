@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import type { Trade } from "@/hooks/useTrades";
+import { formatMoney } from "@/lib/currency";
 
 const RecentTradesTable = ({ trades }: { trades: Trade[] }) => {
   const recent = trades.slice(0, 8);
@@ -45,7 +46,7 @@ const RecentTradesTable = ({ trades }: { trades: Trade[] }) => {
                   <td className="px-4 py-2.5 text-right text-muted-foreground hidden sm:table-cell">{t.entry_price}</td>
                   <td className="px-4 py-2.5 text-right text-muted-foreground hidden sm:table-cell">{t.exit_price ?? "—"}</td>
                   <td className={`px-4 py-2.5 text-right font-bold ${isWin ? "text-profit" : isLoss ? "text-loss" : "text-muted-foreground"}`}>
-                    {t.pnl != null ? `${t.pnl >= 0 ? "+" : ""}${t.pnl.toFixed(2)}` : "—"}
+                    {t.pnl != null ? formatMoney(t.pnl, { signed: true }) : "—"}
                   </td>
                 </tr>
               );

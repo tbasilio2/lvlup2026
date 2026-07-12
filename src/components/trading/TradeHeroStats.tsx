@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { ArrowUpRight, Target, Scale, Flame } from "lucide-react";
 import type { Trade } from "@/hooks/useTrades";
+import { formatMoney } from "@/lib/currency";
 
 const TradeHeroStats = ({ trades }: { trades: Trade[] }) => {
   const stats = useMemo(() => {
@@ -32,7 +33,7 @@ const TradeHeroStats = ({ trades }: { trades: Trade[] }) => {
   const cards = [
     {
       label: "Result",
-      value: `${stats.totalPnl >= 0 ? "+" : ""}${stats.totalPnl.toFixed(2)}`,
+      value: formatMoney(stats.totalPnl, { signed: true }),
       sub: "Net P&L",
       icon: ArrowUpRight,
       tone: stats.totalPnl >= 0 ? "profit" : "loss",

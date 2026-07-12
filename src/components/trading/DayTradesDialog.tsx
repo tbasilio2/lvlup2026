@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Trade } from "@/hooks/useTrades";
+import { formatMoney } from "@/lib/currency";
 
 interface Props {
   open: boolean;
@@ -26,7 +27,7 @@ const DayTradesDialog = ({ open, onOpenChange, title, trades }: Props) => {
           <div className="rounded-lg border border-border bg-secondary/40 p-2">
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono">Net P&L</p>
             <p className={`text-sm font-bold font-mono mt-0.5 ${totalPnl > 0 ? "text-profit" : totalPnl < 0 ? "text-loss" : "text-foreground"}`}>
-              {totalPnl >= 0 ? "+" : ""}{totalPnl.toFixed(2)}
+              {formatMoney(totalPnl, { signed: true })}
             </p>
           </div>
           <div className="rounded-lg border border-border bg-secondary/40 p-2">
@@ -72,7 +73,7 @@ const DayTradesDialog = ({ open, onOpenChange, title, trades }: Props) => {
                   <div className="text-right">
                     {t.pnl != null ? (
                       <span className={`text-sm font-bold font-mono ${isWin ? "text-profit" : isLoss ? "text-loss" : "text-muted-foreground"}`}>
-                        {t.pnl >= 0 ? "+" : ""}{t.pnl.toFixed(2)}
+                        {formatMoney(t.pnl, { signed: true })}
                       </span>
                     ) : (
                       <span className="text-xs text-muted-foreground font-mono">Open</span>

@@ -1,4 +1,5 @@
 import type { TradeAnalytics } from "@/hooks/useTradeAnalytics";
+import { formatMoney } from "@/lib/currency";
 
 const MONTHS = ["J","F","M","A","M","J","J","A","S","O","N","D"];
 
@@ -40,7 +41,7 @@ const MonthlyHeatmap = ({ a }: { a: TradeAnalytics }) => {
                   key={m}
                   className="aspect-square rounded-sm border border-border/40 flex items-center justify-center text-[8px] font-mono"
                   style={{ background: cell ? cellColor(cell.pnl) : "hsl(220, 15%, 10%)" }}
-                  title={cell ? `${y}-${String(m + 1).padStart(2, "0")}: ${cell.pnl >= 0 ? "+" : ""}${cell.pnl.toFixed(2)} (${cell.trades})` : ""}
+                  title={cell ? `${y}-${String(m + 1).padStart(2, "0")}: ${formatMoney(cell.pnl, { signed: true })} (${cell.trades})` : ""}
                 />
               );
             })}

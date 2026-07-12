@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Upload, Loader2, FileText } from "lucide-react";
 import type { TradeInsert } from "@/hooks/useTrades";
+import { formatMoney } from "@/lib/currency";
 
 interface Props {
   onImport: (trades: TradeInsert[]) => Promise<void>;
@@ -118,7 +119,7 @@ const CSVImport = ({ onImport }: Props) => {
                       <td className="px-2 py-1.5 text-right">{t.entry_price}</td>
                       <td className="px-2 py-1.5 text-right">{t.exit_price ?? "—"}</td>
                       <td className={`px-2 py-1.5 text-right ${(t.pnl ?? 0) >= 0 ? "text-emerald-600" : "text-red-500"}`}>
-                        {t.pnl != null ? t.pnl.toFixed(2) : "—"}
+                        {t.pnl != null ? formatMoney(t.pnl) : "—"}
                       </td>
                     </tr>
                   ))}

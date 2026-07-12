@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import type { Trade, TradeInsert } from "@/hooks/useTrades";
 import { useSignedTradeScreenshot } from "@/lib/tradeScreenshot";
+import { formatMoney } from "@/lib/currency";
 
 interface Props {
   trade: Trade;
@@ -190,7 +191,7 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
               <input type="number" step="any" value={form.quantity} onChange={(e) => update("quantity", e.target.value)} required className={inputCls} />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Fees</label>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Fees (R)</label>
               <input type="number" step="any" value={form.fees} onChange={(e) => update("fees", e.target.value)} className={inputCls} />
             </div>
           </div>
@@ -207,11 +208,11 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
           </div>
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">P&L (manual override)</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">P&L (R, manual override)</label>
             <input type="number" step="any" value={form.pnl} onChange={(e) => update("pnl", e.target.value)} placeholder="Leave empty to auto-calculate" className={inputCls + " font-mono"} />
             {!form.pnl.trim() && autoPnl != null && (
               <p className={`text-[10px] mt-1 font-mono ${autoPnl >= 0 ? "text-profit" : "text-loss"}`}>
-                Auto: {autoPnl >= 0 ? "+" : ""}{autoPnl.toFixed(2)}
+                Auto: {formatMoney(autoPnl, { signed: true })}
               </p>
             )}
           </div>

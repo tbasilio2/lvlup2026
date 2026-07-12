@@ -6,6 +6,7 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Trade } from "@/hooks/useTrades";
 import DayTradesDialog from "./DayTradesDialog";
+import { formatMoney, formatMoneyCompact } from "@/lib/currency";
 
 interface Props {
   trades: Trade[];
@@ -85,14 +86,14 @@ const PnLCalendar = ({ trades }: Props) => {
                 !inMonth ? "opacity-20" : ""
               } ${clickable ? "hover:ring-2 hover:ring-primary/50 hover:scale-105 cursor-pointer" : "cursor-default"}`}
               style={{ backgroundColor: pnl != null ? getColor(pnl) : undefined }}
-              title={pnl != null ? `${key}: ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} · ${dayTrades.length} trade(s)` : key}
+              title={pnl != null ? `${key}: ${formatMoney(pnl, { signed: true })} · ${dayTrades.length} trade(s)` : key}
             >
               <span className={`font-mono font-medium ${pnl != null ? "text-foreground" : "text-muted-foreground"}`}>
                 {format(day, "d")}
               </span>
               {pnl != null && (
                 <span className={`text-[8px] font-bold font-mono ${pnl >= 0 ? "text-profit" : "text-loss"}`}>
-                  {pnl >= 0 ? "+" : ""}{pnl.toFixed(0)}
+                  {formatMoneyCompact(pnl, { signed: true })}
                 </span>
               )}
             </button>

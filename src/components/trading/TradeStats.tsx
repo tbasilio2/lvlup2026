@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { Trade } from "@/hooks/useTrades";
+import { formatMoney } from "@/lib/currency";
 
 interface Props {
   trades: Trade[];
@@ -21,10 +22,10 @@ const TradeStats = ({ trades }: Props) => {
   }, [trades]);
 
   const items = [
-    { label: "Total P&L", value: `${stats.totalPnl >= 0 ? "+" : ""}${stats.totalPnl.toFixed(2)}`, positive: stats.totalPnl >= 0 },
+    { label: "Total P&L", value: formatMoney(stats.totalPnl, { signed: true }), positive: stats.totalPnl >= 0 },
     { label: "Win Rate", value: `${stats.winRate.toFixed(1)}%`, positive: stats.winRate >= 50 },
-    { label: "Avg Win", value: `+${stats.avgWin.toFixed(2)}`, positive: true },
-    { label: "Avg Loss", value: `-${stats.avgLoss.toFixed(2)}`, positive: false },
+    { label: "Avg Win", value: formatMoney(stats.avgWin, { signed: true }), positive: true },
+    { label: "Avg Loss", value: `-${formatMoney(stats.avgLoss).replace(/^R/, "R")}`.replace("--", "-"), positive: false },
     { label: "Risk:Reward", value: `1:${stats.rr.toFixed(2)}`, positive: null },
     { label: "Trades", value: `${stats.total} closed · ${stats.openCount} open`, positive: null },
   ];

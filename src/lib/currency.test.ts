@@ -68,9 +68,10 @@ describe("formatMoney", () => {
         expect(formatMoney(-1_234.5, { signed: true })).toBe(`-${c.symbol} ${c.mid}`);
       });
 
-      it("uses zero without a sign when signed=true and value is 0", () => {
-        // 0 is not < 0, and JS treats 0 as falsy for the sign branch: no "+".
-        expect(formatMoney(0, { signed: true })).toMatch(new RegExp(`^\\${c.symbol.replace(/\$/g, "\\$")} `));
+      it("treats zero as non-negative when signed=true (prefixes +)", () => {
+        const zero = c.digits === 0 ? "0" : "0." + "0".repeat(c.digits);
+        expect(formatMoney(0, { signed: true })).toBe(`+${c.symbol} ${zero}`);
+        expect(formatMoney(0)).toBe(`${c.symbol} ${zero}`);
       });
     });
   }

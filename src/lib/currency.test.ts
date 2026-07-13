@@ -10,11 +10,12 @@ import {
 
 // Expected per-currency full format for 1,234,567.50 and 1,234.50 and 0.10.
 // Derived from Intl.NumberFormat output on Node/V8 (stable across recent versions).
+const NB = "\u00A0"; // ZAR uses non-breaking spaces as thousands separators.
 const cases: Record<
   CurrencyCode,
   { symbol: string; big: string; mid: string; small: string; digits: number }
 > = {
-  ZAR: { symbol: "R",   big: "1 234 567,50",  mid: "1 234,50",   small: "0,10", digits: 2 },
+  ZAR: { symbol: "R",   big: `1${NB}234${NB}567,50`, mid: `1${NB}234,50`, small: "0,10", digits: 2 },
   USD: { symbol: "$",   big: "1,234,567.50",  mid: "1,234.50",   small: "0.10", digits: 2 },
   EUR: { symbol: "€",   big: "1,234,567.50",  mid: "1,234.50",   small: "0.10", digits: 2 },
   GBP: { symbol: "£",   big: "1,234,567.50",  mid: "1,234.50",   small: "0.10", digits: 2 },

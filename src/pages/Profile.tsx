@@ -117,6 +117,23 @@ const Profile = () => {
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block font-mono uppercase tracking-wider">Email</label>
               <input type="email" value={user?.email ?? ""} disabled className="w-full rounded-xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground cursor-not-allowed" />
             </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block font-mono uppercase tracking-wider">Currency</label>
+              <Select value={currency} onValueChange={(v) => setCurrency(v as CurrencyCode)}>
+                <SelectTrigger className="w-full rounded-xl border border-border bg-secondary px-4 py-3 text-sm h-auto font-mono">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(CURRENCIES).map((c) => (
+                    <SelectItem key={c.code} value={c.code} className="font-mono">
+                      <span className="tabular-nums">{c.symbol}</span>
+                      <span className="ml-2 text-muted-foreground">{c.code} — {c.label}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[10px] text-muted-foreground mt-1.5 font-mono">Applies to all P&amp;L, fees, and stats. Display only — values are not converted.</p>
+            </div>
             <Button onClick={handleSave} disabled={saving} className="w-full rounded-xl py-3 gap-2">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Changes"}
             </Button>

@@ -70,7 +70,9 @@ describe("formatMoney", () => {
       });
 
       it("treats zero as non-negative when signed=true (prefixes +)", () => {
-        const zero = c.digits === 0 ? "0" : "0." + "0".repeat(c.digits);
+        // Decimal separator is inferred from the currency's "0.10" fixture.
+        const decimalSep = c.small.replace(/[0-9]/g, "") || "";
+        const zero = c.digits === 0 ? "0" : `0${decimalSep}${"0".repeat(c.digits)}`;
         expect(formatMoney(0, { signed: true })).toBe(`+${c.symbol} ${zero}`);
         expect(formatMoney(0)).toBe(`${c.symbol} ${zero}`);
       });

@@ -32,6 +32,8 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
     direction: trade.direction,
     entry_price: String(trade.entry_price),
     exit_price: trade.exit_price != null ? String(trade.exit_price) : "",
+    stop_loss: trade.stop_loss != null ? String(trade.stop_loss) : "",
+    take_profit: trade.take_profit != null ? String(trade.take_profit) : "",
     quantity: String(trade.quantity),
     entry_date: toLocal(trade.entry_date),
     exit_date: toLocal(trade.exit_date),
@@ -59,6 +61,8 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
         direction: trade.direction,
         entry_price: String(trade.entry_price),
         exit_price: trade.exit_price != null ? String(trade.exit_price) : "",
+        stop_loss: trade.stop_loss != null ? String(trade.stop_loss) : "",
+        take_profit: trade.take_profit != null ? String(trade.take_profit) : "",
         quantity: String(trade.quantity),
         entry_date: toLocal(trade.entry_date),
         exit_date: toLocal(trade.exit_date),
@@ -116,6 +120,8 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
       direction: form.direction,
       entry_price: parseFloat(form.entry_price),
       exit_price: form.exit_price ? parseFloat(form.exit_price) : null,
+      stop_loss: form.stop_loss ? parseFloat(form.stop_loss) : null,
+      take_profit: form.take_profit ? parseFloat(form.take_profit) : null,
       quantity: parseFloat(form.quantity),
       entry_date: new Date(form.entry_date).toISOString(),
       exit_date: form.exit_date ? new Date(form.exit_date).toISOString() : null,
@@ -182,6 +188,17 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Exit Price</label>
               <input type="number" step="any" value={form.exit_price} onChange={(e) => update("exit_price", e.target.value)} placeholder="Leave empty if open" className={inputCls} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Stop Loss</label>
+              <input type="number" step="any" value={form.stop_loss} onChange={(e) => update("stop_loss", e.target.value)} placeholder="Optional" className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Take Profit</label>
+              <input type="number" step="any" value={form.take_profit} onChange={(e) => update("take_profit", e.target.value)} placeholder="Optional" className={inputCls} />
             </div>
           </div>
 

@@ -78,6 +78,20 @@ const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
           animate={{ height: "auto", opacity: 1 }}
           className="border-t border-border px-4 py-3 space-y-3 bg-secondary/20"
         >
+          <TradeChart trade={trade} />
+
+          <div className="grid grid-cols-3 gap-3 text-xs">
+            <div>
+              <span className="text-muted-foreground">Stop Loss</span>
+              <p className="font-medium text-loss font-mono">{(trade as any).stop_loss ?? "—"}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Take Profit</span>
+              <p className="font-medium text-profit font-mono">{(trade as any).take_profit ?? "—"}</p>
+            </div>
+            <div />
+          </div>
+
           <div className="grid grid-cols-3 gap-3 text-xs">
             <div>
               <span className="text-muted-foreground">Entry</span>

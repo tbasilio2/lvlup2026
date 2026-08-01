@@ -30,6 +30,8 @@ export interface TradeInsert {
   direction: "long" | "short";
   entry_price: number;
   exit_price?: number | null;
+  stop_loss?: number | null;
+  take_profit?: number | null;
   quantity: number;
   entry_date: string;
   exit_date?: string | null;

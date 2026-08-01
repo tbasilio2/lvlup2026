@@ -64,6 +64,10 @@ const Trading = () => {
             </div>
             <div className="flex gap-2 flex-wrap">
               <MT5ConnectDialog onConnected={() => setMt5Refresh((n) => n + 1)} />
+              <SyncAllButton
+                refreshKey={mt5Refresh}
+                onSynced={() => { refetch(); setMt5Refresh((n) => n + 1); }}
+              />
               <MT5ImportWizard onImport={addTradesBatch} />
               <CSVImport onImport={addTradesBatch} />
               <AddTradeDialog onAdd={addTrade} />

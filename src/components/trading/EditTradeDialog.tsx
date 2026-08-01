@@ -120,6 +120,8 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
       direction: form.direction,
       entry_price: parseFloat(form.entry_price),
       exit_price: form.exit_price ? parseFloat(form.exit_price) : null,
+      stop_loss: form.stop_loss ? parseFloat(form.stop_loss) : null,
+      take_profit: form.take_profit ? parseFloat(form.take_profit) : null,
       quantity: parseFloat(form.quantity),
       entry_date: new Date(form.entry_date).toISOString(),
       exit_date: form.exit_date ? new Date(form.exit_date).toISOString() : null,

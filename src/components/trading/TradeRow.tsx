@@ -4,6 +4,7 @@ import { Trash2, ArrowUpRight, ArrowDownRight, Image as ImageIcon, ChevronDown, 
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import ChartAnalysis from "./ChartAnalysis";
+import TradeChart from "./TradeChart";
 import EditTradeDialog from "./EditTradeDialog";
 import type { Trade, TradeInsert } from "@/hooks/useTrades";
 import { useSignedTradeScreenshot } from "@/lib/tradeScreenshot";

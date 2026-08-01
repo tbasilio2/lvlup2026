@@ -284,9 +284,11 @@ export type Database = {
           quantity: number
           screenshot_url: string | null
           status: string
+          stop_loss: number | null
           strategy: string | null
           symbol: string
           tags: string[] | null
+          take_profit: number | null
           user_id: string
         }
         Insert: {
@@ -305,9 +307,11 @@ export type Database = {
           quantity?: number
           screenshot_url?: string | null
           status?: string
+          stop_loss?: number | null
           strategy?: string | null
           symbol: string
           tags?: string[] | null
+          take_profit?: number | null
           user_id: string
         }
         Update: {
@@ -326,9 +330,11 @@ export type Database = {
           quantity?: number
           screenshot_url?: string | null
           status?: string
+          stop_loss?: number | null
           strategy?: string | null
           symbol?: string
           tags?: string[] | null
+          take_profit?: number | null
           user_id?: string
         }
         Relationships: [

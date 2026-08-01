@@ -25,6 +25,8 @@ const AddTradeDialog = ({ onAdd }: Props) => {
     direction: "long" as "long" | "short",
     entry_price: "",
     exit_price: "",
+    stop_loss: "",
+    take_profit: "",
     quantity: "1",
     entry_date: new Date().toISOString().slice(0, 16),
     exit_date: "",
@@ -88,6 +90,8 @@ const AddTradeDialog = ({ onAdd }: Props) => {
       direction: form.direction,
       entry_price: parseFloat(form.entry_price),
       exit_price: form.exit_price ? parseFloat(form.exit_price) : null,
+      stop_loss: form.stop_loss ? parseFloat(form.stop_loss) : null,
+      take_profit: form.take_profit ? parseFloat(form.take_profit) : null,
       quantity: parseFloat(form.quantity),
       entry_date: new Date(form.entry_date).toISOString(),
       exit_date: form.exit_date ? new Date(form.exit_date).toISOString() : null,
@@ -103,6 +107,7 @@ const AddTradeDialog = ({ onAdd }: Props) => {
     clearScreenshot();
     setForm({
       symbol: "", direction: "long", entry_price: "", exit_price: "",
+      stop_loss: "", take_profit: "",
       quantity: "1", entry_date: new Date().toISOString().slice(0, 16),
       exit_date: "", fees: "0", pnl: "", strategy: "", notes: "",
     });
@@ -147,6 +152,17 @@ const AddTradeDialog = ({ onAdd }: Props) => {
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Exit Price</label>
               <input type="number" step="any" value={form.exit_price} onChange={(e) => update("exit_price", e.target.value)} placeholder="Leave empty if open" className={inputCls} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Stop Loss</label>
+              <input type="number" step="any" value={form.stop_loss} onChange={(e) => update("stop_loss", e.target.value)} placeholder="Optional" className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Take Profit</label>
+              <input type="number" step="any" value={form.take_profit} onChange={(e) => update("take_profit", e.target.value)} placeholder="Optional" className={inputCls} />
             </div>
           </div>
 

@@ -8,6 +8,7 @@ import CSVImport from "@/components/trading/CSVImport";
 import MT5ImportWizard from "@/components/trading/MT5ImportWizard";
 import MT5ConnectDialog from "@/components/trading/MT5ConnectDialog";
 import ConnectedAccountsList from "@/components/trading/ConnectedAccountsList";
+import SyncAllButton from "@/components/trading/SyncAllButton";
 import TradeRow from "@/components/trading/TradeRow";
 import TradeStats from "@/components/trading/TradeStats";
 import TradeHeroStats from "@/components/trading/TradeHeroStats";
@@ -64,6 +65,10 @@ const Trading = () => {
             </div>
             <div className="flex gap-2 flex-wrap">
               <MT5ConnectDialog onConnected={() => setMt5Refresh((n) => n + 1)} />
+              <SyncAllButton
+                refreshKey={mt5Refresh}
+                onSynced={() => { refetch(); setMt5Refresh((n) => n + 1); }}
+              />
               <MT5ImportWizard onImport={addTradesBatch} />
               <CSVImport onImport={addTradesBatch} />
               <AddTradeDialog onAdd={addTrade} />

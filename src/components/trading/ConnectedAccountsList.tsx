@@ -100,6 +100,10 @@ export default function ConnectedAccountsList({ onSynced, refreshKey }: Props) {
           </div>
         </div>
       ))}
+      <p className="text-[10px] text-muted-foreground font-mono pl-1">
+        Auto-syncs every 12 hours (00:00 &amp; 12:00 UTC)
+      </p>
     </div>
+
   );
 }

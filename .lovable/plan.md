@@ -1,45 +1,30 @@
 ## Goal
-Display all monetary values (P&L, fees, wins, losses, expectancy, drawdown, etc.) in South African Rand (ZAR) with an `R` prefix instead of unlabeled numbers.
 
-## Approach
-Numbers today are rendered as bare `toFixed(2)` values with no currency symbol. Add a single formatting helper and use it everywhere money is shown, so we get one source of truth (easy to switch later).
+MT5 trades flow into the journal automatically twice a day, and a clearly visible **Sync All** button lets you pull them in on demand.
 
-### 1. New helper `src/lib/currency.ts`
-```ts
-export const CURRENCY = "ZAR";
-export const CURRENCY_SYMBOL = "R";
+## 1. Scheduled auto-sync (every 12 hours)
 
-// e.g. formatMoney(1234.5) -> "R 1 234.50"; signed -> "+R 1 234.50" / "-R 1 234.50"
-export function formatMoney(n: number, opts?: { signed?: boolean; digits?: number }): string;
-export function formatMoneyCompact(n: number): string; // "R 1.2k" for calendar cells
-```
-Uses `Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" })` under the hood, then normalises the symbol to a plain `R ` prefix so it fits the mono/terminal style.
+Today `mt5-sync` requires a logged-in user token and syncs one account at a time, so it can't run unattended.
 
-### 2. Replace bare P&L / fee renderings with `formatMoney`
-Files to update (UI only, no business logic):
-- `src/components/trading/RecentTradesTable.tsx` — P&L cell
-- `src/components/trading/TradeStats.tsx` — Total P&L, Avg Win, Avg Loss
-- `src/components/trading/TradeHeroStats.tsx`
-- `src/components/trading/TradeRow.tsx`
-- `src/components/trading/EquityCurve.tsx` (axis + tooltip)
-- `src/components/trading/PnLCalendar.tsx` (tooltip + cell → compact)
-- `src/components/trading/DayTradesDialog.tsx`
-- `src/components/trading/analytics/AdvancedMetrics.tsx` — Expectancy, Max DD
-- `src/components/trading/analytics/BreakdownTable.tsx` — Net, Expectancy
-- `src/components/trading/analytics/LongShortCompare.tsx` — Net P&L
-- `src/components/trading/analytics/MonthlyHeatmap.tsx`
-- `src/components/trading/CSVImport.tsx` — preview P&L
-- `src/components/trading/MT5ImportWizard.tsx` — preview P&L
-- `src/components/trading/AddTradeDialog.tsx` / `EditTradeDialog.tsx` — field labels ("P&L (R)", "Fees (R)")
-- `src/pages/Journal.tsx` — Net P&L, Total Fees, per-entry P&L
-- `src/components/JournalEntry.tsx` — field labels
+- Extract the per-account sync logic into a shared module so both the manual and scheduled paths use identical code (no duplicated parsing/import logic).
+- Add a new backend function `mt5-auto-sync` that:
+  - Authenticates via a shared scheduler secret (not a user token).
+  - Loads every connected MT5 account across all users that is in the `DEPLOYED` state.
+  - Runs the same deal-fetch and trade-import routine for each, updating `last_synced_at` / `last_error` per account.
+  - Returns a per-account summary for logging.
+- Register a scheduled job that calls it at 00:00 and 12:00 UTC (`0 0,12 * * *`), enabling the required scheduling extensions.
+- Existing duplicate protection (unique constraint on the MetaApi deal id) means repeated runs never create duplicate trades.
 
-Signed helper is used where a `+` prefix is already shown for wins.
+## 2. Sync button in the UI
 
-### 3. Out of scope
-- No DB schema changes; amounts stay as plain numbers.
-- No FX conversion — this is a display-only relabel. Existing values are shown as ZAR as-is.
-- Chart symbols (`OANDA:EURUSD` etc.) stay untouched — those are instruments, not currency.
+- Add a **Sync All** button in the Trading page header next to **Connect MT5**, shown only when at least one account is connected.
+- It triggers a sync for each connected account, shows a spinner while running, and reports total imported trades via a toast, then refreshes the dashboard stats and trade list.
+- Keep the existing per-account refresh icon in the connected-accounts list for targeted syncs.
+- Show a "Last synced: X ago / Auto-syncs every 12h" line under the accounts list so the schedule is discoverable.
 
-## Notes
-If later you want a user-selectable currency, `CURRENCY`/`CURRENCY_SYMBOL` can be moved to a profile setting and read from context — the helper API stays the same.
+## Technical notes
+
+- Shared logic lives in `supabase/functions/_shared/mt5Sync.ts`, imported by both `mt5-sync` and `mt5-auto-sync`.
+- The scheduled job posts to the function with the scheduler secret in a header; the function rejects any request without it.
+- Cron registration uses project-specific values, so it is applied as a data operation rather than a schema migration.
+- No schema changes are needed beyond what already exists.

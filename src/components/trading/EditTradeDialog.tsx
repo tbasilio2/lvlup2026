@@ -187,6 +187,17 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Stop Loss</label>
+              <input type="number" step="any" value={form.stop_loss} onChange={(e) => update("stop_loss", e.target.value)} placeholder="Optional" className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Take Profit</label>
+              <input type="number" step="any" value={form.take_profit} onChange={(e) => update("take_profit", e.target.value)} placeholder="Optional" className={inputCls} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Quantity / Lots</label>
               <input type="number" step="any" value={form.quantity} onChange={(e) => update("quantity", e.target.value)} required className={inputCls} />
             </div>

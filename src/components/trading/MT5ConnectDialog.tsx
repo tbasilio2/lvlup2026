@@ -107,6 +107,7 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
           </Button>
         </div>
       </DialogContent>
+      <MT5QrScanner open={scanOpen} onOpenChange={setScanOpen} onScanned={applyScan} />
     </Dialog>
   );
 }

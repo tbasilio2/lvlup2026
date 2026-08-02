@@ -66,6 +66,12 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
+          <Button variant="secondary" className="w-full gap-2" onClick={() => setScanOpen(true)}>
+            <QrCode className="h-4 w-4" /> Scan QR to fill details
+          </Button>
+          <div className="relative text-center">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">or enter manually</span>
+          </div>
           <div>
             <Label>Label</Label>
             <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. FTMO Challenge" />

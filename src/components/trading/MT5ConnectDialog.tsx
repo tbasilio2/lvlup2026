@@ -16,11 +16,19 @@ interface Props {
 export default function MT5ConnectDialog({ onConnected }: Props) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [scanOpen, setScanOpen] = useState(false);
   const [label, setLabel] = useState("");
   const [server, setServer] = useState("");
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [region, setRegion] = useState("new-york");
+
+  const applyScan = (creds: ScannedMT5Credentials) => {
+    if (creds.label) setLabel(creds.label);
+    if (creds.server) setServer(creds.server);
+    if (creds.login) setLogin(creds.login);
+    if (creds.password) setPassword(creds.password);
+  };
 
   const submit = async () => {
     if (!server || !login || !password) {

@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Trash2, ArrowUpRight, ArrowDownRight, Image as ImageIcon, ChevronDown, ChevronUp, Pencil } from "lucide-react";
+import { Trash2, ArrowUpRight, ArrowDownRight, Image as ImageIcon, ChevronDown, ChevronUp, Pencil, CandlestickChart } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import ChartAnalysis from "./ChartAnalysis";
 import TradeChart from "./TradeChart";
+import TradingViewWidget from "./TradingViewWidget";
 import EditTradeDialog from "./EditTradeDialog";
 import type { Trade, TradeInsert } from "@/hooks/useTrades";
 import { useSignedTradeScreenshot } from "@/lib/tradeScreenshot";
 import { formatMoney } from "@/lib/currency";
+import { toTradingViewSymbol } from "@/lib/tvSymbol";
 
 const SignedScreenshot = ({ value }: { value: string }) => {
   const url = useSignedTradeScreenshot(value);
@@ -24,6 +26,7 @@ interface Props {
 
 const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
   const [expanded, setExpanded] = useState(false);
+  const [liveChart, setLiveChart] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const isWin = (trade.pnl ?? 0) > 0;
   const isLoss = (trade.pnl ?? 0) < 0;
@@ -80,6 +83,20 @@ const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
           className="border-t border-border px-4 py-3 space-y-3 bg-secondary/20"
         >
           <TradeChart trade={trade} />
+
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => setLiveChart((v) => !v)}
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors font-mono"
+            >
+              <CandlestickChart className="h-3.5 w-3.5" />
+              {liveChart ? "Hide live chart" : `Live chart · ${toTradingViewSymbol(trade.symbol)}`}
+            </button>
+            {liveChart && <TradingViewWidget symbol={toTradingViewSymbol(trade.symbol)} />}
+          </div>
+
+
 
           <div className="grid grid-cols-3 gap-3 text-xs">
             <div>

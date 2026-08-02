@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Link2, Loader2 } from "lucide-react";
+import { Link2, Loader2, QrCode } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import MT5QrScanner, { type ScannedMT5Credentials } from "./MT5QrScanner";
 
 interface Props {
   onConnected?: () => void;
@@ -15,11 +16,19 @@ interface Props {
 export default function MT5ConnectDialog({ onConnected }: Props) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [scanOpen, setScanOpen] = useState(false);
   const [label, setLabel] = useState("");
   const [server, setServer] = useState("");
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [region, setRegion] = useState("new-york");
+
+  const applyScan = (creds: ScannedMT5Credentials) => {
+    if (creds.label) setLabel(creds.label);
+    if (creds.server) setServer(creds.server);
+    if (creds.login) setLogin(creds.login);
+    if (creds.password) setPassword(creds.password);
+  };
 
   const submit = async () => {
     if (!server || !login || !password) {
@@ -57,6 +66,12 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
+          <Button variant="secondary" className="w-full gap-2" onClick={() => setScanOpen(true)}>
+            <QrCode className="h-4 w-4" /> Scan QR to fill details
+          </Button>
+          <div className="relative text-center">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">or enter manually</span>
+          </div>
           <div>
             <Label>Label</Label>
             <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. FTMO Challenge" />
@@ -92,6 +107,7 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
           </Button>
         </div>
       </DialogContent>
+      <MT5QrScanner open={scanOpen} onOpenChange={setScanOpen} onScanned={applyScan} />
     </Dialog>
   );
 }

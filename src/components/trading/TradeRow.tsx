@@ -84,6 +84,20 @@ const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
         >
           <TradeChart trade={trade} />
 
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => setLiveChart((v) => !v)}
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors font-mono"
+            >
+              <CandlestickChart className="h-3.5 w-3.5" />
+              {liveChart ? "Hide live chart" : `Live chart · ${toTradingViewSymbol(trade.symbol)}`}
+            </button>
+            {liveChart && <TradingViewWidget symbol={toTradingViewSymbol(trade.symbol)} />}
+          </div>
+
+
+
           <div className="grid grid-cols-3 gap-3 text-xs">
             <div>
               <span className="text-muted-foreground">Stop Loss</span>

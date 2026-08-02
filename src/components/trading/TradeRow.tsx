@@ -26,6 +26,7 @@ interface Props {
 
 const TradeRow = ({ trade, onDelete, onUpdate }: Props) => {
   const [expanded, setExpanded] = useState(false);
+  const [liveChart, setLiveChart] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const isWin = (trade.pnl ?? 0) > 0;
   const isLoss = (trade.pnl ?? 0) < 0;

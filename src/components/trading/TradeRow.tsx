@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Trash2, ArrowUpRight, ArrowDownRight, Image as ImageIcon, ChevronDown, ChevronUp, Pencil } from "lucide-react";
+import { Trash2, ArrowUpRight, ArrowDownRight, Image as ImageIcon, ChevronDown, ChevronUp, Pencil, CandlestickChart } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import ChartAnalysis from "./ChartAnalysis";
 import TradeChart from "./TradeChart";
+import TradingViewWidget from "./TradingViewWidget";
 import EditTradeDialog from "./EditTradeDialog";
 import type { Trade, TradeInsert } from "@/hooks/useTrades";
 import { useSignedTradeScreenshot } from "@/lib/tradeScreenshot";
 import { formatMoney } from "@/lib/currency";
+import { toTradingViewSymbol } from "@/lib/tvSymbol";
 
 const SignedScreenshot = ({ value }: { value: string }) => {
   const url = useSignedTradeScreenshot(value);

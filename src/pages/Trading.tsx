@@ -147,12 +147,9 @@ const Trading = () => {
           </TabsContent>
 
           <TabsContent value="ai-trade" className="space-y-4">
-            <AITradePlanner />
+            <AICopilot />
           </TabsContent>
 
-          <TabsContent value="advisor" className="space-y-4">
-            <SetupAdvisor />
-          </TabsContent>
 
           <TabsContent value="history" className="space-y-4">
             <AnalysesHistory />

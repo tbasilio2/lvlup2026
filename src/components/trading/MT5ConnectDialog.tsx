@@ -30,6 +30,16 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
     if (creds.password) setPassword(creds.password);
   };
 
+  const openScanner = () => {
+    setOpen(false);
+    setScanOpen(true);
+  };
+
+  const changeScannerOpen = (nextOpen: boolean) => {
+    setScanOpen(nextOpen);
+    if (!nextOpen) setOpen(true);
+  };
+
   const submit = async () => {
     if (!server || !login || !password) {
       toast.error("Server, login, and investor password are required");
@@ -67,7 +77,7 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <Button variant="secondary" className="w-full gap-2" onClick={() => setScanOpen(true)}>
+            <Button variant="secondary" className="w-full gap-2" onClick={openScanner}>
               <QrCode className="h-4 w-4" /> Scan QR to fill details
             </Button>
           <div className="relative text-center">
@@ -109,7 +119,7 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
           </div>
         </DialogContent>
       </Dialog>
-      <MT5QrScanner open={scanOpen} onOpenChange={setScanOpen} onScanned={applyScan} />
+      <MT5QrScanner open={scanOpen} onOpenChange={changeScannerOpen} onScanned={applyScan} />
     </>
   );
 }

@@ -62,10 +62,20 @@ export function useJournal() {
     } else {
       const { data: newEntry, error } = await supabase
         .from("journal_entries")
-        .insert({ user_id: user.id, ...data, profit_loss: data.profitLoss, fees: data.fees })
+        .insert({
+          user_id: user.id,
+          date: data.date,
+          mood: data.mood,
+          gratitude: data.gratitude,
+          intention: data.intention,
+          reflection: data.reflection,
+          wins: data.wins,
+          profit_loss: data.profitLoss,
+          fees: data.fees,
+        })
         .select()
         .single();
-      if (error) { toast.error("Failed to save entry"); return; }
+      if (error) { toast.error(`Failed to save entry: ${error.message}`); return; }
       setEntries((prev) => [{
         id: newEntry.id, date: newEntry.date, mood: newEntry.mood as Mood,
         gratitude: newEntry.gratitude || "", intention: newEntry.intention || "",

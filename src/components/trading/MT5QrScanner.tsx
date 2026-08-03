@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import QrScanner from "qr-scanner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { QrCode, Loader2, Upload } from "lucide-react";
+import { Camera, QrCode, Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 export interface ScannedMT5Credentials {
@@ -85,6 +85,7 @@ export default function MT5QrScanner({ open, onOpenChange, onScanned }: Props) {
   const scannerRef = useRef<QrScanner | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [starting, setStarting] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleResult = (text: string) => {
@@ -100,48 +101,60 @@ export default function MT5QrScanner({ open, onOpenChange, onScanned }: Props) {
   };
 
   useEffect(() => {
-    if (!open || !videoRef.current) return;
-    let cancelled = false;
+    if (open) return;
+    setCameraActive(false);
+    setStarting(false);
     setError(null);
-    setStarting(true);
+    return () => {
+      scannerRef.current?.stop();
+      scannerRef.current?.destroy();
+      scannerRef.current = null;
+    };
+  }, [open]);
 
+  const startCamera = async () => {
+    setError(null);
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+      setError("Camera access is unavailable in this preview. Open the published app in a browser tab, or upload a QR image below.");
+      return;
+    }
+    if (!videoRef.current) {
+      setError("Camera view is not ready. Close this window and try again.");
+      return;
+    }
+
+    scannerRef.current?.destroy();
     const scanner = new QrScanner(
       videoRef.current,
       (result) => handleResult(result.data),
-      { highlightScanRegion: true, highlightCodeOutline: true, preferredCamera: "environment" },
+      {
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+        preferredCamera: "environment",
+        maxScansPerSecond: 10,
+        returnDetailedScanResult: true,
+      },
     );
     scannerRef.current = scanner;
-
-    const boot = async () => {
-      try {
-        // Explicitly prompt for camera permission first so the browser shows the dialog.
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        stream.getTracks().forEach((t) => t.stop());
-        await scanner.start();
-        if (!cancelled) setStarting(false);
-      } catch (err) {
-        if (cancelled) return;
-        setStarting(false);
-        const name = (err as { name?: string })?.name;
-        if (name === "NotAllowedError" || name === "SecurityError") {
-          setError("Camera blocked. Allow camera access for this site (tap the padlock in the address bar), or open the app in a new tab, then try again. You can also upload a QR image below.");
-        } else if (name === "NotFoundError" || name === "OverconstrainedError") {
-          setError("No camera found on this device — upload a QR image instead.");
-        } else {
-          setError("Camera unavailable — allow camera access or upload a QR image instead.");
-        }
-      }
-    };
-    boot();
-
-    return () => {
-      cancelled = true;
-      scanner.stop();
+    setStarting(true);
+    try {
+      await scanner.start();
+      setCameraActive(true);
+    } catch (err) {
       scanner.destroy();
       scannerRef.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+      const name = (err as { name?: string })?.name;
+      if (name === "NotAllowedError" || name === "SecurityError") {
+        setError("Camera permission was blocked. Allow Camera in this site's browser permissions, then tap Try camera again.");
+      } else if (name === "NotFoundError" || name === "OverconstrainedError") {
+        setError("No usable camera was found. Upload a QR image instead.");
+      } else {
+        setError("The camera could not start. Open the app directly in Safari or Chrome, or upload a QR image instead.");
+      }
+    } finally {
+      setStarting(false);
+    }
+  };
 
   const scanImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -166,12 +179,17 @@ export default function MT5QrScanner({ open, onOpenChange, onScanned }: Props) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="relative rounded-xl overflow-hidden border border-border bg-secondary/30 aspect-square">
+        <div className="relative overflow-hidden rounded-lg border border-border bg-secondary/30 aspect-square">
           <video ref={videoRef} className="h-full w-full object-cover" muted playsInline />
-          {starting && (
+          {!cameraActive && (
             <div className="absolute inset-0 flex items-center justify-center gap-2 bg-background/60">
-              <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              <span className="text-xs font-mono text-muted-foreground">Starting camera…</span>
+              {starting ? (
+                <><Loader2 className="h-4 w-4 animate-spin text-primary" /><span className="text-xs font-mono text-muted-foreground">Starting camera…</span></>
+              ) : (
+                <Button type="button" size="sm" className="gap-2" onClick={startCamera}>
+                  <Camera className="h-4 w-4" /> Allow camera
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -179,6 +197,11 @@ export default function MT5QrScanner({ open, onOpenChange, onScanned }: Props) {
         {error && <p className="text-xs text-destructive">{error}</p>}
 
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={scanImage} />
+        {error && (
+          <Button type="button" variant="secondary" size="sm" className="gap-2" onClick={startCamera} disabled={starting}>
+            <Camera className="h-3.5 w-3.5" /> Try camera again
+          </Button>
+        )}
         <Button variant="outline" size="sm" className="gap-2" onClick={() => fileRef.current?.click()}>
           <Upload className="h-3.5 w-3.5" /> Upload QR image instead
         </Button>

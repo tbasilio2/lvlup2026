@@ -112,14 +112,27 @@ export default function MT5QrScanner({ open, onOpenChange, onScanned }: Props) {
     );
     scannerRef.current = scanner;
 
-    scanner
-      .start()
-      .then(() => { if (!cancelled) setStarting(false); })
-      .catch(() => {
+    const boot = async () => {
+      try {
+        // Explicitly prompt for camera permission first so the browser shows the dialog.
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        stream.getTracks().forEach((t) => t.stop());
+        await scanner.start();
+        if (!cancelled) setStarting(false);
+      } catch (err) {
         if (cancelled) return;
         setStarting(false);
-        setError("Camera unavailable — allow camera access or upload a QR image instead.");
-      });
+        const name = (err as { name?: string })?.name;
+        if (name === "NotAllowedError" || name === "SecurityError") {
+          setError("Camera blocked. Allow camera access for this site (tap the padlock in the address bar), or open the app in a new tab, then try again. You can also upload a QR image below.");
+        } else if (name === "NotFoundError" || name === "OverconstrainedError") {
+          setError("No camera found on this device — upload a QR image instead.");
+        } else {
+          setError("Camera unavailable — allow camera access or upload a QR image instead.");
+        }
+      }
+    };
+    boot();
 
     return () => {
       cancelled = true;

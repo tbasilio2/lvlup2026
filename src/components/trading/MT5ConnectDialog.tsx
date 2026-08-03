@@ -51,24 +51,25 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Link2 className="h-4 w-4" />
-          Connect MT5
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Link MT5 account</DialogTitle>
-          <DialogDescription>
-            Use your MT5 <strong>investor (read-only) password</strong> — never the master password.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-3">
-          <Button variant="secondary" className="w-full gap-2" onClick={() => setScanOpen(true)}>
-            <QrCode className="h-4 w-4" /> Scan QR to fill details
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Link2 className="h-4 w-4" />
+            Connect MT5
           </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Link MT5 account</DialogTitle>
+            <DialogDescription>
+              Use your MT5 <strong>investor (read-only) password</strong> — never the master password.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Button variant="secondary" className="w-full gap-2" onClick={() => setScanOpen(true)}>
+              <QrCode className="h-4 w-4" /> Scan QR to fill details
+            </Button>
           <div className="relative text-center">
             <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">or enter manually</span>
           </div>
@@ -105,9 +106,10 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
             {busy ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
             Link account
           </Button>
-        </div>
-      </DialogContent>
+          </div>
+        </DialogContent>
+      </Dialog>
       <MT5QrScanner open={scanOpen} onOpenChange={setScanOpen} onScanned={applyScan} />
-    </Dialog>
+    </>
   );
 }

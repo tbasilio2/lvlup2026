@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { isAllowedScreenshotUrl, invalidScreenshotResponse } from "../_shared/screenshotUrl.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,6 +41,8 @@ serve(async (req) => {
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+    } else if (!isAllowedScreenshotUrl(screenshot_url)) {
+      return invalidScreenshotResponse(corsHeaders);
     }
 
     const systemPrompt = `You are an expert technical analyst and trading coach. You are reviewing a chart screenshot from a trader. Analyze the chart and provide structured feedback. Consider:

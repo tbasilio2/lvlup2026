@@ -46,7 +46,10 @@ export default function ConnectedAccountsList({ onSynced, refreshKey }: Props) {
     if (error || (data as any)?.error) {
       toast.error((data as any)?.error || error?.message || "Sync failed");
     } else if ((data as any)?.ok === false) {
-      toast.message((data as any).message || "Account still provisioning");
+      const state = (data as any)?.state;
+      const msg = (data as any).message || "Account still provisioning";
+      if (state === "MISSING") toast.error(msg, { duration: 8000 });
+      else toast.message(msg);
     } else {
       toast.success(`Synced ${(data as any)?.imported ?? 0} trades`);
       onSynced?.();

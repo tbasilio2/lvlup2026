@@ -41,7 +41,12 @@ export async function syncAccount(admin: any, acct: any, metaToken: string): Pro
       .from("mt5_accounts")
       .update({ state: infoRes.status === 404 ? "MISSING" : "ERROR", last_error: message.slice(0, 500) })
       .eq("id", acct.id);
-    return { ok: false, accountId: acct.id, state: infoRes.status === 404 ? "MISSING" : "ERROR", message, error: message, status: infoRes.status === 404 ? 404 : 400 };
+    if (infoRes.status === 404) {
+      // Not an exception: the linked account is gone. Report it as a normal result
+      // so the client can prompt a reconnect instead of throwing.
+      return { ok: false, accountId: acct.id, state: "MISSING", message };
+    }
+    return { ok: false, accountId: acct.id, state: "ERROR", message, error: message, status: 400 };
   }
 
   const region = info.region || "new-york";

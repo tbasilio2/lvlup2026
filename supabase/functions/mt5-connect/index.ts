@@ -36,29 +36,54 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Missing server / login / password" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Create MetaApi account (uses managed provisioning profile)
-    const createRes = await fetch(`${PROVISIONING}/users/current/accounts`, {
-      method: "POST",
-      headers: { "auth-token": metaToken, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: label || `MT5 ${login}`,
-        type: "cloud-g2",
-        login: String(login),
-        password: String(password),
-        server: String(server),
-        platform,
-        magic: 0,
-        application: "MetaApi",
-        region,
-        keywords: [],
-      }),
-    });
+    const createAccount = (srv: string) =>
+      fetch(`${PROVISIONING}/users/current/accounts`, {
+        method: "POST",
+        headers: { "auth-token": metaToken, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: label || `MT5 ${login}`,
+          type: "cloud-g2",
+          login: String(login),
+          password: String(password),
+          server: srv,
+          platform,
+          magic: 0,
+          application: "MetaApi",
+          region,
+          keywords: [],
+        }),
+      });
 
-    const createJson = await createRes.json().catch(() => ({}));
+    let usedServer = String(server).trim();
+    let createRes = await createAccount(usedServer);
+    let createJson = await createRes.json().catch(() => ({}));
+
+    // Auto-correct common server-name typos using MetaApi's suggestions
+    if (!createRes.ok && createJson?.details?.code === "E_SRV_NOT_FOUND") {
+      const suggestions: string[] = Object.values(
+        (createJson.details.serversByBrokers || {}) as Record<string, string[]>,
+      ).flat();
+      const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const match = suggestions.find((s) => norm(s) === norm(usedServer));
+      if (match) {
+        usedServer = match;
+        createRes = await createAccount(usedServer);
+        createJson = await createRes.json().catch(() => ({}));
+      } else if (suggestions.length) {
+        return new Response(
+          JSON.stringify({
+            error: `Server "${server}" not found. Try one of: ${suggestions.slice(0, 8).join(", ")}`,
+          }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+    }
+
     if (!createRes.ok) {
-      return new Response(JSON.stringify({ error: "MetaApi create failed", detail: createJson }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: createJson?.message || "MetaApi create failed", detail: createJson }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     const metaapiAccountId = createJson.id;
+
 
     // Deploy (best-effort; some accounts auto-deploy)
     await fetch(`${PROVISIONING}/users/current/accounts/${metaapiAccountId}/deploy`, {

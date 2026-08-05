@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
     const { data: row, error: insErr } = await admin.from("mt5_accounts").insert({
       user_id: userId,
       label: label || `MT5 ${login}`,
-      broker_server: String(server),
+      broker_server: usedServer,
       login: String(login),
       platform,
       metaapi_account_id: metaapiAccountId,

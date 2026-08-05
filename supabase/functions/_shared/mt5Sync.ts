@@ -21,11 +21,29 @@ export interface SyncResult {
 export async function syncAccount(admin: any, acct: any, metaToken: string): Promise<SyncResult> {
   const userId = acct.user_id;
 
+  if (!acct.metaapi_account_id) {
+    const message = "Account is not linked yet. Reconnect this MT5 account.";
+    await admin.from("mt5_accounts").update({ state: "NOT_LINKED", last_error: message }).eq("id", acct.id);
+    return { ok: false, accountId: acct.id, state: "NOT_LINKED", message };
+  }
+
   // Fetch state + region from MetaApi
   const infoRes = await fetch(`${PROVISIONING}/users/current/accounts/${acct.metaapi_account_id}`, {
     headers: { "auth-token": metaToken },
   });
   const info = await infoRes.json().catch(() => ({}));
+
+  if (!infoRes.ok) {
+    const message = infoRes.status === 404
+      ? "This MT5 account no longer exists on the broker bridge. Remove it and connect again."
+      : `Broker bridge error (${infoRes.status}): ${info?.message || "unknown error"}`;
+    await admin
+      .from("mt5_accounts")
+      .update({ state: infoRes.status === 404 ? "MISSING" : "ERROR", last_error: message.slice(0, 500) })
+      .eq("id", acct.id);
+    return { ok: false, accountId: acct.id, state: infoRes.status === 404 ? "MISSING" : "ERROR", message, error: message, status: infoRes.status === 404 ? 404 : 400 };
+  }
+
   const region = info.region || "new-york";
   const state = info.state || acct.state;
 
@@ -34,6 +52,7 @@ export async function syncAccount(admin: any, acct: any, metaToken: string): Pro
   if (state !== "DEPLOYED") {
     return { ok: false, accountId: acct.id, state, message: "Account not yet DEPLOYED. Try again in ~30s." };
   }
+
 
   // Fetch history deals for last 6 months
   const now = new Date();

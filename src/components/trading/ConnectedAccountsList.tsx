@@ -85,9 +85,13 @@ export default function ConnectedAccountsList({ onSynced, refreshKey }: Props) {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Badge variant={a.state === "DEPLOYED" ? "default" : "secondary"} className="text-[10px] font-mono">
+            <Badge
+              variant={a.state === "DEPLOYED" ? "default" : a.state === "MISSING" || a.state === "ERROR" ? "destructive" : "secondary"}
+              className="text-[10px] font-mono"
+            >
               {a.state || "UNKNOWN"}
             </Badge>
+
             <span className="text-[10px] text-muted-foreground font-mono hidden sm:inline">
               {a.last_synced_at ? formatDistanceToNow(new Date(a.last_synced_at), { addSuffix: true }) : "never"}
             </span>

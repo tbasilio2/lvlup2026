@@ -19,6 +19,7 @@ import TradingViewWidget from "@/components/trading/TradingViewWidget";
 import TradeAIAnalysis from "@/components/trading/TradeAIAnalysis";
 import AICopilot from "@/components/trading/AICopilot";
 import AnalysesHistory from "@/components/trading/AnalysesHistory";
+import WeeklyReport from "@/components/trading/WeeklyReport";
 import AdvancedMetrics from "@/components/trading/analytics/AdvancedMetrics";
 import DrawdownChart from "@/components/trading/analytics/DrawdownChart";
 import MonthlyHeatmap from "@/components/trading/analytics/MonthlyHeatmap";
@@ -83,11 +84,12 @@ const Trading = () => {
         </div>
 
         <Tabs defaultValue="journal" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6 rounded-xl bg-secondary">
+          <TabsList className="grid w-full grid-cols-7 rounded-xl bg-secondary">
             <TabsTrigger value="journal" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Dashboard</TabsTrigger>
             <TabsTrigger value="analytics" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Stats</TabsTrigger>
             <TabsTrigger value="advanced" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Pro</TabsTrigger>
             <TabsTrigger value="ai-trade" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Copilot</TabsTrigger>
+            <TabsTrigger value="report" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Report</TabsTrigger>
             <TabsTrigger value="history" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">History</TabsTrigger>
             <TabsTrigger value="chart" className="rounded-lg text-[10px] font-mono data-[state=active]:bg-card data-[state=active]:text-primary">Chart</TabsTrigger>
           </TabsList>
@@ -149,6 +151,10 @@ const Trading = () => {
             <AICopilot />
           </TabsContent>
 
+
+          <TabsContent value="report" className="space-y-4">
+            <WeeklyReport />
+          </TabsContent>
 
           <TabsContent value="history" className="space-y-4">
             <AnalysesHistory />

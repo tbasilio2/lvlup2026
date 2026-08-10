@@ -24,6 +24,8 @@ import AdvancedMetrics from "@/components/trading/analytics/AdvancedMetrics";
 import DrawdownChart from "@/components/trading/analytics/DrawdownChart";
 import MonthlyHeatmap from "@/components/trading/analytics/MonthlyHeatmap";
 import BreakdownTable from "@/components/trading/analytics/BreakdownTable";
+import StrategyPerformance from "@/components/trading/analytics/StrategyPerformance";
+
 import TimeOfDayChart from "@/components/trading/analytics/TimeOfDayChart";
 import LongShortCompare from "@/components/trading/analytics/LongShortCompare";
 import { useTradeAnalytics } from "@/hooks/useTradeAnalytics";
@@ -143,8 +145,9 @@ const Trading = () => {
             <DrawdownChart a={analytics} />
             <MonthlyHeatmap a={analytics} />
             <LongShortCompare a={analytics} />
+            <StrategyPerformance trades={trades} />
             <BreakdownTable title="By Symbol" rows={analytics.bySymbol} />
-            <BreakdownTable title="By Strategy" rows={analytics.byStrategy} />
+
             <TimeOfDayChart a={analytics} />
           </TabsContent>
 

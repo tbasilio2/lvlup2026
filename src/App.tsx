@@ -19,6 +19,7 @@ import BottomNav from "./components/BottomNav";
 
 const queryClient = new QueryClient();
 const ONBOARDING_KEY = "lvlup:onboarding-complete";
+const ONBOARDING_FOCUS_KEY = "lvlup:onboarding-focus";
 
 const navItems = [
   { to: "/", icon: <CheckSquare className="h-5 w-5" />, label: "Habits" },
@@ -38,17 +39,24 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => {
   const { user, loading } = useAuth();
   const [onboardingComplete, setOnboardingComplete] = useState(false);
+  const [onboardingFocus, setOnboardingFocus] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
       setOnboardingComplete(false);
+      setOnboardingFocus(null);
       return;
     }
     setOnboardingComplete(localStorage.getItem(`${ONBOARDING_KEY}:${user.id}`) === "true");
+    setOnboardingFocus(localStorage.getItem(`${ONBOARDING_FOCUS_KEY}:${user.id}`));
   }, [user]);
 
-  const completeOnboarding = () => {
-    if (user) localStorage.setItem(`${ONBOARDING_KEY}:${user.id}`, "true");
+  const completeOnboarding = (focus?: string) => {
+    if (user) {
+      localStorage.setItem(`${ONBOARDING_KEY}:${user.id}`, "true");
+      if (focus) localStorage.setItem(`${ONBOARDING_FOCUS_KEY}:${user.id}`, focus);
+      setOnboardingFocus(focus ?? null);
+    }
     setOnboardingComplete(true);
   };
 
@@ -59,7 +67,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/auth" element={user ? <Navigate to="/" replace /> : <Auth />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+        <Route path="/" element={<ProtectedRoute><Index onboardingFocus={onboardingFocus} /></ProtectedRoute>} />
         <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
         <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
         <Route path="/trading" element={<ProtectedRoute><Trading /></ProtectedRoute>} />
@@ -67,12 +75,7 @@ const AppRoutes = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       {user && <BottomNav items={navItems} />}
-      {user && !onboardingComplete && (
-        <WorldClassOnboarding
-          userName={user.user_metadata?.display_name ?? user.email?.split("@")[0]}
-          onComplete={completeOnboarding}
-        />
-      )}
+      {user && !onboardingComplete && <WorldClassOnboarding userName={user.user_metadata?.display_name ?? user.email?.split("@")[0]} onComplete={completeOnboarding} />}
     </>
   );
 };

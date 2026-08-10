@@ -310,7 +310,7 @@ const AICopilot = () => {
 
         <div>
           <label className="text-[10px] font-mono text-muted-foreground mb-0.5 block">Strategy / Setup</label>
-          <input value={form.strategy} onChange={(e) => update("strategy", e.target.value)} placeholder="e.g. Break & Retest at support" className={inputCls} />
+          <StrategySelect value={form.strategy} onChange={(v) => update("strategy", v)} className={inputCls} />
         </div>
         <div>
           <label className="text-[10px] font-mono text-muted-foreground mb-0.5 block">Your Reasoning</label>

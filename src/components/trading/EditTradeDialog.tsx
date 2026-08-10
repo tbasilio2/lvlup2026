@@ -236,7 +236,7 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
 
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1 block">Strategy / Setup</label>
-            <input value={form.strategy} onChange={(e) => update("strategy", e.target.value)} placeholder="e.g. Break & Retest" className={inputCls} />
+            <StrategySelect value={form.strategy} onChange={(v) => update("strategy", v)} className={inputCls} />
           </div>
 
           <div>

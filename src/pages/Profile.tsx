@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { CURRENCIES, useCurrency, setCurrency, type CurrencyCode } from "@/lib/currency";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useStrategies, setStrategies } from "@/lib/strategies";
 
 const Profile = () => {
   const { user, signOut } = useAuth();

@@ -143,8 +143,9 @@ const Trading = () => {
             <DrawdownChart a={analytics} />
             <MonthlyHeatmap a={analytics} />
             <LongShortCompare a={analytics} />
+            <StrategyPerformance trades={trades} />
             <BreakdownTable title="By Symbol" rows={analytics.bySymbol} />
-            <BreakdownTable title="By Strategy" rows={analytics.byStrategy} />
+
             <TimeOfDayChart a={analytics} />
           </TabsContent>
 

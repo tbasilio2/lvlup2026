@@ -37,12 +37,14 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
-  const [onboardingComplete, setOnboardingComplete] = useState(() => localStorage.getItem(ONBOARDING_KEY) === "true");
+  const [onboardingComplete, setOnboardingComplete] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
-    const key = `${ONBOARDING_KEY}:${user.id}`;
-    setOnboardingComplete(localStorage.getItem(key) === "true");
+    if (!user) {
+      setOnboardingComplete(false);
+      return;
+    }
+    setOnboardingComplete(localStorage.getItem(`${ONBOARDING_KEY}:${user.id}`) === "true");
   }, [user]);
 
   const completeOnboarding = () => {

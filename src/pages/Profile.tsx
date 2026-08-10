@@ -134,6 +134,25 @@ const Profile = () => {
               </Select>
               <p className="text-[10px] text-muted-foreground mt-1.5 font-mono">Applies to all P&amp;L, fees, and stats. Display only — values are not converted.</p>
             </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block font-mono uppercase tracking-wider">Top 3 Setups</label>
+              <div className="space-y-2">
+                {[0, 1, 2].map((i) => (
+                  <input
+                    key={i}
+                    type="text"
+                    value={strategies[i] ?? ""}
+                    onChange={(e) => {
+                      const next = [0, 1, 2].map((j) => (j === i ? e.target.value : strategies[j] ?? ""));
+                      setStrategies(next);
+                    }}
+                    className={inputCls}
+                    placeholder={`Setup ${i + 1}`}
+                  />
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-1.5 font-mono">These appear as the strategy dropdown when logging a trade.</p>
+            </div>
             <Button onClick={handleSave} disabled={saving} className="w-full rounded-xl py-3 gap-2">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Changes"}
             </Button>

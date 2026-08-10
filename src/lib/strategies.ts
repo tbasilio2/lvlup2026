@@ -17,7 +17,7 @@ const read = (): string[] => {
   try {
     const raw = localStorage.getItem(KEY);
     const parsed = raw ? JSON.parse(raw) : null;
-    cache = Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string").slice(0, MAX_STRATEGIES) : DEFAULTS;
+    cache = Array.isArray(parsed) ? migrate(parsed.filter((x) => typeof x === "string")).slice(0, MAX_STRATEGIES) : DEFAULTS;
   } catch {
     cache = DEFAULTS;
   }

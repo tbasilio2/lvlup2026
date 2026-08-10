@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CheckSquare, Target, BookOpen, UserCircle, TrendingUp } from "lucide-react";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import WorldClassOnboarding from "./components/WorldClassOnboarding";
 import Index from "./pages/Index";
 import Goals from "./pages/Goals";
 import Journal from "./pages/Journal";
@@ -16,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 
 const queryClient = new QueryClient();
+const ONBOARDING_KEY = "lvlup:onboarding-complete";
 
 const navItems = [
   { to: "/", icon: <CheckSquare className="h-5 w-5" />, label: "Habits" },
@@ -34,11 +37,25 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
+  const [onboardingComplete, setOnboardingComplete] = useState(() => localStorage.getItem(ONBOARDING_KEY) === "true");
+
+  useEffect(() => {
+    if (!user) return;
+    const key = `${ONBOARDING_KEY}:${user.id}`;
+    setOnboardingComplete(localStorage.getItem(key) === "true");
+  }, [user]);
+
+  const completeOnboarding = () => {
+    if (user) localStorage.setItem(`${ONBOARDING_KEY}:${user.id}`, "true");
+    setOnboardingComplete(true);
+  };
+
+  if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">Loading...</div>;
 
   return (
     <>
       <Routes>
-        <Route path="/auth" element={!loading && user ? <Navigate to="/" replace /> : <Auth />} />
+        <Route path="/auth" element={user ? <Navigate to="/" replace /> : <Auth />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
         <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
@@ -48,6 +65,12 @@ const AppRoutes = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       {user && <BottomNav items={navItems} />}
+      {user && !onboardingComplete && (
+        <WorldClassOnboarding
+          userName={user.user_metadata?.display_name ?? user.email?.split("@")[0]}
+          onComplete={completeOnboarding}
+        />
+      )}
     </>
   );
 };

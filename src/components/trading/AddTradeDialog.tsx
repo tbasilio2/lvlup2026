@@ -1,3 +1,4 @@
+import StrategySelect from "@/components/trading/StrategySelect";
 import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";

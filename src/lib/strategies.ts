@@ -3,7 +3,11 @@ import { useSyncExternalStore } from "react";
 const KEY = "top-strategies";
 export const MAX_STRATEGIES = 3;
 
-const DEFAULTS = ["Break & Retest", "Liquidity Sweep", "Trend Continuation"];
+const DEFAULTS = ["Break & Retest", "Liquidity Sweep", "Fib Strategy"];
+
+/** Rename legacy setups to their current names. */
+const RENAMES: Record<string, string> = { "trend continuation": "Fib Strategy" };
+const migrate = (list: string[]) => list.map((s) => RENAMES[s.trim().toLowerCase()] ?? s);
 
 let cache: string[] | null = null;
 const listeners = new Set<() => void>();
@@ -13,7 +17,7 @@ const read = (): string[] => {
   try {
     const raw = localStorage.getItem(KEY);
     const parsed = raw ? JSON.parse(raw) : null;
-    cache = Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string").slice(0, MAX_STRATEGIES) : DEFAULTS;
+    cache = Array.isArray(parsed) ? migrate(parsed.filter((x) => typeof x === "string")).slice(0, MAX_STRATEGIES) : DEFAULTS;
   } catch {
     cache = DEFAULTS;
   }

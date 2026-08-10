@@ -3,7 +3,11 @@ import { useSyncExternalStore } from "react";
 const KEY = "top-strategies";
 export const MAX_STRATEGIES = 3;
 
-const DEFAULTS = ["Break & Retest", "Liquidity Sweep", "Trend Continuation"];
+const DEFAULTS = ["Break & Retest", "Liquidity Sweep", "Fib Strategy"];
+
+/** Rename legacy setups to their current names. */
+const RENAMES: Record<string, string> = { "trend continuation": "Fib Strategy" };
+const migrate = (list: string[]) => list.map((s) => RENAMES[s.trim().toLowerCase()] ?? s);
 
 let cache: string[] | null = null;
 const listeners = new Set<() => void>();

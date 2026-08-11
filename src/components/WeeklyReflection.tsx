@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 1.2 seconds
+Output:
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, TrendingUp, Heart, Lightbulb, RefreshCw, Loader2 } from "lucide-react";
@@ -13,6 +16,8 @@ interface WeeklyReflectionData {
   improvements: string[];
   affirmation: string;
 }
+
+type WeeklyReflectionResponse = WeeklyReflectionData & { error?: string };
 
 interface Props {
   entries: JournalEntry[];
@@ -39,16 +44,17 @@ const WeeklyReflection = ({ entries }: Props) => {
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("weekly-reflection", {
+      const { data, error } = await supabase.functions.invoke<WeeklyReflectionResponse>("weekly-reflection", {
         body: { entries: weekEntries },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
+      if (!data) throw new Error("Weekly reflection returned no data");
       setReflection(data);
       setGenerated(true);
-    } catch (e: any) {
-      console.error(e);
-      toast.error(e.message || "Failed to generate reflection");
+    } catch (error: unknown) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : "Failed to generate reflection");
     } finally {
       setLoading(false);
     }
@@ -152,7 +158,7 @@ const WeeklyReflection = ({ entries }: Props) => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
                   >
-                    <span className="text-accent mt-0.5">✓</span>
+                    <span className="text-accent mt-0.5">âœ“</span>
                     {s}
                   </motion.li>
                 ))}
@@ -174,7 +180,7 @@ const WeeklyReflection = ({ entries }: Props) => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 + 0.2 }}
                   >
-                    <span className="text-primary mt-0.5">→</span>
+                    <span className="text-primary mt-0.5">â†’</span>
                     {s}
                   </motion.li>
                 ))}
@@ -218,3 +224,4 @@ const WeeklyReflection = ({ entries }: Props) => {
 };
 
 export default WeeklyReflection;
+

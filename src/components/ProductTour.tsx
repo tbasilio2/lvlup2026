@@ -32,7 +32,12 @@ const ProductTour = ({ onNavigate, onboardingFocus }: ProductTourProps) => {
     return [{ ...focusStep, title: focus.title, body: focus.body }, ...baseSteps.filter((item) => item.key !== focus.key)];
   }, [onboardingFocus]);
 
-  useEffect(() => { setOpen(localStorage.getItem(TOUR_KEY) !== "true"); }, []);
+  useEffect(() => {
+    const shouldOpen = localStorage.getItem(TOUR_KEY) !== "true";
+    setOpen(shouldOpen);
+    if (shouldOpen) onNavigate?.(steps[0].path);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const finish = () => { localStorage.setItem(TOUR_KEY, "true"); setOpen(false); };
   const next = () => { if (step === steps.length - 1) return finish(); const nextStep = step + 1; setStep(nextStep); onNavigate?.(steps[nextStep].path); };
   const current = steps[step];

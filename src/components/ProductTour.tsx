@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, BookOpen, CheckSquare, Target, TrendingUp, X, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, CheckSquare, Target, TrendingUp, X, Sparkles, PlugZap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SyncVerification from "@/components/trading/SyncVerification";
 
 const TOUR_KEY = "lvlup:product-tour-complete";
 const baseSteps = [
@@ -9,8 +10,10 @@ const baseSteps = [
   { key: "goals", title: "Goals give you direction", body: "Use Goals for the outcomes you care about, then connect them to actions you can control.", icon: Target, path: "/goals" },
   { key: "journal", title: "Journal to find patterns", body: "Reflect on your day, mood and decisions. The value comes from noticing what repeats.", icon: BookOpen, path: "/journal" },
   { key: "trading", title: "Your trading journal, always up to date", body: "Log trades by hand, import an MT5 or CSV report, or link your MT5 account once and let it auto-sync every 12 hours. Entry, stop-loss and take-profit are plotted on a chart for every trade.", icon: TrendingUp, path: "/trading" },
+  { key: "sync-check", title: "Check your auto-sync is working", body: "Run a live test against every linked MT5 account and see the last sync time. Green means auto-sync will keep your journal current on its own.", icon: PlugZap, path: "/trading", verify: true },
   { key: "trading-insights", title: "See what your trading is really doing", body: "The dashboard gives you P&L calendar, equity curve and weekly report. Pro adds drawdown, expectancy and your best-performing setups — and the AI Copilot reviews any chart you upload.", icon: TrendingUp, path: "/trading" },
 ];
+
 
 const focusCopy: Record<string, { title: string; body: string; key: string }> = {
   Consistency: { title: "Your first mission: build consistency", body: "We've put Habits first because that's the focus you chose. Create one habit you can realistically repeat this week.", key: "habits" },
@@ -49,6 +52,8 @@ const ProductTour = ({ onNavigate, onboardingFocus }: ProductTourProps) => {
     <div className="mt-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10"><Icon className="h-6 w-6 text-primary" /></div>
     <p className="mt-6 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">{step === 0 && onboardingFocus ? <><Sparkles className="h-3.5 w-3.5" /> Your focus</> : `Quick tour · ${step + 1} of ${steps.length}`}</p>
     <h2 className="mt-2 text-2xl font-semibold tracking-tight">{current.title}</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">{current.body}</p>
+    {(current as any).verify ? <div className="mt-5 max-h-64 overflow-y-auto pr-1"><SyncVerification compact /></div> : null}
+
     <div className="mt-7 flex gap-2"><Button className="flex-1 rounded-xl" onClick={next}>{step === steps.length - 1 ? "Finish tour" : "Next"}<ArrowRight className="h-4 w-4" /></Button><Button variant="ghost" className="rounded-xl" onClick={finish}>Skip</Button></div>
   </motion.section></AnimatePresence></div></div>;
 };

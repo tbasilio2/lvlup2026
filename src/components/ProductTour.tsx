@@ -8,14 +8,15 @@ const baseSteps = [
   { key: "habits", title: "Habits are your daily actions", body: "Check in here each day and build repeatable momentum. Start small — consistency is the point.", icon: CheckSquare, path: "/" },
   { key: "goals", title: "Goals give you direction", body: "Use Goals for the outcomes you care about, then connect them to actions you can control.", icon: Target, path: "/goals" },
   { key: "journal", title: "Journal to find patterns", body: "Reflect on your day, mood and decisions. The value comes from noticing what repeats.", icon: BookOpen, path: "/journal" },
-  { key: "trading", title: "Trading is about process", body: "Track discipline and decisions — not just results.", icon: TrendingUp, path: "/trading" },
+  { key: "trading", title: "Your trading journal, always up to date", body: "Log trades by hand, import an MT5 or CSV report, or link your MT5 account once and let it auto-sync every 12 hours. Entry, stop-loss and take-profit are plotted on a chart for every trade.", icon: TrendingUp, path: "/trading" },
+  { key: "trading-insights", title: "See what your trading is really doing", body: "The dashboard gives you P&L calendar, equity curve and weekly report. Pro adds drawdown, expectancy and your best-performing setups — and the AI Copilot reviews any chart you upload.", icon: TrendingUp, path: "/trading" },
 ];
 
 const focusCopy: Record<string, { title: string; body: string; key: string }> = {
   Consistency: { title: "Your first mission: build consistency", body: "We've put Habits first because that's the focus you chose. Create one habit you can realistically repeat this week.", key: "habits" },
   Goals: { title: "Your first mission: make a goal actionable", body: "You chose Goals. After this tour, head to Goals and turn one outcome into a concrete next step.", key: "goals" },
   "Self-reflection": { title: "Your first mission: notice the pattern", body: "You chose Self-reflection. Your Journal is the place to capture what happened and learn from it.", key: "journal" },
-  "Trading discipline": { title: "Your first mission: protect the process", body: "You chose Trading discipline. Focus on repeatable execution and review your decisions, not just P&L.", key: "trading" },
+  "Trading discipline": { title: "Your first mission: protect the process", body: "You chose Trading discipline. Start by connecting or importing your MT5 history so every trade is journaled — then review the process, not just the P&L.", key: "trading" },
 };
 
 interface ProductTourProps { onNavigate?: (path: string) => void; onboardingFocus?: string | null }
@@ -31,7 +32,12 @@ const ProductTour = ({ onNavigate, onboardingFocus }: ProductTourProps) => {
     return [{ ...focusStep, title: focus.title, body: focus.body }, ...baseSteps.filter((item) => item.key !== focus.key)];
   }, [onboardingFocus]);
 
-  useEffect(() => { setOpen(localStorage.getItem(TOUR_KEY) !== "true"); }, []);
+  useEffect(() => {
+    const shouldOpen = localStorage.getItem(TOUR_KEY) !== "true";
+    setOpen(shouldOpen);
+    if (shouldOpen) onNavigate?.(steps[0].path);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const finish = () => { localStorage.setItem(TOUR_KEY, "true"); setOpen(false); };
   const next = () => { if (step === steps.length - 1) return finish(); const nextStep = step + 1; setStep(nextStep); onNavigate?.(steps[nextStep].path); };
   const current = steps[step];

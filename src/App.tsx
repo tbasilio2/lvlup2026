@@ -76,7 +76,7 @@ const AppRoutes = () => {
       </Routes>
       {user && <BottomNav items={navItems} />}
       {user && !onboardingComplete && <WorldClassOnboarding userName={user.user_metadata?.display_name ?? user.email?.split("@")[0]} onComplete={completeOnboarding} />}
-      {showTour && <ProductTour onNavigate={(path) => navigate(path)} />}
+      {showTour && <ProductTour onNavigate={(path) => navigate(path)} onboardingFocus={onboardingFocus} />}
     </>
   );
 };

@@ -2,9 +2,13 @@ name: QA
 
 on:
   push:
-    branches: [main, feat/world-class-onboarding]
+    branches: ["main", "feat/world-class-onboarding"]
   pull_request:
-    branches: [main]
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   qa:

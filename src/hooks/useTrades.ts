@@ -39,7 +39,7 @@ export interface TradeInsert {
   fees?: number;
   strategy?: string;
   notes?: string;
-  screenshot_url?: string;
+  screenshot_url?: string | null;
   status?: "open" | "closed";
   tags?: string[];
 }

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, BookOpen, CheckSquare, Target, TrendingUp, X, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, CheckSquare, Target, TrendingUp, X, Sparkles, PlugZap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SyncVerification from "@/components/trading/SyncVerification";
 
 const TOUR_KEY = "lvlup:product-tour-complete";
 const baseSteps = [
@@ -9,8 +10,10 @@ const baseSteps = [
   { key: "goals", title: "Goals give you direction", body: "Use Goals for the outcomes you care about, then connect them to actions you can control.", icon: Target, path: "/goals" },
   { key: "journal", title: "Journal to find patterns", body: "Reflect on your day, mood and decisions. The value comes from noticing what repeats.", icon: BookOpen, path: "/journal" },
   { key: "trading", title: "Your trading journal, always up to date", body: "Log trades by hand, import an MT5 or CSV report, or link your MT5 account once and let it auto-sync every 12 hours. Entry, stop-loss and take-profit are plotted on a chart for every trade.", icon: TrendingUp, path: "/trading" },
+  { key: "sync-check", title: "Check your auto-sync is working", body: "Run a live test against every linked MT5 account and see the last sync time. Green means auto-sync will keep your journal current on its own.", icon: PlugZap, path: "/trading", verify: true },
   { key: "trading-insights", title: "See what your trading is really doing", body: "The dashboard gives you P&L calendar, equity curve and weekly report. Pro adds drawdown, expectancy and your best-performing setups — and the AI Copilot reviews any chart you upload.", icon: TrendingUp, path: "/trading" },
 ];
+
 
 const focusCopy: Record<string, { title: string; body: string; key: string }> = {
   Consistency: { title: "Your first mission: build consistency", body: "We've put Habits first because that's the focus you chose. Create one habit you can realistically repeat this week.", key: "habits" },

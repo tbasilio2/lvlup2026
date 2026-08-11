@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.2 seconds
-Output:
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, TrendingUp, Heart, Lightbulb, RefreshCw, Loader2 } from "lucide-react";
@@ -158,7 +155,7 @@ const WeeklyReflection = ({ entries }: Props) => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
                   >
-                    <span className="text-accent mt-0.5">âœ“</span>
+                    <span className="text-accent mt-0.5">✓</span>
                     {s}
                   </motion.li>
                 ))}
@@ -180,7 +177,7 @@ const WeeklyReflection = ({ entries }: Props) => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 + 0.2 }}
                   >
-                    <span className="text-primary mt-0.5">â†’</span>
+                    <span className="text-primary mt-0.5">→</span>
                     {s}
                   </motion.li>
                 ))}
@@ -224,4 +221,3 @@ const WeeklyReflection = ({ entries }: Props) => {
 };
 
 export default WeeklyReflection;
-

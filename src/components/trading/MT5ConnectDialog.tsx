@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.8 seconds
-Output:
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -80,7 +77,7 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
           <DialogHeader>
             <DialogTitle>Link MT5 account</DialogTitle>
             <DialogDescription>
-              Use your MT5 <strong>investor (read-only) password</strong> â€” never the master password.
+              Use your MT5 <strong>investor (read-only) password</strong> — never the master password.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
@@ -130,4 +127,3 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
     </>
   );
 }
-

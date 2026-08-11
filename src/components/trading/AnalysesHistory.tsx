@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.8 seconds
-Output:
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -90,7 +87,7 @@ const AnalysesHistory = () => {
     q == null ? "text-muted-foreground" : q >= 8 ? "text-profit" : q >= 5 ? "text-streak-glow" : "text-loss";
 
   if (loading) {
-    return <div className="text-center py-8 text-xs text-muted-foreground font-mono">Loading historyâ€¦</div>;
+    return <div className="text-center py-8 text-xs text-muted-foreground font-mono">Loading history…</div>;
   }
 
   if (items.length === 0) {
@@ -135,7 +132,7 @@ const AnalysesHistory = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-bold text-foreground truncate">{it.symbol || "â€”"}</span>
+                    <span className="text-xs font-mono font-bold text-foreground truncate">{it.symbol || "—"}</span>
                     {it.direction && (
                       <span className={`inline-flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
                         it.direction === "long" ? "bg-profit/10 text-profit" : "bg-loss/10 text-loss"
@@ -152,11 +149,11 @@ const AnalysesHistory = () => {
                   </div>
                   <div className="flex items-center gap-2 mt-0.5 text-[10px] font-mono text-muted-foreground">
                     <span>{fmtDate(it.created_at)}</span>
-                    <span>Â·</span>
+                    <span>·</span>
                     <span>{it.kind === "ai_trade" ? "AI Trade" : "Advisor"}</span>
-                    {it.entry_price && <><span>Â·</span><span>E {it.entry_price}</span></>}
-                    {it.stop_loss && <><span>Â·</span><span className="text-loss">SL {it.stop_loss}</span></>}
-                    {it.take_profit && <><span>Â·</span><span className="text-profit">TP {it.take_profit}</span></>}
+                    {it.entry_price && <><span>·</span><span>E {it.entry_price}</span></>}
+                    {it.stop_loss && <><span>·</span><span className="text-loss">SL {it.stop_loss}</span></>}
+                    {it.take_profit && <><span>·</span><span className="text-profit">TP {it.take_profit}</span></>}
                   </div>
                 </div>
                 {isOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
@@ -175,15 +172,15 @@ const AnalysesHistory = () => {
                       <div className="grid grid-cols-3 gap-2">
                         <div className="rounded-lg bg-secondary/40 p-2 text-center">
                           <div className="text-[9px] font-mono text-muted-foreground uppercase mb-0.5">Entry</div>
-                          <div className="text-xs font-bold font-mono text-foreground">{it.entry_price || "â€”"}</div>
+                          <div className="text-xs font-bold font-mono text-foreground">{it.entry_price || "—"}</div>
                         </div>
                         <div className="rounded-lg bg-loss/5 border border-loss/10 p-2 text-center">
                           <div className="text-[9px] font-mono text-loss uppercase mb-0.5">Stop Loss</div>
-                          <div className="text-xs font-bold font-mono text-loss">{it.stop_loss || "â€”"}</div>
+                          <div className="text-xs font-bold font-mono text-loss">{it.stop_loss || "—"}</div>
                         </div>
                         <div className="rounded-lg bg-profit/5 border border-profit/10 p-2 text-center">
                           <div className="text-[9px] font-mono text-profit uppercase mb-0.5">Take Profit</div>
-                          <div className="text-xs font-bold font-mono text-profit">{it.take_profit || "â€”"}</div>
+                          <div className="text-xs font-bold font-mono text-profit">{it.take_profit || "—"}</div>
                         </div>
                       </div>
                       {it.risk_reward && (
@@ -206,7 +203,7 @@ const AnalysesHistory = () => {
                           <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">Suggestions</div>
                           <ul className="space-y-1">
                             {it.payload.suggestions.map((s: string, i: number) => (
-                              <li key={i} className="flex items-start gap-2"><span className="text-primary text-xs">â€º</span><span className="text-xs text-foreground/90">{s}</span></li>
+                              <li key={i} className="flex items-start gap-2"><span className="text-primary text-xs">›</span><span className="text-xs text-foreground/90">{s}</span></li>
                             ))}
                           </ul>
                         </div>
@@ -230,4 +227,3 @@ const AnalysesHistory = () => {
 };
 
 export default AnalysesHistory;
-

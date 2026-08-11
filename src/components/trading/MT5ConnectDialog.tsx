@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 1.8 seconds
+Output:
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -11,6 +14,10 @@ import MT5QrScanner, { type ScannedMT5Credentials } from "./MT5QrScanner";
 
 interface Props {
   onConnected?: () => void;
+}
+
+interface Mt5ConnectResponse {
+  error?: string;
 }
 
 export default function MT5ConnectDialog({ onConnected }: Props) {
@@ -46,12 +53,12 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
       return;
     }
     setBusy(true);
-    const { data, error } = await supabase.functions.invoke("mt5-connect", {
+    const { data, error } = await supabase.functions.invoke<Mt5ConnectResponse>("mt5-connect", {
       body: { label, server, login, password, region, platform: "mt5" },
     });
     setBusy(false);
-    if (error || (data as any)?.error) {
-      toast.error((data as any)?.error || error?.message || "Failed to connect");
+    if (error || data?.error) {
+      toast.error(data?.error || error?.message || "Failed to connect");
       return;
     }
     toast.success("Account linked. Provisioning takes ~30-60s, then hit Sync.");
@@ -73,7 +80,7 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
           <DialogHeader>
             <DialogTitle>Link MT5 account</DialogTitle>
             <DialogDescription>
-              Use your MT5 <strong>investor (read-only) password</strong> — never the master password.
+              Use your MT5 <strong>investor (read-only) password</strong> â€” never the master password.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
@@ -123,3 +130,4 @@ export default function MT5ConnectDialog({ onConnected }: Props) {
     </>
   );
 }
+

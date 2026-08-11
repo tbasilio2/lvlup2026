@@ -102,7 +102,7 @@ export default function SyncVerification({ compact, onSynced }: Props) {
               Last sync: {a.last_synced_at ? formatDistanceToNow(new Date(a.last_synced_at), { addSuffix: true }) : "never"}
             </div>
             {r ? (
-              <div className={`mt-2 flex items-start gap-1.5 text-[11px] ${r.ok ? "text-success" : "text-destructive"}`}>
+              <div className={`mt-2 flex items-start gap-1.5 text-[11px] ${r.ok ? "text-profit" : "text-destructive"}`}>
                 {r.ok ? <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" /> : <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />}
                 <span>{r.message}</span>
               </div>

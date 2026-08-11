@@ -18,6 +18,8 @@ interface Props {
   onSave: (id: string, updates: Partial<TradeInsert>) => Promise<void>;
 }
 
+type TradeUpdates = Partial<TradeInsert> & { screenshot_url?: string | null };
+
 const toLocal = (iso: string | null) => (iso ? new Date(iso).toISOString().slice(0, 16) : "");
 
 const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
@@ -116,7 +118,7 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
     if (screenshotFile) screenshot_url = await uploadScreenshot();
     else if (removeScreenshot) screenshot_url = null;
 
-    const updates: Partial<TradeInsert> & { screenshot_url?: string | null } = {
+    const updates: TradeUpdates = {
       symbol: form.symbol.toUpperCase(),
       direction: form.direction,
       entry_price: parseFloat(form.entry_price),
@@ -127,28 +129,28 @@ const EditTradeDialog = ({ trade, open, onOpenChange, onSave }: Props) => {
       entry_date: new Date(form.entry_date).toISOString(),
       exit_date: form.exit_date ? new Date(form.exit_date).toISOString() : null,
       fees: parseFloat(form.fees || "0"),
-      strategy: form.strategy || null as any,
-      notes: form.notes || null as any,
+      strategy: form.strategy || undefined,
+      notes: form.notes || undefined,
       tags: form.tags ? form.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
     };
 
     const manualPnl = form.pnl.trim() ? parseFloat(form.pnl) : null;
     if (manualPnl != null) {
-      (updates as any).pnl = manualPnl;
-      (updates as any).status = "closed";
+      updates.pnl = manualPnl;
+      updates.status = "closed";
     } else if (updates.exit_price != null) {
       const pnl =
         updates.direction === "long"
           ? (updates.exit_price - (updates.entry_price as number)) * (updates.quantity as number)
           : ((updates.entry_price as number) - updates.exit_price) * (updates.quantity as number);
-      (updates as any).pnl = pnl - (updates.fees ?? 0);
-      (updates as any).status = "closed";
+      updates.pnl = pnl - (updates.fees ?? 0);
+      updates.status = "closed";
     } else {
-      (updates as any).pnl = null;
-      (updates as any).status = "open";
+      updates.pnl = null;
+      updates.status = "open";
     }
 
-    if (screenshot_url !== undefined) (updates as any).screenshot_url = screenshot_url;
+    if (screenshot_url !== undefined) updates.screenshot_url = screenshot_url;
 
     await onSave(trade.id, updates);
     setLoading(false);

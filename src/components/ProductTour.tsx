@@ -52,6 +52,8 @@ const ProductTour = ({ onNavigate, onboardingFocus }: ProductTourProps) => {
     <div className="mt-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10"><Icon className="h-6 w-6 text-primary" /></div>
     <p className="mt-6 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">{step === 0 && onboardingFocus ? <><Sparkles className="h-3.5 w-3.5" /> Your focus</> : `Quick tour · ${step + 1} of ${steps.length}`}</p>
     <h2 className="mt-2 text-2xl font-semibold tracking-tight">{current.title}</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">{current.body}</p>
+    {(current as any).verify ? <div className="mt-5 max-h-64 overflow-y-auto pr-1"><SyncVerification compact /></div> : null}
+
     <div className="mt-7 flex gap-2"><Button className="flex-1 rounded-xl" onClick={next}>{step === steps.length - 1 ? "Finish tour" : "Next"}<ArrowRight className="h-4 w-4" /></Button><Button variant="ghost" className="rounded-xl" onClick={finish}>Skip</Button></div>
   </motion.section></AnimatePresence></div></div>;
 };

@@ -17,10 +17,32 @@ interface Account {
   last_error: string | null;
 }
 
+interface SyncResponse {
+  error?: string;
+  ok?: boolean;
+  state?: string;
+  message?: string;
+  imported?: number;
+}
+
 interface Props {
   onSynced?: () => void;
   refreshKey?: number;
 }
+
+const isSyncResponse = (value: unknown): value is SyncResponse =>
+  typeof value === "object" && value !== null;
+
+const isAccount = (value: unknown): value is Account => {
+  if (typeof value !== "object" || value === null) return false;
+  const account = value as Record<string, unknown>;
+  return (
+    typeof account.id === "string" &&
+    typeof account.label === "string" &&
+    typeof account.broker_server === "string" &&
+    typeof account.login === "string"
+  );
+};
 
 export default function ConnectedAccountsList({ onSynced, refreshKey }: Props) {
   const { user } = useAuth();
@@ -34,7 +56,7 @@ export default function ConnectedAccountsList({ onSynced, refreshKey }: Props) {
       .select("id,label,broker_server,login,state,last_synced_at,last_error")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
-    setAccounts((data as any) || []);
+    setAccounts(Array.isArray(data) ? data.filter(isAccount) : []);
   }, [user]);
 
   useEffect(() => { load(); }, [load, refreshKey]);
@@ -43,15 +65,16 @@ export default function ConnectedAccountsList({ onSynced, refreshKey }: Props) {
     setBusyId(id);
     const { data, error } = await supabase.functions.invoke("mt5-sync", { body: { accountId: id } });
     setBusyId(null);
-    if (error || (data as any)?.error) {
-      toast.error((data as any)?.error || error?.message || "Sync failed");
-    } else if ((data as any)?.ok === false) {
-      const state = (data as any)?.state;
-      const msg = (data as any).message || "Account still provisioning";
+    const response = isSyncResponse(data) ? data : {};
+    if (error || response.error) {
+      toast.error(response.error || error?.message || "Sync failed");
+    } else if (response.ok === false) {
+      const state = response.state;
+      const msg = response.message || "Account still provisioning";
       if (state === "MISSING") toast.error(msg, { duration: 8000 });
       else toast.message(msg);
     } else {
-      toast.success(`Synced ${(data as any)?.imported ?? 0} trades`);
+      toast.success(`Synced ${response.imported ?? 0} trades`);
       onSynced?.();
     }
     load();
@@ -94,7 +117,6 @@ export default function ConnectedAccountsList({ onSynced, refreshKey }: Props) {
             >
               {a.state || "UNKNOWN"}
             </Badge>
-
             <span className="text-[10px] text-muted-foreground font-mono hidden sm:inline">
               {a.last_synced_at ? formatDistanceToNow(new Date(a.last_synced_at), { addSuffix: true }) : "never"}
             </span>
@@ -111,6 +133,5 @@ export default function ConnectedAccountsList({ onSynced, refreshKey }: Props) {
         Auto-syncs every 12 hours (00:00 &amp; 12:00 UTC)
       </p>
     </div>
-
   );
 }

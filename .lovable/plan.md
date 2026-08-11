@@ -1,30 +1,21 @@
 ## Goal
 
-MT5 trades flow into the journal automatically twice a day, and a clearly visible **Sync All** button lets you pull them in on demand.
+Complete the existing product tour so the trading step is meaningful and the focus personalisation actually works.
 
-## 1. Scheduled auto-sync (every 12 hours)
+## What's wrong today
 
-Today `mt5-sync` requires a logged-in user token and syncs one account at a time, so it can't run unattended.
+- `App.tsx` renders `<ProductTour onNavigate={...} />` without passing `onboardingFocus`, so the "Your focus" personalisation in the tour never appears — even after the user picks a focus during onboarding.
+- The trading step copy is a single generic line ("Track discipline and decisions") that doesn't mention any of the journal's actual capabilities (MT5 sync, calendar/equity, Copilot, Pro analytics).
+- The tour navigates on "Next" but never navigates to the first step's route, so a user starting on a different page sees mismatched copy and screen.
 
-- Extract the per-account sync logic into a shared module so both the manual and scheduled paths use identical code (no duplicated parsing/import logic).
-- Add a new backend function `mt5-auto-sync` that:
-  - Authenticates via a shared scheduler secret (not a user token).
-  - Loads every connected MT5 account across all users that is in the `DEPLOYED` state.
-  - Runs the same deal-fetch and trade-import routine for each, updating `last_synced_at` / `last_error` per account.
-  - Returns a per-account summary for logging.
-- Register a scheduled job that calls it at 00:00 and 12:00 UTC (`0 0,12 * * *`), enabling the required scheduling extensions.
-- Existing duplicate protection (unique constraint on the MetaApi deal id) means repeated runs never create duplicate trades.
+## Changes
 
-## 2. Sync button in the UI
-
-- Add a **Sync All** button in the Trading page header next to **Connect MT5**, shown only when at least one account is connected.
-- It triggers a sync for each connected account, shows a spinner while running, and reports total imported trades via a toast, then refreshes the dashboard stats and trade list.
-- Keep the existing per-account refresh icon in the connected-accounts list for targeted syncs.
-- Show a "Last synced: X ago / Auto-syncs every 12h" line under the accounts list so the schedule is discoverable.
+1. Pass `onboardingFocus` from `AppRoutes` into `ProductTour` so the focus-first ordering and "Your focus" badge work as designed.
+2. Navigate to the first step's route when the tour opens, so the highlighted page always matches the copy.
+3. Expand the trading step into a proper trading-journal introduction: what the journal does (log trades manually, import from MT5/CSV, auto-sync), where results live (dashboard, P&L calendar, equity curve), and the AI Copilot review. Keep it concise — split into two short tour cards rather than one long one.
+4. Keep the "Trading discipline" focus copy consistent with the expanded trading step wording.
 
 ## Technical notes
 
-- Shared logic lives in `supabase/functions/_shared/mt5Sync.ts`, imported by both `mt5-sync` and `mt5-auto-sync`.
-- The scheduled job posts to the function with the scheduler secret in a header; the function rejects any request without it.
-- Cron registration uses project-specific values, so it is applied as a data operation rather than a schema migration.
-- No schema changes are needed beyond what already exists.
+- Files touched: `src/App.tsx` (pass the prop), `src/components/ProductTour.tsx` (step definitions, initial navigation).
+- No backend or schema changes; tour completion still tracked via the existing `lvlup:product-tour-complete` localStorage key.

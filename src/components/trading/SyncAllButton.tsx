@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.1 seconds
-Output:
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,7 +43,7 @@ export default function SyncAllButton({ onSynced, refreshKey }: Props) {
     }
     setBusy(false);
     if (failed && !imported) toast.error("Sync failed");
-    else if (failed) toast.warning(`Synced ${imported} trades Â· ${failed} account(s) failed`);
+    else if (failed) toast.warning(`Synced ${imported} trades · ${failed} account(s) failed`);
     else toast.success(`Synced ${imported} trades`);
     onSynced?.();
   };
@@ -58,4 +55,3 @@ export default function SyncAllButton({ onSynced, refreshKey }: Props) {
     </Button>
   );
 }
-

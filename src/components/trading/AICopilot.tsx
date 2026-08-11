@@ -36,6 +36,19 @@ interface ChartAdvice {
   suggestions: string[];
 }
 
+type ChartAnalysisRow = Record<string, unknown>;
+
+type ChartAnalysisClient = {
+  from: (table: string) => {
+    insert: (row: ChartAnalysisRow) => PromiseLike<unknown>;
+  };
+};
+
+const insertChartAnalysis = (row: ChartAnalysisRow) => {
+  const client = supabase as unknown as ChartAnalysisClient;
+  return client.from("chart_analyses").insert(row);
+};
+
 const qualityColor = (q: number) =>
   q >= 8 ? "text-profit" : q >= 5 ? "text-streak-glow" : "text-loss";
 
@@ -97,7 +110,7 @@ const AICopilot = () => {
       setAdvice(data);
 
       if (user) {
-        await supabase.from("chart_analyses" as any).insert({
+        await insertChartAnalysis({
           user_id: user.id,
           kind: "advisor",
           symbol: ctx.symbol ?? null,
@@ -145,7 +158,7 @@ const AICopilot = () => {
         take_profit: generated!.take_profit || p.take_profit,
       }));
 
-      await supabase.from("chart_analyses" as any).insert({
+      await insertChartAnalysis({
         user_id: user.id,
         kind: "ai_trade",
         symbol: generated.symbol ?? null,
@@ -333,7 +346,7 @@ const AICopilot = () => {
       {/* Plan results */}
       <AnimatePresence>
         {plan && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-3">
+          <motion.div initial={{ opacity: 0, y: 0 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-3">
             <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -345,138 +358,85 @@ const AICopilot = () => {
                     {plan.direction?.toUpperCase()}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Star className={`h-4 w-4 ${qualityColor(plan.trade_quality)}`} />
-                  <span className={`text-2xl font-bold font-mono ${qualityColor(plan.trade_quality)}`}>
-                    {plan.trade_quality}<span className="text-sm text-muted-foreground">/10</span>
-                  </span>
+                <div className={`text-lg font-bold font-mono ${qualityColor(plan.trade_quality)}`}>
+                  {plan.trade_quality}/10
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">{plan.trade_quality_reason}</p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Crosshair className="h-3.5 w-3.5 text-primary" />
-                <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Trade Levels</span>
-                <span className="ml-auto text-[10px] font-mono text-muted-foreground">R:R {plan.risk_reward}</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="rounded-lg bg-secondary/40 p-2.5 text-center">
-                  <div className="text-[9px] font-mono text-muted-foreground uppercase mb-1">Entry</div>
-                  <div className="text-sm font-bold font-mono text-foreground">{plan.entry_price}</div>
+              <p className="text-xs text-muted-foreground mb-3">{plan.trade_quality_reason}</p>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="rounded-lg bg-background/60 border border-border p-2">
+                  <p className="text-[9px] text-muted-foreground font-mono">ENTRY</p>
+                  <p className="text-xs font-mono font-semibold">{plan.entry_price}</p>
                 </div>
-                <div className="rounded-lg bg-loss/5 border border-loss/10 p-2.5 text-center">
-                  <div className="text-[9px] font-mono text-loss uppercase mb-1">Stop Loss</div>
-                  <div className="text-sm font-bold font-mono text-loss">{plan.stop_loss}</div>
+                <div className="rounded-lg bg-background/60 border border-loss/20 p-2">
+                  <p className="text-[9px] text-muted-foreground font-mono">STOP</p>
+                  <p className="text-xs font-mono font-semibold text-loss">{plan.stop_loss}</p>
                 </div>
-                <div className="rounded-lg bg-profit/5 border border-profit/10 p-2.5 text-center">
-                  <div className="text-[9px] font-mono text-profit uppercase mb-1">Take Profit</div>
-                  <div className="text-sm font-bold font-mono text-profit">{plan.take_profit}</div>
+                <div className="rounded-lg bg-background/60 border border-profit/20 p-2">
+                  <p className="text-[9px] text-muted-foreground font-mono">TARGET</p>
+                  <p className="text-xs font-mono font-semibold text-profit">{plan.take_profit}</p>
                 </div>
               </div>
             </div>
 
-            {[
-              { icon: Eye, title: "Chart Analysis", content: plan.chart_analysis },
-              { icon: Crosshair, title: "Entry Reasoning", content: plan.entry_reasoning },
-              { icon: Shield, title: "Stop Loss Reasoning", content: plan.sl_reasoning },
-              { icon: Target, title: "Take Profit Reasoning", content: plan.tp_reasoning },
-            ].map((section) => (
-              <div key={section.title} className="rounded-xl border border-border bg-card p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <section.icon className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{section.title}</span>
+            <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+              <h4 className="text-xs font-semibold flex items-center gap-1.5"><Eye className="h-3.5 w-3.5 text-primary" /> Chart Analysis</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">{plan.chart_analysis}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="rounded-lg bg-secondary/30 p-3">
+                  <p className="text-[9px] text-muted-foreground font-mono mb-1">ENTRY REASONING</p>
+                  <p className="text-xs text-foreground/80">{plan.entry_reasoning}</p>
                 </div>
-                <p className="text-xs text-foreground/90 leading-relaxed">{section.content}</p>
-              </div>
-            ))}
-
-            {plan.key_levels?.length > 0 && (
-              <div className="rounded-xl border border-border bg-card p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Target className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Key Levels</span>
+                <div className="rounded-lg bg-secondary/30 p-3">
+                  <p className="text-[9px] text-muted-foreground font-mono mb-1">RISK / REWARD</p>
+                  <p className="text-xs text-foreground/80">{plan.risk_reward}</p>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {plan.key_levels.map((lvl, j) => (
-                    <span key={j} className="text-xs font-mono px-2 py-1 rounded-lg bg-secondary/50 text-foreground/80">{lvl}</span>
-                  ))}
+                <div className="rounded-lg bg-secondary/30 p-3">
+                  <p className="text-[9px] text-muted-foreground font-mono mb-1">STOP REASONING</p>
+                  <p className="text-xs text-foreground/80">{plan.sl_reasoning}</p>
+                </div>
+                <div className="rounded-lg bg-secondary/30 p-3">
+                  <p className="text-[9px] text-muted-foreground font-mono mb-1">TARGET REASONING</p>
+                  <p className="text-xs text-foreground/80">{plan.tp_reasoning}</p>
                 </div>
               </div>
-            )}
-
-            {plan.warnings?.length > 0 && (
-              <div className="rounded-xl border border-streak-glow/20 bg-streak-glow/5 p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="h-3.5 w-3.5 text-streak-glow" />
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-streak-glow">Warnings</span>
+              {plan.key_levels?.length > 0 && (
+                <div>
+                  <p className="text-[9px] text-muted-foreground font-mono mb-1">KEY LEVELS</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {plan.key_levels.map((level, i) => <span key={i} className="text-[10px] px-2 py-1 rounded-md bg-secondary text-foreground/80">{level}</span>)}
+                  </div>
                 </div>
-                <ul className="space-y-1.5">
-                  {plan.warnings.map((w, j) => (
-                    <li key={j} className="flex items-start gap-2">
-                      <span className="text-xs mt-0.5 text-streak-glow">⚠</span>
-                      <span className="text-xs text-foreground/90 leading-relaxed">{w}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+              )}
+              {plan.warnings?.length > 0 && (
+                <div className="rounded-lg border border-loss/20 bg-loss/5 p-3">
+                  <p className="text-[9px] text-loss font-mono mb-1 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> WARNINGS</p>
+                  <ul className="space-y-1">{plan.warnings.map((w, i) => <li key={i} className="text-[10px] text-loss/80">• {w}</li>)}</ul>
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Advisor results */}
-      {advising && !advice && (
-        <div className="flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5">
-          <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-          <span className="text-xs text-muted-foreground">Coach is reviewing your setup…</span>
-        </div>
+      {advice && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-streak-glow/20 bg-streak-glow/5 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-semibold flex items-center gap-1.5"><Lightbulb className="h-3.5 w-3.5 text-streak-glow" /> Setup Critique</h4>
+            <span className={`text-sm font-mono font-bold ${qualityColor(advice.setup_quality)}`}>{advice.setup_quality}/10</span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">{advice.chart_analysis}</p>
+          <p className="text-xs text-foreground/80"><strong>Verdict:</strong> {advice.setup_quality_reason}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {advice.key_observations?.map((o, i) => <div key={i} className="rounded-lg bg-background/50 p-2 text-[10px] text-muted-foreground">• {o}</div>)}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div><p className="text-[9px] text-muted-foreground font-mono mb-1">ENTRY FEEDBACK</p><p className="text-[10px] text-foreground/80">{advice.entry_feedback}</p></div>
+            <div><p className="text-[9px] text-muted-foreground font-mono mb-1">RISK MANAGEMENT</p><p className="text-[10px] text-foreground/80">{advice.risk_management}</p></div>
+          </div>
+          {advice.suggestions?.length > 0 && <div><p className="text-[9px] text-muted-foreground font-mono mb-1">SUGGESTIONS</p><ul className="space-y-1">{advice.suggestions.map((s, i) => <li key={i} className="text-[10px] text-foreground/80">• {s}</li>)}</ul></div>}
+        </motion.div>
       )}
-      <AnimatePresence>
-        {advice && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-3">
-            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex items-center gap-3">
-              <div className={`text-3xl font-bold font-mono ${qualityColor(advice.setup_quality)}`}>
-                {advice.setup_quality}<span className="text-base text-muted-foreground">/10</span>
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <Star className={`h-4 w-4 ${qualityColor(advice.setup_quality)}`} />
-                  <span className="text-xs font-semibold text-foreground">Setup Quality (Coach)</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">{advice.setup_quality_reason}</p>
-              </div>
-            </div>
-
-            {[
-              { icon: Target, title: "Key Observations", content: advice.key_observations, type: "list" as const },
-              { icon: Target, title: "Entry Feedback", content: advice.entry_feedback, type: "text" as const },
-              { icon: Shield, title: "Risk Management", content: advice.risk_management, type: "text" as const },
-              { icon: Lightbulb, title: "Suggestions", content: advice.suggestions, type: "list" as const },
-            ].map((section) => (
-              <div key={section.title} className="rounded-xl border border-border bg-card p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <section.icon className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{section.title}</span>
-                </div>
-                {section.type === "text" ? (
-                  <p className="text-xs text-foreground/90 leading-relaxed">{section.content as string}</p>
-                ) : (
-                  <ul className="space-y-1.5">
-                    {((section.content as string[]) ?? []).map((item, j) => (
-                      <li key={j} className="flex items-start gap-2">
-                        <span className="text-xs mt-0.5 text-primary">›</span>
-                        <span className="text-xs text-foreground/90 leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

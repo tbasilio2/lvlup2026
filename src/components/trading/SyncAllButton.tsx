@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 1.1 seconds
+Output:
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,6 +13,11 @@ interface Props {
   refreshKey?: number;
 }
 
+interface Mt5SyncResponse {
+  error?: string;
+  imported?: number;
+}
+
 export default function SyncAllButton({ onSynced, refreshKey }: Props) {
   const { user } = useAuth();
   const [ids, setIds] = useState<string[]>([]);
@@ -18,7 +26,7 @@ export default function SyncAllButton({ onSynced, refreshKey }: Props) {
   const load = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase.from("mt5_accounts").select("id").eq("user_id", user.id);
-    setIds((data || []).map((a: any) => a.id));
+    setIds((data ?? []).map(({ id }) => id));
   }, [user]);
 
   useEffect(() => { load(); }, [load, refreshKey]);
@@ -30,13 +38,15 @@ export default function SyncAllButton({ onSynced, refreshKey }: Props) {
     let imported = 0;
     let failed = 0;
     for (const id of ids) {
-      const { data, error } = await supabase.functions.invoke("mt5-sync", { body: { accountId: id } });
-      if (error || (data as any)?.error) failed++;
-      else imported += (data as any)?.imported ?? 0;
+      const { data, error } = await supabase.functions.invoke<Mt5SyncResponse>("mt5-sync", {
+        body: { accountId: id },
+      });
+      if (error || data?.error) failed++;
+      else imported += data?.imported ?? 0;
     }
     setBusy(false);
     if (failed && !imported) toast.error("Sync failed");
-    else if (failed) toast.warning(`Synced ${imported} trades · ${failed} account(s) failed`);
+    else if (failed) toast.warning(`Synced ${imported} trades Â· ${failed} account(s) failed`);
     else toast.success(`Synced ${imported} trades`);
     onSynced?.();
   };
@@ -48,3 +58,4 @@ export default function SyncAllButton({ onSynced, refreshKey }: Props) {
     </Button>
   );
 }
+

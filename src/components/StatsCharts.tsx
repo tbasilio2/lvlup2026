@@ -1,6 +1,10 @@
+Exit code: 0
+Wall time: 0.9 seconds
+Output:
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
+import type { TooltipProps } from "recharts";
 import { TrendingUp, TrendingDown, Minus, Trophy, Target, Flame } from "lucide-react";
 import type { Habit, HabitLog } from "@/lib/habits";
 import { formatDate } from "@/lib/habits";
@@ -126,12 +130,12 @@ const StatsCharts = ({ log, habits }: StatsChartsProps) => {
     return "hsl(var(--habit-incomplete))";
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
     if (!active || !payload?.length) return null;
     return (
       <div className="rounded-xl bg-card border border-border px-3 py-2 shadow-lg text-xs">
         <p className="font-semibold text-foreground">{label}</p>
-        <p className="text-muted-foreground">{payload[0].value}% completion</p>
+        <p className="text-muted-foreground">{payload[0]?.value}% completion</p>
       </div>
     );
   };
@@ -192,7 +196,7 @@ const StatsCharts = ({ log, habits }: StatsChartsProps) => {
         transition={{ delay: 0.25 }}
       >
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-          Daily Completion — This Week
+          Daily Completion â€” This Week
         </h3>
         <div className="h-36">
           <ResponsiveContainer width="100%" height="100%">
@@ -223,7 +227,7 @@ const StatsCharts = ({ log, habits }: StatsChartsProps) => {
         transition={{ delay: 0.3 }}
       >
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-          Weekly Average — Last 4 Weeks
+          Weekly Average â€” Last 4 Weeks
         </h3>
         <div className="h-36">
           <ResponsiveContainer width="100%" height="100%">
@@ -250,3 +254,4 @@ const StatsCharts = ({ log, habits }: StatsChartsProps) => {
 };
 
 export default StatsCharts;
+

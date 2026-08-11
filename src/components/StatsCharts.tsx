@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.9 seconds
-Output:
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
@@ -196,7 +193,7 @@ const StatsCharts = ({ log, habits }: StatsChartsProps) => {
         transition={{ delay: 0.25 }}
       >
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-          Daily Completion â€” This Week
+          Daily Completion — This Week
         </h3>
         <div className="h-36">
           <ResponsiveContainer width="100%" height="100%">
@@ -227,7 +224,7 @@ const StatsCharts = ({ log, habits }: StatsChartsProps) => {
         transition={{ delay: 0.3 }}
       >
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-          Weekly Average â€” Last 4 Weeks
+          Weekly Average — Last 4 Weeks
         </h3>
         <div className="h-36">
           <ResponsiveContainer width="100%" height="100%">
@@ -254,4 +251,3 @@ const StatsCharts = ({ log, habits }: StatsChartsProps) => {
 };
 
 export default StatsCharts;
-

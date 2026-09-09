@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { CURRENCIES, useCurrency, setCurrency, type CurrencyCode } from "@/lib/currency";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useStrategies, setStrategies } from "@/lib/strategies";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useSubscription, TIERS } from "@/hooks/useSubscription";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
@@ -164,10 +164,14 @@ const Profile = () => {
 
           <div className="mt-8 rounded-xl border border-border bg-card p-4">
             <p className="text-xs font-medium text-muted-foreground font-mono uppercase tracking-wider">Plan</p>
-            <p className="mt-1 text-sm text-foreground">{sub.hasFullAccess ? "Entry access — $30/month" : "Free — habit tracker only"}</p>
-            {!sub.hasFullAccess && (
+            <p className="mt-1 text-sm text-foreground">
+              {sub.isActivePaid
+                ? `${TIERS[sub.tier].name} — $${TIERS[sub.tier].price}/month · ${TIERS[sub.tier].tagline}`
+                : "Free — habit tracker only"}
+            </p>
+            {!sub.isActivePaid && (
               <Button variant="outline" className="mt-3 w-full rounded-xl" onClick={() => navigate("/pricing")}>
-                Upgrade to Entry access
+                Upgrade your plan
               </Button>
             )}
           </div>

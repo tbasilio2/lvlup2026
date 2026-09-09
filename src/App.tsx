@@ -40,10 +40,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const PaidRoute = ({ children, feature }: { children: React.ReactNode; feature: string }) => {
-  const { hasFullAccess, loading } = useSubscription();
+const PaidRoute = ({ children, feature, featureKey }: { children: React.ReactNode; feature: string; featureKey: string }) => {
+  const { canAccess, loading } = useSubscription();
   if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">Loading...</div>;
-  if (!hasFullAccess) return <Paywall feature={feature} />;
+  if (!canAccess(featureKey)) return <Paywall feature={feature} />;
   return <>{children}</>;
 };
 
@@ -78,9 +78,9 @@ const AppRoutes = () => {
         <Route path="/auth" element={user ? <Navigate to="/" replace /> : <Auth />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={<ProtectedRoute><Index onboardingFocus={onboardingFocus} /></ProtectedRoute>} />
-        <Route path="/goals" element={<ProtectedRoute><PaidRoute feature="Goals"><Goals /></PaidRoute></ProtectedRoute>} />
-        <Route path="/journal" element={<ProtectedRoute><PaidRoute feature="The journal"><Journal /></PaidRoute></ProtectedRoute>} />
-        <Route path="/trading" element={<ProtectedRoute><PaidRoute feature="The trading journal"><Trading /></PaidRoute></ProtectedRoute>} />
+        <Route path="/goals" element={<ProtectedRoute><PaidRoute feature="Goals" featureKey="goals"><Goals /></PaidRoute></ProtectedRoute>} />
+        <Route path="/journal" element={<ProtectedRoute><PaidRoute feature="The journal" featureKey="journal"><Journal /></PaidRoute></ProtectedRoute>} />
+        <Route path="/trading" element={<ProtectedRoute><PaidRoute feature="The trading journal" featureKey="trading"><Trading /></PaidRoute></ProtectedRoute>} />
         <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />

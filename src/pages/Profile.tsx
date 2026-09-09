@@ -160,6 +160,16 @@ const Profile = () => {
             </Button>
           </div>
 
+          <div className="mt-8 rounded-xl border border-border bg-card p-4">
+            <p className="text-xs font-medium text-muted-foreground font-mono uppercase tracking-wider">Plan</p>
+            <p className="mt-1 text-sm text-foreground">{sub.hasFullAccess ? "Entry access — $30/month" : "Free — habit tracker only"}</p>
+            {!sub.hasFullAccess && (
+              <Button variant="outline" className="mt-3 w-full rounded-xl" onClick={() => navigate("/pricing")}>
+                Upgrade to Entry access
+              </Button>
+            )}
+          </div>
+
           <div className="mt-10 pt-6 border-t border-border">
             <Button variant="outline" onClick={signOut} className="w-full rounded-xl py-3 gap-2 text-destructive hover:text-destructive border-destructive/20 hover:bg-destructive/10">
               <LogOut className="h-4 w-4" /> Sign Out

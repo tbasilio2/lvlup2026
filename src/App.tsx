@@ -40,6 +40,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const PaidRoute = ({ children, feature }: { children: React.ReactNode; feature: string }) => {
+  const { hasFullAccess, loading } = useSubscription();
+  if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">Loading...</div>;
+  if (!hasFullAccess) return <Paywall feature={feature} />;
+  return <>{children}</>;
+};
+
 const AppRoutes = () => {
   const { user, loading } = useAuth();
   const location = useLocation();

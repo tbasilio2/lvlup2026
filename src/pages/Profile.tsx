@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { CURRENCIES, useCurrency, setCurrency, type CurrencyCode } from "@/lib/currency";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useStrategies, setStrategies } from "@/lib/strategies";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
@@ -17,6 +18,7 @@ const Profile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const currency = useCurrency();
   const strategies = useStrategies();
+  const sub = useSubscription();
 
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);

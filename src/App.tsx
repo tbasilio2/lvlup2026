@@ -17,6 +17,9 @@ import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
+import Paywall from "./components/Paywall";
+import Pricing from "./pages/Pricing";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const queryClient = new QueryClient();
 const ONBOARDING_KEY = "lvlup:onboarding-complete";

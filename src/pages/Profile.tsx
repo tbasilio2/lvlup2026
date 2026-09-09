@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { CURRENCIES, useCurrency, setCurrency, type CurrencyCode } from "@/lib/currency";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useStrategies, setStrategies } from "@/lib/strategies";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
@@ -17,6 +18,7 @@ const Profile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const currency = useCurrency();
   const strategies = useStrategies();
+  const sub = useSubscription();
 
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -158,6 +160,16 @@ const Profile = () => {
             <Button onClick={handleSave} disabled={saving} className="w-full rounded-xl py-3 gap-2">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save Changes"}
             </Button>
+          </div>
+
+          <div className="mt-8 rounded-xl border border-border bg-card p-4">
+            <p className="text-xs font-medium text-muted-foreground font-mono uppercase tracking-wider">Plan</p>
+            <p className="mt-1 text-sm text-foreground">{sub.hasFullAccess ? "Entry access — $30/month" : "Free — habit tracker only"}</p>
+            {!sub.hasFullAccess && (
+              <Button variant="outline" className="mt-3 w-full rounded-xl" onClick={() => navigate("/pricing")}>
+                Upgrade to Entry access
+              </Button>
+            )}
           </div>
 
           <div className="mt-10 pt-6 border-t border-border">

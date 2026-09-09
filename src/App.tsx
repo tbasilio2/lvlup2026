@@ -17,6 +17,9 @@ import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
+import Paywall from "./components/Paywall";
+import Pricing from "./pages/Pricing";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const queryClient = new QueryClient();
 const ONBOARDING_KEY = "lvlup:onboarding-complete";
@@ -34,6 +37,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">Loading...</div>;
   if (!user) return <Navigate to="/auth" replace />;
+  return <>{children}</>;
+};
+
+const PaidRoute = ({ children, feature }: { children: React.ReactNode; feature: string }) => {
+  const { hasFullAccess, loading } = useSubscription();
+  if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">Loading...</div>;
+  if (!hasFullAccess) return <Paywall feature={feature} />;
   return <>{children}</>;
 };
 
@@ -68,9 +78,10 @@ const AppRoutes = () => {
         <Route path="/auth" element={user ? <Navigate to="/" replace /> : <Auth />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={<ProtectedRoute><Index onboardingFocus={onboardingFocus} /></ProtectedRoute>} />
-        <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
-        <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
-        <Route path="/trading" element={<ProtectedRoute><Trading /></ProtectedRoute>} />
+        <Route path="/goals" element={<ProtectedRoute><PaidRoute feature="Goals"><Goals /></PaidRoute></ProtectedRoute>} />
+        <Route path="/journal" element={<ProtectedRoute><PaidRoute feature="The journal"><Journal /></PaidRoute></ProtectedRoute>} />
+        <Route path="/trading" element={<ProtectedRoute><PaidRoute feature="The trading journal"><Trading /></PaidRoute></ProtectedRoute>} />
+        <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>

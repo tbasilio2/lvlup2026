@@ -3,7 +3,7 @@ import { ArrowLeft, Check, Lock, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { TIERS, type Tier } from "@/hooks/useSubscription";
+import { TIERS, useSubscription, TRIAL_DAYS, type Tier } from "@/hooks/useSubscription";
 
 const freeFeatures = ["Daily habit tracker", "Streaks and progress rings", "12-week activity heatmap"];
 

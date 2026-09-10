@@ -167,11 +167,13 @@ const Profile = () => {
             <p className="mt-1 text-sm text-foreground">
               {sub.isActivePaid
                 ? `${TIERS[sub.tier].name} — $${TIERS[sub.tier].price}/month · ${TIERS[sub.tier].tagline}`
-                : "Free — habit tracker only"}
+                : sub.isTrialing
+                  ? `Free trial — everything unlocked, ${sub.trialDaysLeft} ${sub.trialDaysLeft === 1 ? "day" : "days"} left`
+                  : "Free — habit tracker only"}
             </p>
             {!sub.isActivePaid && (
               <Button variant="outline" className="mt-3 w-full rounded-xl" onClick={() => navigate("/pricing")}>
-                Upgrade your plan
+                {sub.isTrialing ? "See plans" : "Upgrade your plan"}
               </Button>
             )}
           </div>

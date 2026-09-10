@@ -28,6 +28,7 @@ const planOrder: Exclude<Tier, "free">[] = ["entry", "journal", "pro"];
 
 const Paywall = ({ feature }: { feature?: string }) => {
   const navigate = useNavigate();
+  const sub = useSubscription();
 
   const handleCheckout = () => toast.info("Checkout isn't live yet — payments are being set up.");
 

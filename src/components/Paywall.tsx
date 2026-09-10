@@ -52,8 +52,23 @@ const Paywall = ({ feature }: { feature?: string }) => {
             {feature ? `${feature} needs a paid plan` : "Unlock the full system"}
           </h1>
           <p className="mt-4 text-sm leading-6 text-muted-foreground">
-            The habit tracker stays free forever. Pick the plan that fits how you level up — upgrade any time.
+            The habit tracker stays free forever. Every account starts with a {TRIAL_DAYS}-day free trial of everything —
+            pick the plan that fits how you level up when it ends.
           </p>
+
+          {sub.isTrialing ? (
+            <div className="mt-5 rounded-2xl border border-primary/30 bg-primary/5 p-4">
+              <p className="font-mono text-xs uppercase tracking-wider text-primary">Free trial active</p>
+              <p className="mt-1 text-sm text-foreground">
+                {sub.trialDaysLeft} {sub.trialDaysLeft === 1 ? "day" : "days"} left — everything is unlocked until then.
+              </p>
+            </div>
+          ) : sub.trialEndsAt && !sub.isActivePaid ? (
+            <div className="mt-5 rounded-2xl border border-border bg-card p-4">
+              <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Trial ended</p>
+              <p className="mt-1 text-sm text-foreground">Pick a plan below to keep your paid pages.</p>
+            </div>
+          ) : null}
 
           <div className="mt-8 space-y-4">
             {planOrder.map((tier) => {

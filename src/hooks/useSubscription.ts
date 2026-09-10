@@ -18,12 +18,19 @@ const FEATURE_ACCESS: Record<string, Tier[]> = {
   trading: ["pro"],
 };
 
+export const TRIAL_DAYS = 10;
+
 export interface SubscriptionState {
   tier: Tier;
   status: string;
   currentPeriodEnd: string | null;
   /** True when the subscription is paid, active, and not expired. */
   isActivePaid: boolean;
+  /** True while the 10-day free trial is still running. */
+  isTrialing: boolean;
+  trialEndsAt: string | null;
+  /** Whole days left in the trial (0 when no trial or expired). */
+  trialDaysLeft: number;
   canAccess: (feature: string) => boolean;
   loading: boolean;
 }

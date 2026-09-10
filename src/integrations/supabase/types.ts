@@ -274,6 +274,7 @@ export type Database = {
           provider_customer_id: string | null
           status: string
           tier: string
+          trial_ends_at: string | null
           updated_at: string
           user_id: string
         }
@@ -283,6 +284,7 @@ export type Database = {
           provider_customer_id?: string | null
           status?: string
           tier?: string
+          trial_ends_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -292,6 +294,7 @@ export type Database = {
           provider_customer_id?: string | null
           status?: string
           tier?: string
+          trial_ends_at?: string | null
           updated_at?: string
           user_id?: string
         }

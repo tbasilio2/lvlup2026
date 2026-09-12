@@ -34,6 +34,7 @@ import { useTradeAnalytics } from "@/hooks/useTradeAnalytics";
 import { TrendingUp, Server } from "lucide-react";
 
 const Trading = () => {
+  const navigate = useNavigate();
   const { trades, loading, addTrade, addTradesBatch, deleteTrade, updateTrade, refetch } = useTrades();
   const [chartSymbol, setChartSymbol] = useState("OANDA:EURUSD");
   const [mt5Refresh, setMt5Refresh] = useState(0);

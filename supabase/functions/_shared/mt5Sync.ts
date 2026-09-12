@@ -58,6 +58,27 @@ export async function syncAccount(admin: any, acct: any, metaToken: string): Pro
     return { ok: false, accountId: acct.id, state, message: "Account not yet DEPLOYED. Try again in ~30s." };
   }
 
+  // Pull live account balance / equity
+  try {
+    const aiRes = await fetch(
+      `${clientHost(region)}/users/current/accounts/${acct.metaapi_account_id}/account-information`,
+      { headers: { "auth-token": metaToken } },
+    );
+    if (aiRes.ok) {
+      const ai = await aiRes.json();
+      await admin.from("mt5_accounts").update({
+        balance: typeof ai.balance === "number" ? ai.balance : null,
+        equity: typeof ai.equity === "number" ? ai.equity : null,
+        currency: ai.currency ?? null,
+        leverage: typeof ai.leverage === "number" ? ai.leverage : null,
+      }).eq("id", acct.id);
+    }
+  } catch (_e) {
+    // non-fatal: trades still sync
+  }
+
+
+
 
   // Fetch history deals for last 6 months
   const now = new Date();

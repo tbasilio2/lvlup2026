@@ -200,12 +200,16 @@ export type Database = {
       }
       mt5_accounts: {
         Row: {
+          balance: number | null
           broker_server: string
           created_at: string
+          currency: string | null
+          equity: number | null
           id: string
           label: string
           last_error: string | null
           last_synced_at: string | null
+          leverage: number | null
           login: string
           metaapi_account_id: string | null
           platform: string
@@ -214,12 +218,16 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          balance?: number | null
           broker_server: string
           created_at?: string
+          currency?: string | null
+          equity?: number | null
           id?: string
           label: string
           last_error?: string | null
           last_synced_at?: string | null
+          leverage?: number | null
           login: string
           metaapi_account_id?: string | null
           platform?: string
@@ -228,12 +236,16 @@ export type Database = {
           user_id: string
         }
         Update: {
+          balance?: number | null
           broker_server?: string
           created_at?: string
+          currency?: string | null
+          equity?: number | null
           id?: string
           label?: string
           last_error?: string | null
           last_synced_at?: string | null
+          leverage?: number | null
           login?: string
           metaapi_account_id?: string | null
           platform?: string

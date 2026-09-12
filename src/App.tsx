@@ -13,6 +13,7 @@ import Goals from "./pages/Goals";
 import Journal from "./pages/Journal";
 import Profile from "./pages/Profile";
 import Trading from "./pages/Trading";
+import MT5Login from "./pages/MT5Login";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -81,6 +82,7 @@ const AppRoutes = () => {
         <Route path="/goals" element={<ProtectedRoute><PaidRoute feature="Goals" featureKey="goals"><Goals /></PaidRoute></ProtectedRoute>} />
         <Route path="/journal" element={<ProtectedRoute><PaidRoute feature="The journal" featureKey="journal"><Journal /></PaidRoute></ProtectedRoute>} />
         <Route path="/trading" element={<ProtectedRoute><PaidRoute feature="The trading journal" featureKey="trading"><Trading /></PaidRoute></ProtectedRoute>} />
+        <Route path="/mt5" element={<ProtectedRoute><PaidRoute feature="MT5 sync" featureKey="trading"><MT5Login /></PaidRoute></ProtectedRoute>} />
         <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />

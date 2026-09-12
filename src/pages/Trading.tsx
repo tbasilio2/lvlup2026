@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTrades } from "@/hooks/useTrades";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,7 +31,7 @@ import StrategyPerformance from "@/components/trading/analytics/StrategyPerforma
 import TimeOfDayChart from "@/components/trading/analytics/TimeOfDayChart";
 import LongShortCompare from "@/components/trading/analytics/LongShortCompare";
 import { useTradeAnalytics } from "@/hooks/useTradeAnalytics";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Server } from "lucide-react";
 
 const Trading = () => {
   const { trades, loading, addTrade, addTradesBatch, deleteTrade, updateTrade, refetch } = useTrades();
@@ -66,6 +68,10 @@ const Trading = () => {
               </div>
             </div>
             <div className="flex gap-2 flex-wrap">
+              <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate("/mt5")}>
+                <Server className="h-4 w-4" />
+                MT5 Login
+              </Button>
               <MT5ConnectDialog onConnected={() => setMt5Refresh((n) => n + 1)} />
               <SyncAllButton
                 refreshKey={mt5Refresh}

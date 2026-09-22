@@ -1,12 +1,12 @@
 import StrategySelect from "@/components/trading/StrategySelect";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import {
   Brain, Loader2, ImagePlus, X, Star, Eye, Target, Shield, Lightbulb,
-  ArrowUpRight, ArrowDownRight, AlertTriangle, Crosshair, RefreshCw, Send,
+  ArrowUpRight, ArrowDownRight, AlertTriangle, Crosshair, RefreshCw, Send, ClipboardPaste,
 } from "lucide-react";
 
 interface TradePlan {

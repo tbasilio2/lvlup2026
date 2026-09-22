@@ -179,13 +179,58 @@ const AICopilot = () => {
     await runAdvice(uploaded.url, uploaded.path, ctx);
   };
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
+  const acceptFile = useCallback((f: File) => {
+    if (!f.type.startsWith("image/")) { toast.error("That file isn't an image"); return; }
     if (f.size > 5 * 1024 * 1024) { toast.error("Max 5MB"); return; }
     lastFileRef.current = f;
     setPreview(URL.createObjectURL(f));
     runAll(f);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) acceptFile(f);
+  };
+
+  /** Paste a TradingView screenshot (Ctrl/Cmd+V) anywhere on the page. */
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const item = Array.from(e.clipboardData?.items ?? []).find((i) => i.type.startsWith("image/"));
+      if (!item) return;
+      const f = item.getAsFile();
+      if (!f) return;
+      e.preventDefault();
+      toast.success("Chart pasted — analyzing…");
+      acceptFile(f);
+    };
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, [acceptFile]);
+
+  /** Read an image straight out of the clipboard via the button. */
+  const pasteFromClipboard = async () => {
+    try {
+      const items = await navigator.clipboard.read();
+      for (const item of items) {
+        const type = item.types.find((t) => t.startsWith("image/"));
+        if (!type) continue;
+        const blob = await item.getType(type);
+        acceptFile(new File([blob], `tradingview-${Date.now()}.png`, { type }));
+        return;
+      }
+      toast.error("No image on your clipboard — take a TradingView screenshot first");
+    } catch {
+      toast.error("Couldn't read the clipboard — press Ctrl/Cmd+V instead");
+    }
+  };
+
+  const [dragging, setDragging] = useState(false);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const f = e.dataTransfer.files?.[0];
+    if (f) acceptFile(f);
   };
 
   const clearFile = () => {

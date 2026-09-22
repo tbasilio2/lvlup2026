@@ -291,15 +291,32 @@ const AICopilot = () => {
             )}
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            className="w-full rounded-xl border border-dashed border-border bg-secondary/20 hover:bg-secondary/40 transition-colors py-8 flex flex-col items-center gap-1.5"
-          >
-            <ImagePlus className="h-6 w-6 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Upload chart screenshot</span>
-            <span className="text-[10px] text-muted-foreground/70 font-mono">Plan + advice generated automatically</span>
-          </button>
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={handleDrop}
+              className={`w-full rounded-xl border border-dashed transition-colors py-8 flex flex-col items-center gap-1.5 ${
+                dragging ? "border-primary bg-primary/10" : "border-border bg-secondary/20 hover:bg-secondary/40"
+              }`}
+            >
+              <ImagePlus className="h-6 w-6 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Upload, paste or drop a chart screenshot</span>
+              <span className="text-[10px] text-muted-foreground/70 font-mono">Plan + advice generated automatically</span>
+            </button>
+            <button
+              type="button"
+              onClick={pasteFromClipboard}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary transition-all hover:bg-primary/20"
+            >
+              <ClipboardPaste className="h-3.5 w-3.5" /> Paste TradingView screenshot
+            </button>
+            <p className="text-[10px] text-muted-foreground/70 font-mono text-center">
+              In TradingView press Ctrl+Alt+S to copy the chart, then Ctrl/Cmd+V here
+            </p>
+          </div>
         )}
 
         {plan && !planning && (

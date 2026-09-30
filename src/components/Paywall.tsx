@@ -109,13 +109,22 @@ const Paywall = ({ feature }: { feature?: string }) => {
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    variant={isPro ? "default" : "outline"}
-                    className="mt-5 w-full rounded-xl py-5 text-sm font-semibold"
-                    onClick={handleCheckout}
-                  >
-                    <Sparkles className="h-4 w-4" /> Get {plan.name}
-                  </Button>
+                  <div className="mt-5 grid grid-cols-2 gap-2">
+                    <Button
+                      variant={isPro ? "default" : "outline"}
+                      className="rounded-xl py-5 text-sm font-semibold"
+                      onClick={() => openStore(tier, "whop")}
+                    >
+                      Buy on Whop <ExternalLink className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="rounded-xl py-5 text-sm font-semibold"
+                      onClick={() => openStore(tier, "gumroad")}
+                    >
+                      Buy on Gumroad <ExternalLink className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
               );
             })}
@@ -131,6 +140,9 @@ const Paywall = ({ feature }: { feature?: string }) => {
                 ))}
               </ul>
             </div>
+
+            <RedeemLicenseDialog onRedeemed={() => sub.refresh()} />
+
           </div>
         </motion.div>
       </div>

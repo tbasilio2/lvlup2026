@@ -31,13 +31,16 @@ export interface SubscriptionState {
   trialEndsAt: string | null;
   /** Whole days left in the trial (0 when no trial or expired). */
   trialDaysLeft: number;
+  /** Which store the membership came from, when paid. */
+  provider: string | null;
   canAccess: (feature: string) => boolean;
+  refresh: () => void;
   loading: boolean;
 }
 
 const isValidTier = (t: string | undefined): t is Tier => t === "entry" || t === "journal" || t === "pro";
 
-const EMPTY: Omit<SubscriptionState, "canAccess"> = {
+const EMPTY: Omit<SubscriptionState, "canAccess" | "refresh"> = {
   tier: "free",
   status: "inactive",
   currentPeriodEnd: null,
@@ -45,8 +48,10 @@ const EMPTY: Omit<SubscriptionState, "canAccess"> = {
   isTrialing: false,
   trialEndsAt: null,
   trialDaysLeft: 0,
+  provider: null,
   loading: false,
 };
+
 
 const daysLeft = (iso: string | null): number => {
   if (!iso) return 0;
@@ -56,7 +61,11 @@ const daysLeft = (iso: string | null): number => {
 
 export const useSubscription = (): SubscriptionState => {
   const { user } = useAuth();
-  const [state, setState] = useState<Omit<SubscriptionState, "canAccess">>({ ...EMPTY, loading: true });
+  const [nonce, setNonce] = useState(0);
+  const [state, setState] = useState<Omit<SubscriptionState, "canAccess" | "refresh">>({
+    ...EMPTY,
+    loading: true,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -66,7 +75,7 @@ export const useSubscription = (): SubscriptionState => {
     }
     supabase
       .from("subscriptions")
-      .select("tier, status, current_period_end, trial_ends_at")
+      .select("tier, status, current_period_end, trial_ends_at, provider")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => {
@@ -74,7 +83,8 @@ export const useSubscription = (): SubscriptionState => {
         const tier: Tier = isValidTier(data?.tier) ? data.tier : "free";
         const status = data?.status ?? "inactive";
         const end = data?.current_period_end ?? null;
-        const trialEndsAt = (data as { trial_ends_at?: string | null } | null)?.trial_ends_at ?? null;
+        const row = data as { trial_ends_at?: string | null; provider?: string | null } | null;
+        const trialEndsAt = row?.trial_ends_at ?? null;
         const notExpired = !end || new Date(end).getTime() > Date.now();
         const isActivePaid = tier !== "free" && status === "active" && notExpired;
         const trialDaysLeft = daysLeft(trialEndsAt);
@@ -86,13 +96,14 @@ export const useSubscription = (): SubscriptionState => {
           isTrialing: !isActivePaid && trialDaysLeft > 0,
           trialEndsAt,
           trialDaysLeft,
+          provider: row?.provider ?? null,
           loading: false,
         });
       });
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [user, nonce]);
 
   const canAccess = (feature: string): boolean => {
     if (state.loading) return false;
@@ -102,5 +113,6 @@ export const useSubscription = (): SubscriptionState => {
     return allowed ? allowed.includes(state.tier) : false;
   };
 
-  return { ...state, canAccess };
+  return { ...state, canAccess, refresh: () => setNonce((n) => n + 1) };
+
 };

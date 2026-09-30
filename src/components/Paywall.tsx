@@ -1,9 +1,12 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, Lock, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, ExternalLink, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { TIERS, useSubscription, TRIAL_DAYS, type Tier } from "@/hooks/useSubscription";
+import { checkoutUrl, isPlaceholderLink, CHECKOUT_LINKS, type PaidTier, type StoreId } from "@/lib/checkoutLinks";
+import { useAuth } from "@/contexts/AuthContext";
+import RedeemLicenseDialog from "@/components/RedeemLicenseDialog";
+import { toast } from "sonner";
 
 const freeFeatures = ["Daily habit tracker", "Streaks and progress rings", "12-week activity heatmap"];
 
@@ -29,8 +32,17 @@ const planOrder: Exclude<Tier, "free">[] = ["entry", "journal", "pro"];
 const Paywall = ({ feature }: { feature?: string }) => {
   const navigate = useNavigate();
   const sub = useSubscription();
+  const { user } = useAuth();
 
-  const handleCheckout = () => toast.info("Checkout isn't live yet — payments are being set up.");
+  const openStore = (tier: PaidTier, store: StoreId) => {
+    const link = CHECKOUT_LINKS[tier][store];
+    if (isPlaceholderLink(link)) {
+      toast.info("This store link isn't set up yet — add your product link to go live.");
+      return;
+    }
+    window.open(checkoutUrl(tier, store, user?.email), "_blank", "noopener,noreferrer");
+  };
+
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -97,13 +109,22 @@ const Paywall = ({ feature }: { feature?: string }) => {
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    variant={isPro ? "default" : "outline"}
-                    className="mt-5 w-full rounded-xl py-5 text-sm font-semibold"
-                    onClick={handleCheckout}
-                  >
-                    <Sparkles className="h-4 w-4" /> Get {plan.name}
-                  </Button>
+                  <div className="mt-5 grid grid-cols-2 gap-2">
+                    <Button
+                      variant={isPro ? "default" : "outline"}
+                      className="rounded-xl py-5 text-sm font-semibold"
+                      onClick={() => openStore(tier, "whop")}
+                    >
+                      Buy on Whop <ExternalLink className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="rounded-xl py-5 text-sm font-semibold"
+                      onClick={() => openStore(tier, "gumroad")}
+                    >
+                      Buy on Gumroad <ExternalLink className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
               );
             })}
@@ -119,6 +140,9 @@ const Paywall = ({ feature }: { feature?: string }) => {
                 ))}
               </ul>
             </div>
+
+            <RedeemLicenseDialog onRedeemed={() => sub.refresh()} />
+
           </div>
         </motion.div>
       </div>

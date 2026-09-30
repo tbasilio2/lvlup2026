@@ -283,7 +283,11 @@ export type Database = {
         Row: {
           created_at: string
           current_period_end: string | null
+          license_key: string | null
+          provider: string | null
           provider_customer_id: string | null
+          provider_email: string | null
+          provider_subscription_id: string | null
           status: string
           tier: string
           trial_ends_at: string | null
@@ -293,7 +297,11 @@ export type Database = {
         Insert: {
           created_at?: string
           current_period_end?: string | null
+          license_key?: string | null
+          provider?: string | null
           provider_customer_id?: string | null
+          provider_email?: string | null
+          provider_subscription_id?: string | null
           status?: string
           tier?: string
           trial_ends_at?: string | null
@@ -303,7 +311,11 @@ export type Database = {
         Update: {
           created_at?: string
           current_period_end?: string | null
+          license_key?: string | null
+          provider?: string | null
           provider_customer_id?: string | null
+          provider_email?: string | null
+          provider_subscription_id?: string | null
           status?: string
           tier?: string
           trial_ends_at?: string | null

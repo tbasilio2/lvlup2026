@@ -31,13 +31,16 @@ export interface SubscriptionState {
   trialEndsAt: string | null;
   /** Whole days left in the trial (0 when no trial or expired). */
   trialDaysLeft: number;
+  /** Which store the membership came from, when paid. */
+  provider: string | null;
   canAccess: (feature: string) => boolean;
+  refresh: () => void;
   loading: boolean;
 }
 
 const isValidTier = (t: string | undefined): t is Tier => t === "entry" || t === "journal" || t === "pro";
 
-const EMPTY: Omit<SubscriptionState, "canAccess"> = {
+const EMPTY: Omit<SubscriptionState, "canAccess" | "refresh"> = {
   tier: "free",
   status: "inactive",
   currentPeriodEnd: null,
@@ -45,8 +48,10 @@ const EMPTY: Omit<SubscriptionState, "canAccess"> = {
   isTrialing: false,
   trialEndsAt: null,
   trialDaysLeft: 0,
+  provider: null,
   loading: false,
 };
+
 
 const daysLeft = (iso: string | null): number => {
   if (!iso) return 0;

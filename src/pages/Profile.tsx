@@ -11,6 +11,8 @@ import { CURRENCIES, useCurrency, setCurrency, type CurrencyCode } from "@/lib/c
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useStrategies, setStrategies } from "@/lib/strategies";
 import { useSubscription, TIERS } from "@/hooks/useSubscription";
+import RedeemLicenseDialog from "@/components/RedeemLicenseDialog";
+
 
 const Profile = () => {
   const { user, signOut } = useAuth();
@@ -171,12 +173,22 @@ const Profile = () => {
                   ? `Free trial — everything unlocked, ${sub.trialDaysLeft} ${sub.trialDaysLeft === 1 ? "day" : "days"} left`
                   : "Free — habit tracker only"}
             </p>
+            {sub.isActivePaid && sub.provider && (
+              <p className="mt-1 text-xs text-muted-foreground font-mono">
+                Active via {sub.provider === "whop" ? "Whop" : "Gumroad"}
+                {sub.currentPeriodEnd
+                  ? ` · renews ${new Date(sub.currentPeriodEnd).toLocaleDateString()}`
+                  : ""}
+              </p>
+            )}
             {!sub.isActivePaid && (
               <Button variant="outline" className="mt-3 w-full rounded-xl" onClick={() => navigate("/pricing")}>
                 {sub.isTrialing ? "See plans" : "Upgrade your plan"}
               </Button>
             )}
+            <RedeemLicenseDialog onRedeemed={sub.refresh} />
           </div>
+
 
           <div className="mt-10 pt-6 border-t border-border">
             <Button variant="outline" onClick={signOut} className="w-full rounded-xl py-3 gap-2 text-destructive hover:text-destructive border-destructive/20 hover:bg-destructive/10">

@@ -3,7 +3,7 @@ import {
   ArrowRight, BarChart3, BookOpen, CalendarDays, Check, ExternalLink,
   Flame, KeyRound, LineChart, Lock, Sparkles, Target, TrendingUp, Zap,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { TIERS, TRIAL_DAYS, type Tier } from "@/hooks/useSubscription";
 import { checkoutUrl, isPlaceholderLink, CHECKOUT_LINKS, type PaidTier, type StoreId } from "@/lib/checkoutLinks";

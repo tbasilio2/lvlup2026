@@ -69,7 +69,7 @@ const Landing = () => {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20">
-              <TrendingUp className="h-4.5 w-4.5 h-5 w-5 text-primary" />
+              <TrendingUp className="h-5 w-5 text-primary" />
             </div>
             <span className="font-semibold tracking-tight">LvLUp</span>
           </div>

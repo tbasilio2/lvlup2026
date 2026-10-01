@@ -46,8 +46,7 @@ const Landing = () => {
   const { user } = useAuth();
 
   if (user) {
-    navigate("/", { replace: true });
-    return null;
+    return <Navigate to="/" replace />;
   }
 
   const openStore = (tier: PaidTier, store: StoreId) => {

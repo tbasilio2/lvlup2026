@@ -11,6 +11,8 @@ import { CURRENCIES, useCurrency, setCurrency, type CurrencyCode } from "@/lib/c
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useStrategies, setStrategies } from "@/lib/strategies";
 import { useSubscription, TIERS } from "@/hooks/useSubscription";
+import RedeemLicenseDialog from "@/components/RedeemLicenseDialog";
+
 
 const Profile = () => {
   const { user, signOut } = useAuth();

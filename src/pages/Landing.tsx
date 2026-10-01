@@ -128,7 +128,7 @@ const Landing = () => {
         >
           <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
             <span className="h-2.5 w-2.5 rounded-full bg-loss/70" />
-            <span className="h-2.5 w-2.5 rounded-full bg-chart-2/70" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[hsl(45_93%_58%)]/70" />
             <span className="h-2.5 w-2.5 rounded-full bg-primary/70" />
             <span className="ml-3 text-muted-foreground">lvlup — daily review</span>
           </div>

@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import WorldClassOnboarding from "./components/WorldClassOnboarding";
 import ProductTour from "./components/ProductTour";
 import Index from "./pages/Index";
+import Landing from "./pages/Landing";
 import Goals from "./pages/Goals";
 import Journal from "./pages/Journal";
 import Profile from "./pages/Profile";
@@ -37,7 +38,7 @@ const navItems = [
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">Loading...</div>;
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) return <Navigate to="/welcome" replace />;
   return <>{children}</>;
 };
 
@@ -76,6 +77,7 @@ const AppRoutes = () => {
   return (
     <>
       <Routes>
+        <Route path="/welcome" element={user ? <Navigate to="/" replace /> : <Landing />} />
         <Route path="/auth" element={user ? <Navigate to="/" replace /> : <Auth />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={<ProtectedRoute><Index onboardingFocus={onboardingFocus} /></ProtectedRoute>} />

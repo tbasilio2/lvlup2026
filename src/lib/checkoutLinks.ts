@@ -20,6 +20,10 @@ export const CHECKOUT_LINKS: Record<PaidTier, Record<StoreId, string>> = {
     whop: "https://whop.com/your-store/pro-44/",
     gumroad: "https://yourstore.gumroad.com/l/pro",
   },
+  lifetime: {
+    whop: "https://whop.com/your-store/lifetime-99/",
+    gumroad: "https://yourstore.gumroad.com/l/lifetime",
+  },
 };
 
 export const STORE_LABELS: Record<StoreId, string> = {

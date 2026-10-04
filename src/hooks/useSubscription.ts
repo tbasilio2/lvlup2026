@@ -2,20 +2,21 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
-export type Tier = "free" | "entry" | "journal" | "pro";
+export type Tier = "free" | "entry" | "journal" | "pro" | "lifetime";
 
-export const TIERS: Record<Tier, { name: string; price: number | null; tagline: string }> = {
+export const TIERS: Record<Tier, { name: string; price: number | null; tagline: string; oneTime?: boolean }> = {
   free: { name: "Free", price: null, tagline: "Habit tracker only" },
   entry: { name: "Entry", price: 17, tagline: "Habit tracker + Goals" },
   journal: { name: "Journal", price: 25, tagline: "Habit tracker + Journal" },
   pro: { name: "Pro", price: 44, tagline: "Everything included" },
+  lifetime: { name: "Lifetime", price: 99, tagline: "Everything, forever — one payment", oneTime: true },
 };
 
-/** Tiers that unlock each paid feature. */
+/** Tiers that unlock each paid feature. Lifetime unlocks everything. */
 const FEATURE_ACCESS: Record<string, Tier[]> = {
-  goals: ["entry", "pro"],
-  journal: ["journal", "pro"],
-  trading: ["pro"],
+  goals: ["entry", "pro", "lifetime"],
+  journal: ["journal", "pro", "lifetime"],
+  trading: ["pro", "lifetime"],
 };
 
 export const TRIAL_DAYS = 10;
@@ -38,7 +39,8 @@ export interface SubscriptionState {
   loading: boolean;
 }
 
-const isValidTier = (t: string | undefined): t is Tier => t === "entry" || t === "journal" || t === "pro";
+const isValidTier = (t: string | undefined): t is Tier =>
+  t === "entry" || t === "journal" || t === "pro" || t === "lifetime";
 
 const EMPTY: Omit<SubscriptionState, "canAccess" | "refresh"> = {
   tier: "free",

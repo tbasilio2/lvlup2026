@@ -168,7 +168,7 @@ const Profile = () => {
             <p className="text-xs font-medium text-muted-foreground font-mono uppercase tracking-wider">Plan</p>
             <p className="mt-1 text-sm text-foreground">
               {sub.isActivePaid
-                ? `${TIERS[sub.tier].name} — $${TIERS[sub.tier].price}/month · ${TIERS[sub.tier].tagline}`
+                ? `${TIERS[sub.tier].name} — $${TIERS[sub.tier].price}${TIERS[sub.tier].oneTime ? " once" : "/month"} · ${TIERS[sub.tier].tagline}`
                 : sub.isTrialing
                   ? `Free trial — everything unlocked, ${sub.trialDaysLeft} ${sub.trialDaysLeft === 1 ? "day" : "days"} left`
                   : "Free — habit tracker only"}

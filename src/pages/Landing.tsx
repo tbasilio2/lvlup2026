@@ -227,7 +227,9 @@ const Landing = () => {
                     Buy now on Gumroad <ExternalLink className="h-3.5 w-3.5" />
                   </Button>
                 </div>
-                <p className="mt-3 text-center text-[11px] text-muted-foreground">{TRIAL_DAYS}-day free trial included</p>
+                <p className="mt-3 text-center text-[11px] text-muted-foreground">
+                  {plan.oneTime ? "Yours forever — pay once" : `${TRIAL_DAYS}-day free trial included`}
+                </p>
               </motion.div>
             );
           })}

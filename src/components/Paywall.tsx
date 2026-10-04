@@ -25,9 +25,15 @@ const planFeatures: Record<Exclude<Tier, "free">, string[]> = {
     "Pro analytics: drawdown, expectancy, strategy ranking",
     "AI chart copilot and weekly trade reports",
   ],
+  lifetime: [
+    "Everything in Pro, forever",
+    "One payment — no monthly fees",
+    "cTrader, Match-Trader & TradeLocker sync",
+    "All future platforms and features included",
+  ],
 };
 
-const planOrder: Exclude<Tier, "free">[] = ["entry", "journal", "pro"];
+const planOrder: Exclude<Tier, "free">[] = ["entry", "journal", "pro", "lifetime"];
 
 const Paywall = ({ feature }: { feature?: string }) => {
   const navigate = useNavigate();
@@ -98,7 +104,7 @@ const Paywall = ({ feature }: { feature?: string }) => {
                     </p>
                     <div className="flex items-baseline gap-1">
                       <span className="font-mono text-2xl font-semibold text-foreground tabular-nums">${plan.price}</span>
-                      <span className="text-xs text-muted-foreground">/ month</span>
+                      <span className="text-xs text-muted-foreground">{plan.oneTime ? "once" : "/ month"}</span>
                     </div>
                   </div>
                   <ul className="mt-4 space-y-2.5">

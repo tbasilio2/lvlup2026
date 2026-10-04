@@ -37,9 +37,15 @@ const planFeatures: Record<Exclude<Tier, "free">, string[]> = {
     "Pro analytics: drawdown, expectancy, strategy ranking",
     "AI chart copilot and weekly trade reports",
   ],
+  lifetime: [
+    "Everything in Pro, forever",
+    "One payment — no monthly fees",
+    "cTrader, Match-Trader & TradeLocker sync",
+    "All future platforms and features included",
+  ],
 };
 
-const planOrder: Exclude<Tier, "free">[] = ["entry", "journal", "pro"];
+const planOrder: Exclude<Tier, "free">[] = ["entry", "journal", "pro", "lifetime"];
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -176,7 +182,7 @@ const Landing = () => {
           </p>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {planOrder.map((tier) => {
             const plan = TIERS[tier];
             const isPro = tier === "pro";
@@ -194,7 +200,7 @@ const Landing = () => {
                 <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{plan.name}</p>
                 <div className="mt-3 flex items-baseline gap-1.5">
                   <span className="font-mono text-4xl font-semibold tabular-nums">${plan.price}</span>
-                  <span className="text-sm text-muted-foreground">/ month</span>
+                  <span className="text-sm text-muted-foreground">{plan.oneTime ? "once" : "/ month"}</span>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">{plan.tagline}</p>
                 <ul className="mt-5 space-y-2.5">
@@ -221,7 +227,9 @@ const Landing = () => {
                     Buy now on Gumroad <ExternalLink className="h-3.5 w-3.5" />
                   </Button>
                 </div>
-                <p className="mt-3 text-center text-[11px] text-muted-foreground">{TRIAL_DAYS}-day free trial included</p>
+                <p className="mt-3 text-center text-[11px] text-muted-foreground">
+                  {plan.oneTime ? "Yours forever — pay once" : `${TRIAL_DAYS}-day free trial included`}
+                </p>
               </motion.div>
             );
           })}

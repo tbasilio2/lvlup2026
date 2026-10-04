@@ -14,6 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
+      broker_accounts: {
+        Row: {
+          balance: number | null
+          base_url: string | null
+          created_at: string
+          currency: string | null
+          email: string | null
+          equity: number | null
+          external_account_id: string | null
+          id: string
+          label: string
+          last_error: string | null
+          last_synced_at: string | null
+          platform: string
+          server: string | null
+          state: string | null
+          user_id: string
+        }
+        Insert: {
+          balance?: number | null
+          base_url?: string | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          equity?: number | null
+          external_account_id?: string | null
+          id?: string
+          label: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          platform: string
+          server?: string | null
+          state?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number | null
+          base_url?: string | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          equity?: number | null
+          external_account_id?: string | null
+          id?: string
+          label?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          platform?: string
+          server?: string | null
+          state?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      broker_credentials: {
+        Row: {
+          broker_account_id: string
+          secret: Json
+          updated_at: string
+        }
+        Insert: {
+          broker_account_id: string
+          secret: Json
+          updated_at?: string
+        }
+        Update: {
+          broker_account_id?: string
+          secret?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_credentials_broker_account_id_fkey"
+            columns: ["broker_account_id"]
+            isOneToOne: true
+            referencedRelation: "broker_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chart_analyses: {
         Row: {
           created_at: string
@@ -326,6 +406,7 @@ export type Database = {
       }
       trades: {
         Row: {
+          broker_account_id: string | null
           created_at: string
           direction: string
           entry_date: string
@@ -349,6 +430,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          broker_account_id?: string | null
           created_at?: string
           direction: string
           entry_date: string
@@ -372,6 +454,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          broker_account_id?: string | null
           created_at?: string
           direction?: string
           entry_date?: string
@@ -395,6 +478,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "trades_broker_account_id_fkey"
+            columns: ["broker_account_id"]
+            isOneToOne: false
+            referencedRelation: "broker_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "trades_mt5_account_id_fkey"
             columns: ["mt5_account_id"]

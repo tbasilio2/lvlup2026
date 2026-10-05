@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { syncAccount } from "../_shared/mt5Sync.ts";
+import { syncBrokerAccount } from "../_shared/brokerSync.ts";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -33,6 +34,9 @@ Deno.serve(async (req) => {
         results.push({ ok: false, accountId: acct.id, error: String(e) });
       }
     }
+
+    const { data: brokers } = await admin.from("broker_accounts").select("*").neq("platform", "ctrader");
+    for (const b of brokers ?? []) results.push(await syncBrokerAccount(admin, b) as any);
 
     const imported = results.reduce((s, r: any) => s + (r.imported ?? 0), 0);
     console.log(`mt5-auto-sync: ${results.length} accounts, ${imported} trades upserted`);

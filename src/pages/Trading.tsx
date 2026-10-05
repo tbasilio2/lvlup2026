@@ -73,6 +73,10 @@ const Trading = () => {
                 <Server className="h-4 w-4" />
                 MT5 Login
               </Button>
+              <Button variant="outline" size="sm" className="gap-2" onClick={() => navigate("/brokers")}>
+                <Server className="h-4 w-4" />
+                cTrader · Match-Trader · TradeLocker
+              </Button>
               <MT5ConnectDialog onConnected={() => setMt5Refresh((n) => n + 1)} />
               <SyncAllButton
                 refreshKey={mt5Refresh}

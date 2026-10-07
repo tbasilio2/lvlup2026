@@ -1,4 +1,4 @@
-export type Tier = "entry" | "journal" | "pro" | "lifetime";
+export type Tier = "entry" | "journal" | "pro" | "elite" | "lifetime";
 
 /**
  * Maps store product identifiers to app tiers.
@@ -10,6 +10,11 @@ export const GUMROAD_PRODUCTS: Record<string, Tier> = {
   journal: "journal",
   pro: "pro",
   lifetime: "lifetime",
+  // Set these to real public product identifiers before launch. Legacy pro stays unchanged.
+  lvlup_pro_monthly: "pro",
+  lvlup_pro_yearly: "pro",
+  lvlup_elite_monthly: "elite",
+  lvlup_elite_yearly: "elite",
 };
 
 export const WHOP_PRODUCTS: Record<string, Tier> = {
@@ -17,6 +22,10 @@ export const WHOP_PRODUCTS: Record<string, Tier> = {
   plan_journal: "journal",
   plan_pro: "pro",
   plan_lifetime: "lifetime",
+  plan_lvlup_pro_monthly: "pro",
+  plan_lvlup_pro_yearly: "pro",
+  plan_lvlup_elite_monthly: "elite",
+  plan_lvlup_elite_yearly: "elite",
 };
 
 const normalise = (v: unknown) => String(v ?? "").trim().toLowerCase();
@@ -36,6 +45,7 @@ export function resolveTier(
   // Fallback: infer from names containing the tier word.
   for (const c of candidates) {
     const key = normalise(c);
+    if (key.includes("elite")) return "elite";
     if (key.includes("lifetime")) return "lifetime";
     if (key.includes("pro")) return "pro";
     if (key.includes("journal")) return "journal";

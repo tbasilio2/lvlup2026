@@ -1,336 +1,37 @@
-import { motion } from "framer-motion";
-import {
-  ArrowRight, BarChart3, BookOpen, CalendarDays, Check, ExternalLink,
-  Flame, KeyRound, LineChart, Lock, Sparkles, Target, TrendingUp, Zap,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, TrendingUp, Play, ShieldCheck, Lock, BookOpen, ChevronRight } from "lucide-react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { TIERS, TRIAL_DAYS, type Tier } from "@/hooks/useSubscription";
-import { checkoutUrl, isPlaceholderLink, CHECKOUT_LINKS, type PaidTier, type StoreId } from "@/lib/checkoutLinks";
-import RedeemLicenseDialog from "@/components/RedeemLicenseDialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import ProductPreview from "@/components/ProductPreview";
+import PricingPlans from "@/components/PricingPlans";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
-
-const features = [
-  { icon: Flame, title: "Habit tracker", body: "Daily check-ins, streaks, progress rings and a 12-week heatmap that shows your consistency at a glance." },
-  { icon: Target, title: "Goals with hierarchy", body: "Break big goals into nested sub-goals with progress that rolls up automatically as you complete habits." },
-  { icon: BookOpen, title: "Reflection journal", body: "Daily journaling with mood tracking, P&L and fee logging, and AI-generated weekly reviews of your patterns." },
-  { icon: TrendingUp, title: "Trading journal", body: "Every trade logged with entry, stop-loss, take-profit and live charts. Import from MT5, CSV or a chart screenshot." },
-  { icon: Zap, title: "MT5 auto-sync", body: "Link your MetaTrader 5 account once — balances, equity and trades sync automatically every 12 hours." },
-  { icon: Sparkles, title: "AI chart copilot", body: "Upload a TradingView screenshot and get direction, entry, stop-loss, take-profit and a full trade plan in seconds." },
-  { icon: BarChart3, title: "Pro analytics", body: "Win rate, expectancy, drawdown, profit factor, time-of-day and strategy ranking — all computed from your own data." },
-  { icon: CalendarDays, title: "Weekly reports", body: "Every trading week ends with a graded AI report: what worked, what didn't, and what to fix next week." },
-];
-
-const planFeatures: Record<Exclude<Tier, "free">, string[]> = {
-  entry: ["Everything in Free", "Goals with hierarchy and roll-ups", "Goal progress tracking"],
-  journal: [
-    "Everything in Free",
-    "Reflection journal with mood tracking",
-    "P&L and fee logging per entry",
-    "AI weekly reviews",
-  ],
-  pro: [
-    "Everything in Entry + Journal",
-    "Full trading journal and P&L calendar",
-    "MT5 auto-sync every 12 hours",
-    "Pro analytics: drawdown, expectancy, strategy ranking",
-    "AI chart copilot and weekly trade reports",
-  ],
-  lifetime: [
-    "Everything in Pro, forever",
-    "One payment — no monthly fees",
-    "cTrader, Match-Trader & TradeLocker sync",
-    "All future platforms and features included",
-  ],
-};
-
-const planOrder: Exclude<Tier, "free">[] = ["entry", "journal", "pro", "lifetime"];
-
-const Landing = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-  if (user) {
-    return <Navigate to="/" replace />;
-  }
-
-  const openStore = (tier: PaidTier, store: StoreId) => {
-    const link = CHECKOUT_LINKS[tier][store];
-    if (isPlaceholderLink(link)) {
-      toast.info("This store link isn't set up yet — add your product link to go live.");
-      return;
-    }
-    window.open(checkoutUrl(tier, store), "_blank", "noopener,noreferrer");
-  };
-
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* grid backdrop */}
-      <div className="fixed inset-0 bg-[linear-gradient(hsl(220,15%,12%)_1px,transparent_1px),linear-gradient(90deg,hsl(220,15%,12%)_1px,transparent_1px)] bg-[size:40px_40px] opacity-30 pointer-events-none" />
-
-      {/* Nav */}
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20">
-              <TrendingUp className="h-5 w-5 text-primary" />
-            </div>
-            <span className="font-semibold tracking-tight">LvLUp</span>
-          </div>
-          <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-            <a href="#features" className="transition-colors hover:text-foreground">Features</a>
-            <a href="#pricing" className="transition-colors hover:text-foreground">Pricing</a>
-            <a href="#faq" className="transition-colors hover:text-foreground">FAQ</a>
-          </nav>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" className="rounded-xl text-sm" onClick={() => navigate("/auth")}>Sign in</Button>
-            <Button className="rounded-xl text-sm font-semibold" onClick={() => navigate("/auth")}>
-              Start free <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section className="relative z-10 mx-auto max-w-6xl px-5 pt-20 pb-24 text-center md:pt-28">
-        <motion.p
-          className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/5 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-primary"
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-          {TRIAL_DAYS}-day free trial on every plan
-        </motion.p>
-        <motion.h1
-          className="mx-auto max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight md:text-6xl"
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        >
-          Build discipline. Trade your plan. <span className="text-primary">LvL Up.</span>
-        </motion.h1>
-        <motion.p
-          className="mx-auto mt-6 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg"
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        >
-          One system for your habits, goals, journal and trades. Track what you do, review what you traded,
-          and let AI find the patterns you'd miss on your own.
-        </motion.p>
-        <motion.div
-          className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-        >
-          <Button size="lg" className="glow-primary rounded-xl px-7 py-6 text-sm font-semibold" onClick={() => navigate("/auth")}>
-            Start your {TRIAL_DAYS}-day free trial <ArrowRight className="h-4 w-4" />
-          </Button>
-          <Button size="lg" variant="outline" className="rounded-xl px-7 py-6 text-sm font-semibold" onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}>
-            See plans
-          </Button>
-        </motion.div>
-
-        {/* terminal strip */}
-        <motion.div
-          className="mx-auto mt-14 max-w-3xl overflow-hidden rounded-2xl border border-border bg-card text-left font-mono text-xs md:text-sm"
-          initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-        >
-          <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-loss/70" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[hsl(45_93%_58%)]/70" />
-            <span className="h-2.5 w-2.5 rounded-full bg-primary/70" />
-            <span className="ml-3 text-muted-foreground">lvlup — daily review</span>
-          </div>
-          <div className="space-y-1.5 px-5 py-5 leading-6">
-            <p><span className="text-primary">$</span> <span className="text-muted-foreground">habits --today</span> <span className="text-profit">6/6 complete</span> <span className="text-muted-foreground">streak 34d</span></p>
-            <p><span className="text-primary">$</span> <span className="text-muted-foreground">trades --week</span> <span className="text-foreground">win rate 61%</span> <span className="text-profit">+R 4.2</span> <span className="text-muted-foreground">expectancy 0.38R</span></p>
-            <p><span className="text-primary">$</span> <span className="text-muted-foreground">copilot --chart XAUUSD.png</span> <span className="text-foreground">long @ 2,412</span> <span className="text-loss">sl 2,396</span> <span className="text-profit">tp 2,452</span></p>
-            <p><span className="text-primary">$</span> <span className="text-muted-foreground">report --weekly</span> <span className="text-foreground">grade A-</span> <span className="text-muted-foreground">"best sessions: london open"</span><span className="animate-pulse text-primary">▌</span></p>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="relative z-10 mx-auto max-w-6xl px-5 py-20">
-        <div className="mb-12 text-center">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Features</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Everything in one place</h2>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-muted-foreground md:text-base">
-            Most traders juggle a habit app, a spreadsheet and a notes file. LvLUp replaces all three.
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((f, i) => (
-            <motion.div
-              key={f.title}
-              className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/30"
-              initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: (i % 4) * 0.06 }}
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/15">
-                <f.icon className="h-5 w-5 text-primary" />
-              </div>
-              <h3 className="mt-4 text-sm font-semibold">{f.title}</h3>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">{f.body}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="relative z-10 mx-auto max-w-6xl px-5 py-20">
-        <div className="mb-12 text-center">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Pricing</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Simple monthly plans</h2>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-muted-foreground md:text-base">
-            The habit tracker is free forever. Every plan starts with a {TRIAL_DAYS}-day free trial of everything — no card needed to try.
-          </p>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {planOrder.map((tier) => {
-            const plan = TIERS[tier];
-            const isPro = tier === "pro";
-            return (
-              <motion.div
-                key={tier}
-                className={`relative rounded-2xl border p-6 ${isPro ? "border-primary/40 bg-card glow-primary" : "border-border bg-card"}`}
-                initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-              >
-                {isPro && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground">
-                    Best value
-                  </span>
-                )}
-                <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{plan.name}</p>
-                <div className="mt-3 flex items-baseline gap-1.5">
-                  <span className="font-mono text-4xl font-semibold tabular-nums">${plan.price}</span>
-                  <span className="text-sm text-muted-foreground">{plan.oneTime ? "once" : "/ month"}</span>
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground">{plan.tagline}</p>
-                <ul className="mt-5 space-y-2.5">
-                  {planFeatures[tier].map((item) => (
-                    <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-6 space-y-2">
-                  <Button
-                    className={`w-full rounded-xl py-5 text-sm font-semibold ${isPro ? "glow-primary" : ""}`}
-                    variant={isPro ? "default" : "outline"}
-                    onClick={() => openStore(tier, "whop")}
-                  >
-                    Buy now on Whop <ExternalLink className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full rounded-xl py-5 text-sm font-semibold"
-                    onClick={() => openStore(tier, "gumroad")}
-                  >
-                    Buy now on Gumroad <ExternalLink className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-                <p className="mt-3 text-center text-[11px] text-muted-foreground">
-                  {plan.oneTime ? "Yours forever — pay once" : `${TRIAL_DAYS}-day free trial included`}
-                </p>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Free + redeem */}
-        <div className="mt-5 grid gap-5 md:grid-cols-2">
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Free</p>
-            <div className="mt-3 flex items-baseline gap-1.5">
-              <span className="font-mono text-4xl font-semibold">$0</span>
-              <span className="text-sm text-muted-foreground">forever</span>
-            </div>
-            <ul className="mt-5 space-y-2.5">
-              {["Daily habit tracker", "Streaks and progress rings", "12-week activity heatmap"].map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0" /> {item}
-                </li>
-              ))}
-            </ul>
-            <Button variant="ghost" className="mt-5 w-full rounded-xl text-sm" onClick={() => navigate("/auth")}>
-              Start free <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-          <div className="flex flex-col justify-center rounded-2xl border border-border bg-card p-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/15">
-              <KeyRound className="h-5 w-5 text-primary" />
-            </div>
-            <h3 className="mt-4 text-sm font-semibold">Already purchased?</h3>
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              Bought on Whop or Gumroad? Redeem the key from your receipt and your plan unlocks instantly.
-            </p>
-            <div className="mt-4">
-              <RedeemLicenseDialog
-                trigger={
-                  <Button variant="outline" className="w-full rounded-xl text-sm font-semibold">
-                    <KeyRound className="h-4 w-4" /> Redeem your key
-                  </Button>
-                }
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section id="faq" className="relative z-10 mx-auto max-w-3xl px-5 py-20">
-        <div className="mb-10 text-center">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">FAQ</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight">Questions, answered</h2>
-        </div>
-        <div className="space-y-3">
-          {[
-            { q: "How does the free trial work?", a: `Create an account and every paid feature is unlocked for ${TRIAL_DAYS} days — goals, journal, trading journal, MT5 sync and AI tools. No card required. When it ends, the habit tracker stays free and you can pick a plan anytime.` },
-            { q: "How do I pay?", a: "Checkout runs through Whop or Gumroad — pick your plan, pay there, then redeem the license key from your receipt inside the app. Your membership activates instantly." },
-            { q: "Is my MT5 account safe?", a: "We connect with read-only (investor) credentials, so LvLUp can never place or modify trades. It can only read balance, equity and closed deals to sync into your journal." },
-            { q: "Where does the AI fit in?", a: "Upload a chart screenshot and the copilot extracts direction, entry, stop-loss and take-profit with reasoning. Weekly reviews and trade reports analyse your own logged data — nothing else." },
-          ].map((item) => (
-            <div key={item.q} className="rounded-2xl border border-border bg-card p-5">
-              <h3 className="text-sm font-semibold">{item.q}</h3>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.a}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="relative z-10 mx-auto max-w-6xl px-5 pb-24">
-        <div className="rounded-3xl border border-primary/25 bg-primary/5 p-10 text-center md:p-14">
-          <LineChart className="mx-auto h-8 w-8 text-primary" />
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight md:text-4xl">Your next level starts today</h2>
-          <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-muted-foreground">
-            Start with the free habit tracker, or unlock everything for {TRIAL_DAYS} days and see what a real system feels like.
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button size="lg" className="glow-primary rounded-xl px-7 py-6 text-sm font-semibold" onClick={() => navigate("/auth")}>
-              Start your free trial <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline" className="rounded-xl px-7 py-6 text-sm font-semibold" onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}>
-              Buy a plan
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-border/60 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 text-xs text-muted-foreground md:flex-row">
-          <div className="flex items-center gap-2">
-            <Lock className="h-3.5 w-3.5" />
-            <span>Read-only broker access. Your data stays yours.</span>
-          </div>
-          <div className="flex items-center gap-6">
-            <Link to="/auth" className="transition-colors hover:text-foreground">Sign in</Link>
-            <a href="#pricing" className="transition-colors hover:text-foreground">Pricing</a>
-            <span>© {new Date().getFullYear()} LvLUp</span>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-};
-
-export default Landing;
+import { trackEvent } from "@/lib/analytics";
+import { BROKER_STATUS, BROKER_SECURITY_NOTE } from "@/lib/brokers";
+import { PST_CHECKOUT_URL, isPlaceholderLink } from "@/lib/checkoutLinks";
+const demoScenes = ["journal", "analytics", "review", "process"] as const;
+export default function Landing() {
+  const { user } = useAuth(); const navigate = useNavigate();
+  const [demo, setDemo] = useState(false); const [seconds, setSeconds] = useState(0);
+  useEffect(() => { trackEvent("landing_view"); }, []);
+  useEffect(() => { if (!demo) return; setSeconds(0); const timer = window.setInterval(() => setSeconds(value => Math.min(45, value + 1)), 1000); return () => clearInterval(timer); }, [demo]);
+  if (user) return <Navigate to="/trading" replace />;
+  const start = () => { trackEvent("start_free_clicked"); navigate("/auth?signup=1"); };
+  return <div className="min-h-screen bg-background text-foreground">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur"><div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:px-6"><Link to="/welcome" className="flex items-center gap-2 text-sm font-semibold"><TrendingUp className="h-5 w-5 text-primary" />LVL UP</Link><nav className="hidden gap-7 text-xs text-muted-foreground md:flex"><a href="#product">Product</a><a href="#education">PST Education</a><a href="#pricing">Pricing</a></nav><div className="flex gap-1"><Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>Sign in</Button><Button size="sm" onClick={start}>Start Free<ArrowRight /></Button></div></div></header>
+    <main>
+      <section className="mx-auto max-w-6xl px-4 pb-12 pt-12 text-center sm:px-6 md:pt-16"><p className="section-label">The Trader Performance OS</p><h1 className="mt-5 text-6xl font-semibold sm:text-7xl">LVL UP<span className="text-primary">.</span></h1><h2 className="mx-auto mt-4 max-w-2xl text-3xl leading-tight md:text-4xl">The operating system for disciplined traders.</h2><p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-muted-foreground sm:text-base">Plan your trades. Sync your execution. Journal your decisions. Measure your edge. Improve your process.</p><div className="mt-7 flex flex-wrap justify-center gap-3"><Button size="lg" onClick={start}>Start Free<ArrowRight /></Button><Button size="lg" variant="outline" onClick={() => setDemo(true)}><Play />Watch 45-sec Demo</Button></div><p className="mt-3 text-xs text-muted-foreground">No card required · Your process, not a promise of profit.</p><div className="mx-auto mt-10 max-w-5xl"><ProductPreview /></div></section>
+      <section className="premium-band border-b border-border"><div className="mx-auto flex max-w-6xl flex-wrap justify-center gap-x-7 gap-y-3 px-5 py-6 text-xs">{BROKER_STATUS.map(b => <span key={b.name}>{b.name}<span className={`ml-2 text-[10px] ${b.status === "Available" ? "text-primary" : "text-muted-foreground"}`}>{b.status}</span></span>)}{["AI-assisted review", "Trading Journal", "Performance Analytics"].map(text => <span key={text} className="text-muted-foreground">{text}</span>)}</div></section>
+      <section className="mx-auto grid max-w-6xl gap-8 px-5 py-20 md:grid-cols-2"><div><p className="section-label">The missing piece</p><h2 className="mt-4 text-3xl leading-tight">You don't need another setup.<br />You need a process.</h2></div><div className="space-y-4 text-sm leading-7 text-muted-foreground"><p>Scattered screenshots. Forgotten decisions. A winning trade that broke your rules. A losing trade that followed them.</p><p>Bring execution and intention into the same workspace. Understand what you actually do, then improve what you can control.</p></div></section>
+      <section id="product" className="premium-band"><div className="mx-auto max-w-6xl px-5 py-16"><p className="section-label">One continuous loop</p><div className="mt-7 grid gap-7 sm:grid-cols-2 lg:grid-cols-4">{[["Connect", "Bring execution into view. MT5 is available; other connections are clearly marked beta."], ["Journal", "Capture the setup, risk and decision behind every trade."], ["Analyse", "Compare outcomes across strategies, sessions and execution."], ["Improve", "Turn your review into rules, goals and repeatable habits."]].map(([title, body], i) => <div key={title}><p className="font-mono text-xs text-primary">0{i + 1} <ChevronRight className="ml-2 inline h-3 w-3" /></p><h3 className="mt-3 text-xl">{title}</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">{body}</p></div>)}</div></div></section>
+      {([{ view: "journal", label: "Execution, with context", title: "Your trading journal. The whole picture.", body: "Entry, stop, target, notes and screenshots together. Revisit trades from your P&L calendar and see the story behind the numbers." }, { view: "analytics", label: "Measure your edge", title: "Evidence over intuition.", body: "Win rate, expectancy, drawdown and strategy performance computed from your own journal. Look for patterns, not guarantees." }, { view: "review", label: "A second set of eyes", title: "AI-assisted trade review.", body: "Analyse structure, execution and performance with a second set of eyes. Educational feedback to question your process, not signals telling you what to buy." }, { view: "process", label: "Discipline is a practice", title: "A better process starts today.", body: "Tie your trader habits, goals and reflections to the decisions you make in the market. Repeat the right actions and review them honestly." }] as const).map((feature, i) => <section key={feature.view} className="premium-band"><div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 lg:grid-cols-2"><div className={i % 2 ? "lg:order-2" : ""}><p className="section-label">{feature.label}</p><h2 className="mt-4 text-3xl leading-tight">{feature.title}</h2><p className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">{feature.body}</p></div><ProductPreview view={feature.view} /></div></section>)}
+      <section className="premium-band"><div className="mx-auto max-w-6xl px-5 py-16"><p className="section-label">Broker syncing</p><h2 className="mt-4 text-3xl">Execution meets reflection.</h2><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{BROKER_STATUS.map(b => <div key={b.name} className="rounded-lg border border-border bg-card p-5"><h3 className="text-lg">{b.name}</h3><p className={`mt-3 text-xs ${b.status === "Available" ? "text-primary" : "text-muted-foreground"}`}>{b.status}</p></div>)}</div><p className="mt-6 max-w-3xl text-xs leading-6 text-muted-foreground">{BROKER_SECURITY_NOTE}</p></div></section>
+      <section id="education" className="premium-band bg-card"><div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 md:grid-cols-2"><div><p className="section-label">Separate education program</p><h2 className="mt-4 text-3xl">Precision Structure Trading</h2><p className="mt-5 text-sm leading-7 text-muted-foreground">A 10-module education program with exercises, checklists and chart examples. Develop a structured approach to studying the market.</p><p className="mt-4 text-xs leading-6 text-muted-foreground">PST is not a SaaS tier. Purchasing education does not unlock a LVL UP subscription. Curriculum and course delivery will be confirmed before checkout opens.</p></div><div className="flex flex-col justify-center border-l border-border pl-6"><BookOpen className="h-7 w-7 text-primary" /><p className="mt-5 font-mono text-4xl">$99 <span className="text-sm text-muted-foreground">one-time</span></p><p className="mt-4 text-sm text-muted-foreground">10 modules · Exercises · Checklists · Chart examples</p><Button className="mt-6 self-start" disabled={isPlaceholderLink(PST_CHECKOUT_URL)} onClick={() => { trackEvent("checkout_clicked"); window.open(PST_CHECKOUT_URL, "_blank", "noopener,noreferrer"); }}>PST checkout coming soon<ArrowRight /></Button></div></div></section>
+      <section id="pricing" className="premium-band"><div className="mx-auto max-w-6xl px-5 py-16"><div className="mb-9 text-center"><p className="section-label">Invest in your process</p><h2 className="mt-4 text-3xl">Start free. Go deeper when you're ready.</h2><p className="mt-4 text-sm text-muted-foreground">A trading workspace at every level. Existing buyers keep their legacy access.</p></div><PricingPlans /><div className="mt-6 text-center"><Button variant="link" onClick={() => navigate("/auth")}>Already purchased? Sign in to redeem your license.</Button></div></div></section>
+      <section className="premium-band"><div className="mx-auto grid max-w-6xl gap-8 px-5 py-16 md:grid-cols-3"><div><ShieldCheck className="h-6 w-6 text-primary" /><h3 className="mt-4 text-lg">Your journal stays yours.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Account-scoped data access. Private trade screenshots use expiring signed links.</p></div><div><Lock className="h-6 w-6 text-primary" /><h3 className="mt-4 text-lg">Built for review, not execution.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">LVL UP does not submit orders. Use read-only credentials where your broker supports them.</p></div><div><BookOpen className="h-6 w-6 text-primary" /><h3 className="mt-4 text-lg">No profit promises.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Analytics and AI are educational tools, not financial advice. Trading involves risk of loss.</p></div></div></section>
+      <section id="faq" className="premium-band"><div className="mx-auto max-w-3xl px-5 py-16"><p className="section-label">Questions, answered</p><h2 className="mt-4 text-3xl">Before you get started.</h2><div className="mt-8">{[["What can I use for free?", "Habits, goals, up to 10 manual trades, trade notes, the P&L calendar and basic analytics. Existing trials continue until their original end date."], ["Which brokers are supported?", "MT5 is available. TradeLocker and Match-Trader are beta and require statement checks. cTrader is coming soon and cannot be connected yet."], ["Does AI give trading signals?", "No. AI-assisted review offers educational observations about structure, execution and risk. Verify its output and make your own decisions."], ["What happens to my existing plan?", "Legacy memberships and purchased licenses retain their existing entitlements. They are identified as Legacy in your account; historical data is preserved."], ["How do payments work?", "Whop is the primary checkout, with Gumroad as an alternative. Checkout remains unavailable until real product links and purchase verification are configured."], ["Is PST included in my subscription?", "No. Precision Structure Trading is a separate $99 education program, not lifetime SaaS access." ]].map(([q, a]) => <details key={q} className="border-b border-border py-5"><summary className="cursor-pointer text-sm font-medium">{q}</summary><p className="mt-3 text-sm leading-7 text-muted-foreground">{a}</p></details>)}</div></div></section>
+      <section className="premium-band"><div className="mx-auto max-w-6xl px-5 py-20 text-center"><p className="section-label">The next trade deserves a process</p><h2 className="mt-4 text-3xl md:text-4xl">Trade with intention. Review with clarity.</h2><Button size="lg" className="mt-7" onClick={start}>Start Free<ArrowRight /></Button></div></section>
+    </main><footer className="border-t border-border"><div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-4 px-5 py-7 text-xs text-muted-foreground"><span>© {new Date().getFullYear()} LVL UP — The Trader Performance OS</span><span>Educational tools. Not financial advice.</span></div></footer>
+    <Dialog open={demo} onOpenChange={setDemo}><DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-4xl overflow-y-auto"><DialogTitle>LVL UP · 45-second product walkthrough</DialogTitle><DialogDescription>Illustrative workspace · no customer results or live account data.</DialogDescription><ProductPreview view={demoScenes[Math.min(3, Math.floor(seconds / 12))]} /><div className="flex items-center justify-between text-xs text-muted-foreground"><span>{["Journal your execution", "Measure performance", "Review the decision", "Improve your process"][Math.min(3, Math.floor(seconds / 12))]}</span><span className="font-mono">{seconds}s / 45s</span></div><progress className="h-1 w-full accent-primary" value={seconds} max={45} />{seconds === 45 && <Button onClick={() => setSeconds(0)}><Play />Replay demo</Button>}</DialogContent></Dialog>
+  </div>;
+}

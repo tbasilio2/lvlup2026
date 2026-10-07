@@ -142,6 +142,24 @@ export type Database = {
         }
         Relationships: []
       }
+      conversion_events: {
+        Row: {
+          created_at: string
+          event_name: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
       goals: {
         Row: {
           completed: boolean
@@ -341,6 +359,8 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          onboarding_completed_at: string | null
+          trading_preferences: Json
           updated_at: string
         }
         Insert: {
@@ -348,6 +368,8 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          onboarding_completed_at?: string | null
+          trading_preferences?: Json
           updated_at?: string
         }
         Update: {
@@ -355,6 +377,8 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          onboarding_completed_at?: string | null
+          trading_preferences?: Json
           updated_at?: string
         }
         Relationships: []
@@ -364,6 +388,7 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           license_key: string | null
+          plan_version: string
           provider: string | null
           provider_customer_id: string | null
           provider_email: string | null
@@ -378,6 +403,7 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           license_key?: string | null
+          plan_version?: string
           provider?: string | null
           provider_customer_id?: string | null
           provider_email?: string | null
@@ -392,6 +418,7 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           license_key?: string | null
+          plan_version?: string
           provider?: string | null
           provider_customer_id?: string | null
           provider_email?: string | null
@@ -529,7 +556,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      trader_has_feature: {
+        Args: { _feature: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

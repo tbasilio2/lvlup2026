@@ -8,19 +8,19 @@ const TradeHeroStats = ({ trades }: { trades: Trade[] }) => {
     const closed = trades
       .filter((t) => t.pnl != null)
       .sort((a, b) => new Date(a.exit_date ?? a.entry_date).getTime() - new Date(b.exit_date ?? b.entry_date).getTime());
-    const wins = closed.filter((t) => t.pnl! > 0);
-    const losses = closed.filter((t) => t.pnl! < 0);
-    const totalPnl = closed.reduce((s, t) => s + t.pnl!, 0);
+    const wins = closed.filter((t) => (t.pnl ?? 0) > 0);
+    const losses = closed.filter((t) => (t.pnl ?? 0) < 0);
+    const totalPnl = closed.reduce((s, t) => s + (t.pnl ?? 0), 0);
     const winRate = closed.length ? (wins.length / closed.length) * 100 : 0;
-    const avgWin = wins.length ? wins.reduce((s, t) => s + t.pnl!, 0) / wins.length : 0;
-    const avgLoss = losses.length ? Math.abs(losses.reduce((s, t) => s + t.pnl!, 0) / losses.length) : 0;
+    const avgWin = wins.length ? wins.reduce((s, t) => s + (t.pnl ?? 0), 0) / wins.length : 0;
+    const avgLoss = losses.length ? Math.abs(losses.reduce((s, t) => s + (t.pnl ?? 0), 0) / losses.length) : 0;
     const rr = avgLoss > 0 ? avgWin / avgLoss : 0;
 
     // current streak (from end)
     let streak = 0;
     let streakWin: boolean | null = null;
     for (let i = closed.length - 1; i >= 0; i--) {
-      const w = closed[i].pnl! > 0;
+      const w = (closed[i].pnl ?? 0) > 0;
       if (streakWin === null) {
         streakWin = w;
         streak = 1;
@@ -66,7 +66,7 @@ const TradeHeroStats = ({ trades }: { trades: Trade[] }) => {
       {cards.map(({ label, value, sub, icon: Icon, tone }) => (
         <div
           key={label}
-          className="relative rounded-2xl border border-border bg-card p-4 overflow-hidden group hover:border-primary/30 transition-colors"
+          className="relative rounded-lg border border-border bg-card p-4 overflow-hidden group hover:border-primary/30 transition-colors"
         >
           <div className="flex items-center justify-between mb-3">
             <p className="text-[10px] text-muted-foreground uppercase tracking-[0.14em] font-mono">{label}</p>
@@ -78,15 +78,13 @@ const TradeHeroStats = ({ trades }: { trades: Trade[] }) => {
               <Icon className="h-3.5 w-3.5" />
             </div>
           </div>
-          <p className={`text-2xl lg:text-3xl font-bold font-mono tracking-tight ${
+          <p className={`text-lg sm:text-2xl font-bold font-mono tracking-tight ${
             tone === "profit" ? "text-profit" : tone === "loss" ? "text-loss" : "text-foreground"
           }`}>
             {value}
           </p>
           <p className="text-[11px] text-muted-foreground font-mono mt-1">{sub}</p>
-          <div className={`absolute -bottom-8 -right-8 h-24 w-24 rounded-full blur-3xl opacity-20 ${
-            tone === "profit" ? "bg-profit" : tone === "loss" ? "bg-loss" : "bg-primary"
-          }`} />
+
         </div>
       ))}
     </div>

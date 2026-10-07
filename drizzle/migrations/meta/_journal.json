@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791393889648,
+      "tag": "0000_trader_launch_onboarding_access_events",
+      "breakpoints": true
+    }
+  ]
+}

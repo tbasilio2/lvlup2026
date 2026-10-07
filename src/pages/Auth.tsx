@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/analytics";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 const Auth = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(new URLSearchParams(window.location.search).get("signup") === "1");
   const [isForgot, setIsForgot] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,6 +41,7 @@ const Auth = () => {
       } else if (isSignUp) {
         const { error } = await supabase.auth.signUp({ email, password, options: { data: { display_name: displayName }, emailRedirectTo: window.location.origin } });
         if (error) throw error;
+        trackEvent("signup_completed");
         toast.success("Check your email to confirm your account");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -62,9 +64,9 @@ const Auth = () => {
           <div className="inline-flex items-center justify-center h-12 w-12 mb-4 rounded-2xl bg-primary/10 border border-primary/20">
             <Sparkles className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight mb-1">LvLUp</h1>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight mb-1">LVL UP</h1>
           <p className="text-sm text-muted-foreground">
-            {isForgot ? "Reset your password" : isSignUp ? "Build your personal system" : "Your life. Your system. Your next level."}
+            {isForgot ? "Reset your password" : isSignUp ? "Build your trading process" : "The Trader Performance OS"}
           </p>
         </div>
 

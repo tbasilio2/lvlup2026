@@ -2,21 +2,16 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
-export type Tier = "free" | "entry" | "journal" | "pro" | "lifetime";
+import { hasFeature, isTier, type Tier } from "@/lib/plans";
+export type { Tier } from "@/lib/plans";
 
 export const TIERS: Record<Tier, { name: string; price: number | null; tagline: string; oneTime?: boolean }> = {
-  free: { name: "Free", price: null, tagline: "Habit tracker only" },
+  free: { name: "Free", price: 0, tagline: "Your trader performance foundation" },
   entry: { name: "Entry", price: 17, tagline: "Habit tracker + Goals" },
   journal: { name: "Journal", price: 25, tagline: "Habit tracker + Journal" },
-  pro: { name: "Pro", price: 44, tagline: "Everything included" },
+  pro: { name: "Pro", price: 29, tagline: "Full journal, MT5 and performance review" },
+  elite: { name: "Elite", price: 49, tagline: "Multi-broker and advanced review" },
   lifetime: { name: "Lifetime", price: 99, tagline: "Everything, forever — one payment", oneTime: true },
-};
-
-/** Tiers that unlock each paid feature. Lifetime unlocks everything. */
-const FEATURE_ACCESS: Record<string, Tier[]> = {
-  goals: ["entry", "pro", "lifetime"],
-  journal: ["journal", "pro", "lifetime"],
-  trading: ["pro", "lifetime"],
 };
 
 export const TRIAL_DAYS = 10;
@@ -34,13 +29,11 @@ export interface SubscriptionState {
   trialDaysLeft: number;
   /** Which store the membership came from, when paid. */
   provider: string | null;
+  isLegacy: boolean;
   canAccess: (feature: string) => boolean;
   refresh: () => void;
   loading: boolean;
 }
-
-const isValidTier = (t: string | undefined): t is Tier =>
-  t === "entry" || t === "journal" || t === "pro" || t === "lifetime";
 
 const EMPTY: Omit<SubscriptionState, "canAccess" | "refresh"> = {
   tier: "free",
@@ -51,6 +44,7 @@ const EMPTY: Omit<SubscriptionState, "canAccess" | "refresh"> = {
   trialEndsAt: null,
   trialDaysLeft: 0,
   provider: null,
+  isLegacy: false,
   loading: false,
 };
 
@@ -77,12 +71,12 @@ export const useSubscription = (): SubscriptionState => {
     }
     supabase
       .from("subscriptions")
-      .select("tier, status, current_period_end, trial_ends_at, provider")
+      .select("tier, status, current_period_end, trial_ends_at, provider, plan_version")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled) return;
-        const tier: Tier = isValidTier(data?.tier) ? data.tier : "free";
+        const tier: Tier = isTier(data?.tier) ? data.tier : "free";
         const status = data?.status ?? "inactive";
         const end = data?.current_period_end ?? null;
         const row = data as { trial_ends_at?: string | null; provider?: string | null } | null;
@@ -99,6 +93,7 @@ export const useSubscription = (): SubscriptionState => {
           trialEndsAt,
           trialDaysLeft,
           provider: row?.provider ?? null,
+          isLegacy: data?.plan_version !== "current",
           loading: false,
         });
       });
@@ -109,10 +104,7 @@ export const useSubscription = (): SubscriptionState => {
 
   const canAccess = (feature: string): boolean => {
     if (state.loading) return false;
-    if (state.isTrialing) return true;
-    if (state.tier === "free" || !state.isActivePaid) return false;
-    const allowed = FEATURE_ACCESS[feature];
-    return allowed ? allowed.includes(state.tier) : false;
+    return hasFeature(state.tier, state.isActivePaid, state.isTrialing, state.isLegacy, feature);
   };
 
   return { ...state, canAccess, refresh: () => setNonce((n) => n + 1) };

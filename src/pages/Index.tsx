@@ -6,6 +6,7 @@ import ProgressRing from "@/components/ProgressRing";
 import HabitItem from "@/components/HabitItem";
 import Heatmap from "@/components/Heatmap";
 import AddHabitDialog from "@/components/AddHabitDialog";
+import StreakWidget from "@/components/StreakWidget";
 import StatsCharts from "@/components/StatsCharts";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";

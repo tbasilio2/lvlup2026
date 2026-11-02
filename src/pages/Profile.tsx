@@ -12,6 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useStrategies, setStrategies } from "@/lib/strategies";
 import { useSubscription, TIERS } from "@/hooks/useSubscription";
 import RedeemLicenseDialog from "@/components/RedeemLicenseDialog";
+import useGamification from "@/hooks/useGamification";
+import XPBar from "@/components/gamification/XPBar";
+import BadgeGrid from "@/components/gamification/BadgeGrid";
 
 
 const Profile = () => {

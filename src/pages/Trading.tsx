@@ -31,6 +31,8 @@ import StrategyPerformance from "@/components/trading/analytics/StrategyPerforma
 import TimeOfDayChart from "@/components/trading/analytics/TimeOfDayChart";
 import LongShortCompare from "@/components/trading/analytics/LongShortCompare";
 import { useTradeAnalytics } from "@/hooks/useTradeAnalytics";
+import useGamification from "@/hooks/useGamification";
+import LevelSummary from "@/components/gamification/LevelSummary";
 import { TrendingUp, Server } from "lucide-react";
 
 const Trading = () => {
